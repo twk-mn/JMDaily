@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for?(:title) ? "#{yield(:title)} — Joetsu-Myoko Daily" : "Joetsu-Myoko Daily — Local News in English" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "English-language local news for Joetsu, Myoko, and the surrounding region in Niigata, Japan." %>">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <% if content_for?(:canonical_url) %>
+      <link rel="canonical" href="<%= yield(:canonical_url) %>">
+    <% end %>
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="Joetsu-Myoko Daily">
+    <meta property="og:title" content="<%= content_for?(:title) ? yield(:title) : "Joetsu-Myoko Daily" %>">
+    <meta property="og:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "English-language local news for Joetsu, Myoko, and the surrounding region." %>">
+    <meta property="og:type" content="<%= content_for?(:og_type) ? yield(:og_type) : "website" %>">
+    <% if content_for?(:og_image) %>
+      <meta property="og:image" content="<%= yield(:og_image) %>">
+    <% end %>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : "Joetsu-Myoko Daily" %>">
+    <meta name="twitter:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "English-language local news for Joetsu, Myoko, and the surrounding region." %>">
+
+    <%= yield(:head) if content_for?(:head) %>
+
+    <link rel="alternate" type="application/rss+xml" title="Joetsu-Myoko Daily RSS" href="<%= feed_url(format: :rss) %>">
+  </head>
+
+  <body class="bg-white text-gray-900 antialiased">
+    <%= render "shared/header" %>
+
+    <main class="min-h-screen">
+      <%= yield %>
+    </main>
+
+    <%= render "shared/footer" %>
+  </body>
+</html>

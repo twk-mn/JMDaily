@@ -1,0 +1,74 @@
+<header class="border-b border-gray-200">
+  <!-- Masthead -->
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 text-center">
+    <%= link_to root_path, class: "inline-block" do %>
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900" style="font-family: Georgia, 'Times New Roman', serif;">
+        Joetsu-Myoko Daily
+      </h1>
+      <p class="text-sm text-gray-500 mt-1">Local news in English — Joetsu · Myoko · Niigata</p>
+    <% end %>
+  </div>
+
+  <!-- Header banner ad -->
+  <% header_ad = ad_for("header_banner") %>
+  <% if header_ad %>
+    <div class="border-t border-gray-100 bg-gray-50">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex justify-center">
+        <%= header_ad %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Navigation -->
+  <nav class="border-t border-gray-100 bg-white" data-controller="mobile-menu">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-12">
+        <div class="hidden md:flex items-center space-x-1">
+          <%= link_to "News", news_path, class: "px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Politics", politics_path, class: "px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Business", business_path, class: "px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Community", community_path, class: "px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Weather & Travel", weather_travel_path, class: "px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Events", events_path, class: "px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md" %>
+          <span class="text-gray-300 px-1">|</span>
+          <%= link_to "Joetsu", location_path("joetsu"), class: "px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Myoko", location_path("myoko"), class: "px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Itoigawa", location_path("itoigawa"), class: "px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md" %>
+        </div>
+
+        <div class="hidden md:flex items-center">
+          <%= form_with url: search_path, method: :get, class: "flex items-center" do %>
+            <input type="search" name="q" placeholder="Search..." value="<%= params[:q] %>"
+                   class="block w-40 rounded-md border-0 py-1 px-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600">
+          <% end %>
+        </div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden flex items-center w-full justify-between">
+          <button type="button" data-action="click->mobile-menu#toggle" class="text-gray-700 hover:text-gray-900 px-2 py-1 text-sm font-medium">
+            ☰ Menu
+          </button>
+          <%= form_with url: search_path, method: :get, class: "flex items-center" do %>
+            <input type="search" name="q" placeholder="Search..." value="<%= params[:q] %>"
+                   class="block w-32 rounded-md border-0 py-1 px-2 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600">
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Mobile menu -->
+      <div class="md:hidden hidden pb-4 space-y-1" data-mobile-menu-target="menu">
+        <%= link_to "News", news_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md" %>
+        <%= link_to "Politics", politics_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md" %>
+        <%= link_to "Business", business_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md" %>
+        <%= link_to "Community", community_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md" %>
+        <%= link_to "Weather & Travel", weather_travel_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md" %>
+        <%= link_to "Events", events_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md" %>
+        <div class="border-t border-gray-100 pt-2 mt-2">
+          <%= link_to "Joetsu", location_path("joetsu"), class: "block px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Myoko", location_path("myoko"), class: "block px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md" %>
+          <%= link_to "Itoigawa", location_path("itoigawa"), class: "block px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md" %>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
