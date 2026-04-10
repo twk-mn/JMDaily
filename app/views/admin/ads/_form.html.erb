@@ -1,0 +1,149 @@
+<% content_for :title, ad.persisted? ? "Edit Ad" : "New Ad" %>
+
+<h1 class="text-2xl font-bold text-gray-900 mb-6"><%= ad.persisted? ? "Edit Ad" : "New Ad" %></h1>
+
+<div class="bg-white shadow rounded-lg p-6 max-w-2xl">
+  <%= form_with model: [:admin, ad], class: "space-y-6" do |f| %>
+    <% if ad.errors.any? %>
+      <div class="rounded-md bg-red-50 p-4">
+        <ul class="list-disc pl-5 text-sm text-red-700">
+          <% ad.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Core fields -->
+    <div class="grid grid-cols-1 gap-4">
+      <div>
+        <%= f.label :name, "Internal name", class: "block text-sm font-medium text-gray-700" %>
+        <p class="text-xs text-gray-400 mb-1">Used only in the admin. Not shown publicly.</p>
+        <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :ad_type, "Ad type", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :ad_type,
+              [["Direct (image + link)", "direct"], ["Google AdSense / script", "adsense"], ["Custom HTML", "custom_html"]],
+              {},
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+        <div>
+          <%= f.label :placement_zone, "Placement zone", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :placement_zone,
+              Ad::PLACEMENT_ZONES.map { |z| [Ad::ZONE_LABELS[z], z] },
+              { include_blank: "— select a zone —" },
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :status, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :status,
+              [["Active", "active"], ["Paused", "paused"], ["Archived", "archived"]],
+              {},
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+        <div>
+          <%= f.label :priority, class: "block text-sm font-medium text-gray-700" %>
+          <p class="text-xs text-gray-400 mb-1">Higher number = shown first when multiple ads match a zone.</p>
+          <%= f.number_field :priority, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direct ad fields -->
+    <div class="border-t border-gray-100 pt-4 space-y-4">
+      <h3 class="text-sm font-semibold text-gray-700">Direct Ad — Image &amp; Link <span class="font-normal text-gray-400">(used when type is "Direct")</span></h3>
+
+      <div>
+        <%= f.label :image, "Banner image", class: "block text-sm font-medium text-gray-700" %>
+        <% if ad.persisted? && ad.image.attached? %>
+          <div class="mt-2 mb-2">
+            <%= image_tag ad.image.variant(resize_to_limit: [400, 200]), class: "max-w-xs rounded border border-gray-200" %>
+          </div>
+        <% end %>
+        <%= f.file_field :image, accept: "image/*", class: "mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" %>
+      </div>
+
+      <div>
+        <%= f.label :link_url, "Destination URL", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :link_url, placeholder: "https://example.com", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border font-mono" %>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :link_target, "Link target", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :link_target,
+              [["New tab (_blank)", "_blank"], ["Same tab (_self)", "_self"]],
+              {},
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+        <div>
+          <%= f.label :sponsor_label, "Sponsor label", class: "block text-sm font-medium text-gray-700" %>
+          <p class="text-xs text-gray-400 mb-1">Optional. Shown below the banner, e.g. "Sponsored by Myoko Tourism".</p>
+          <%= f.text_field :sponsor_label, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script / HTML fields -->
+    <div class="border-t border-gray-100 pt-4 space-y-4">
+      <h3 class="text-sm font-semibold text-gray-700">Script / HTML Code <span class="font-normal text-gray-400">(used when type is "AdSense" or "Custom HTML")</span></h3>
+      <div>
+        <%= f.label :script_code, "Embed code", class: "block text-sm font-medium text-gray-700" %>
+        <p class="text-xs text-gray-400 mb-1">Paste the full AdSense tag or custom HTML here. Rendered as-is.</p>
+        <%= f.text_area :script_code, rows: 8, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border font-mono" %>
+      </div>
+    </div>
+
+    <!-- Scheduling -->
+    <div class="border-t border-gray-100 pt-4 space-y-4">
+      <h3 class="text-sm font-semibold text-gray-700">Flight Dates <span class="font-normal text-gray-400">(optional — leave blank to run indefinitely)</span></h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :starts_at, "Start date", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.datetime_local_field :starts_at, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+        <div>
+          <%= f.label :ends_at, "End date", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.datetime_local_field :ends_at, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional targeting -->
+    <div class="border-t border-gray-100 pt-4 space-y-4">
+      <h3 class="text-sm font-semibold text-gray-700">Targeting <span class="font-normal text-gray-400">(optional — leave blank to show everywhere)</span></h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :target_category_id, "Limit to category", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :target_category_id,
+              Category.order(:name).map { |c| [c.name, c.id] },
+              { include_blank: "All categories" },
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+        <div>
+          <%= f.label :target_location_id, "Limit to location", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :target_location_id,
+              Location.order(:name).map { |l| [l.name, l.id] },
+              { include_blank: "All locations" },
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+      <%= f.submit class: "rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+      <%= link_to "Cancel", admin_ads_path, class: "text-sm text-gray-500 hover:text-gray-700" %>
+      <% if ad.persisted? %>
+        <%= button_to "Delete", admin_ad_path(ad), method: :delete,
+            class: "ml-auto text-sm text-red-600 hover:text-red-800 cursor-pointer",
+            data: { turbo_confirm: "Delete this ad?" } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

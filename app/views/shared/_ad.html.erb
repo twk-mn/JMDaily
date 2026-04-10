@@ -1,0 +1,16 @@
+<div class="ad-unit py-3 text-center" data-zone="<%= ad.placement_zone %>">
+  <% if ad.ad_type == "direct" %>
+    <% if ad.image.attached? %>
+      <%= link_to ad_click_path(ad), target: ad.link_target, rel: "noopener sponsored nofollow" do %>
+        <%= image_tag ad.image.variant(resize_to_limit: [970, 250]),
+            alt: ad.sponsor_label.presence || "Advertisement",
+            class: "inline-block max-w-full h-auto" %>
+      <% end %>
+    <% end %>
+    <% if ad.sponsor_label.present? %>
+      <p class="text-xs text-gray-400 mt-1"><%= ad.sponsor_label %></p>
+    <% end %>
+  <% else %>
+    <%= raw ad.script_code %>
+  <% end %>
+</div>
