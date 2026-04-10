@@ -20,9 +20,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           <% if @lead_story.featured_image.attached? %>
             <div class="aspect-[16/10] overflow-hidden rounded-lg bg-gray-100">
-              <%= image_tag @lead_story.featured_image.variant(resize_to_fill: [800, 500]),
+              <%= image_tag @lead_story.featured_image.variant(:medium),
                   class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300",
-                  alt: @lead_story.featured_image_caption.presence || @lead_story.title %>
+                  alt: @lead_story.featured_image_caption.presence || @lead_story.title,
+                  width: 800, height: 500 %>
             </div>
           <% end %>
           <div>

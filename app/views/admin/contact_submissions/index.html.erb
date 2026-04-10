@@ -1,0 +1,59 @@
+<% content_for :title, "Messages" %>
+
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-3">
+    <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
+    <% if @unread_count > 0 %>
+      <span class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
+        <%= @unread_count %> unread
+      </span>
+    <% end %>
+  </div>
+</div>
+
+<div class="bg-white shadow rounded-lg overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-4"></th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">From</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Preview</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Received</th>
+        <th class="px-6 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200">
+      <% if @submissions.empty? %>
+        <tr>
+          <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-400">No messages yet.</td>
+        </tr>
+      <% end %>
+      <% @submissions.each do |submission| %>
+        <tr class="<%= submission.read? ? 'bg-white' : 'bg-indigo-50' %> hover:bg-gray-50">
+          <td class="px-4 py-4">
+            <% unless submission.read? %>
+              <span class="inline-block w-2 h-2 rounded-full bg-indigo-500" title="Unread"></span>
+            <% end %>
+          </td>
+          <td class="px-6 py-4 text-sm">
+            <div class="font-medium text-gray-900 <%= 'font-semibold' unless submission.read? %>"><%= submission.name %></div>
+            <div class="text-gray-500"><%= submission.email %></div>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700 <%= 'font-semibold' unless submission.read? %>">
+            <%= submission.subject.presence || "—" %>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+            <%= truncate(submission.message, length: 80) %>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+            <%= submission.created_at.strftime("%-d %b %Y, %-I:%M %p") %>
+          </td>
+          <td class="px-6 py-4 text-right text-sm">
+            <%= link_to "Read", admin_contact_submission_path(submission), class: "text-indigo-600 hover:text-indigo-900" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

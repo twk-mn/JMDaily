@@ -1,0 +1,15 @@
+<h2>New tip received</h2>
+
+<% if @tip.name.present? %>
+  <p><strong>Name:</strong> <%= @tip.name %></p>
+<% end %>
+<% if @tip.email.present? %>
+  <p><strong>Email:</strong> <%= @tip.email %></p>
+<% end %>
+
+<p><strong>Tip:</strong></p>
+<blockquote style="border-left: 3px solid #ccc; padding-left: 1em; color: #333;">
+  <%= simple_format @tip.tip_body %>
+</blockquote>
+
+<p><a href="<%= admin_tip_submission_url(@tip) %>">View in admin inbox</a></p>

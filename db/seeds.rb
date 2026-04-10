@@ -1,11 +1,16 @@
-# Admin user
+# Admin user — password must be set via ADMIN_PASSWORD env var in any environment
+# Default is development-only and intentionally obvious so it is never accidentally used in production.
+raise "Set ADMIN_PASSWORD env var in production" if Rails.env.production? && ENV["ADMIN_PASSWORD"].blank?
+
+default_password = ENV.fetch("ADMIN_PASSWORD", "JMDaily2024Dev!")
+
 admin = User.find_or_create_by!(email: "admin@jmdaily.com") do |u|
   u.name = "Admin"
-  u.password = "password123"
-  u.password_confirmation = "password123"
+  u.password = default_password
+  u.password_confirmation = default_password
   u.role = "admin"
 end
-puts "Admin user created: admin@jmdaily.com / password123"
+puts "Admin user ready: admin@jmdaily.com"
 
 # Categories
 categories = {
@@ -72,4 +77,4 @@ pages.each do |title, attrs|
 end
 puts "Static pages created."
 
-puts "\nSeeding complete! Log in at /admin/login with admin@jmdaily.com / password123"
+puts "\nSeeding complete! Log in at /admin/login with admin@jmdaily.com"

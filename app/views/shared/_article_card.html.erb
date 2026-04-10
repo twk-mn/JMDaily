@@ -3,10 +3,11 @@
     <div class="flex-shrink-0 w-32 sm:w-48">
       <%= link_to article_path(article) do %>
         <div class="aspect-[16/10] overflow-hidden rounded-md bg-gray-100">
-          <%= image_tag article.featured_image.variant(resize_to_fill: [384, 240]),
+          <%= image_tag article.featured_image.variant(:thumb),
               class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
               alt: article.featured_image_caption.presence || article.title,
-              loading: "lazy" %>
+              loading: "lazy",
+              width: 400, height: 250 %>
         </div>
       <% end %>
     </div>

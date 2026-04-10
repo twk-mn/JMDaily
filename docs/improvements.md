@@ -36,7 +36,7 @@
 
 ## Immediate Action
 
-### [ ] Rotate default seed credentials
+### [x] Rotate default seed credentials
 
 The seeds file creates `admin@jmdaily.com` / `password123`. If this was ever
 run in a non-development environment, those credentials must be changed immediately.
@@ -172,10 +172,12 @@ effectively the same as "draft."
 
 ### Plan
 
-- [ ] Add `Solid Queue` (or confirm existing job backend) to `Gemfile`
-- [ ] Create `PublishScheduledArticlesJob` — queries `where(status: "scheduled").where("published_at <= ?", Time.current)`, updates each to `published`
-- [ ] Schedule job to run every 5 minutes via `config/recurring.yml` (Rails 8 built-in with Solid Queue)
-- [ ] Regenerate sitemap after bulk publish
+- [x] Add `Solid Queue` to `Gemfile` (PostgreSQL-backed, no Redis needed)
+- [x] Create `PublishScheduledArticlesJob` — queries `where(status: "scheduled").where("published_at <= ?", Time.current)`, bulk-updates to `published`
+- [x] Schedule job to run every 5 minutes via `config/recurring.yml`
+- [x] Solid Queue tables created via migration `20260410000002`
+- [x] Active Job adapter set to `:solid_queue` in production
+- [ ] Regenerate sitemap after bulk publish (deferred to sitemap task #19)
 
 ---
 
@@ -189,10 +191,10 @@ database access.
 
 ### Plan
 
-- [ ] Create `Admin::ContactSubmissionsController` (index, show, destroy)
-- [ ] Create admin views — index list with preview, show page with full message
-- [ ] Add to admin sidebar nav
-- [ ] Add `read` boolean to `contact_submissions` (migration) for tracking read state
+- [x] Create `Admin::ContactSubmissionsController` (index, show, destroy)
+- [x] Create admin views — index list with unread badge + preview, show page with full message + reply link
+- [x] Add to admin nav with live unread count badge
+- [x] Add `read` boolean to `contact_submissions` (migration `20260410000003`), auto-marked on show
 - [ ] Configure email delivery (Postmark or Resend) so new submissions also notify via email
 - [ ] Add mailer: `ContactMailer#new_submission` sends to editor email address stored in env
 
@@ -207,11 +209,12 @@ editors or change passwords.
 
 ### Plan
 
-- [ ] Create `Admin::UsersController` (index, new, create, edit, update, destroy)
-- [ ] Require `admin` role to access (see RBAC section)
-- [ ] New user form: name, email, role (admin/editor), temporary password or invite flow
-- [ ] Edit form: name, email, role — separate password change form
-- [ ] Add to admin sidebar, visible only to admin-role users
+- [x] Create `Admin::UsersController` (index, new, create, edit, update, destroy)
+- [x] New user form: name, email, role select, password + confirmation
+- [x] Edit form: name, email, role — password change section optional (blank = no change)
+- [x] Guards: cannot delete own account, cannot change own role
+- [x] Index shows linked author profile with edit link
+- [ ] Restrict to admin-role users only (part of RBAC task #7)
 
 ---
 
@@ -225,15 +228,12 @@ third-party ad scripts are injected into pages.
 
 ### Plan
 
-- [ ] Define a baseline CSP in the initializer:
-  - `default-src 'self'`
-  - `img-src 'self' data: blob: *.active_storage`
-  - `script-src 'self' 'nonce-...'`
-  - `style-src 'self' 'nonce-...'`
-  - `font-src 'self'`
-- [ ] Update once ad network domains are known (AdSense, etc.)
-- [ ] Test in report-only mode first: `Content-Security-Policy-Report-Only`
-- [ ] Enable enforcement after confirming no breakage
+- [x] CSP enabled in `config/initializers/content_security_policy.rb`
+- [x] `script-src :self` with nonces (importmap compatible via `content_security_policy_nonce_generator`)
+- [x] `style-src :unsafe_inline` for Trix editor + inline styles in views
+- [x] `frame-ancestors :none` (clickjacking protection)
+- [x] AdSense domains documented in comments, ready to uncomment when needed
+- [x] Report-only mode available via commented-out line for safe testing
 
 ---
 
@@ -246,9 +246,9 @@ remains valid indefinitely.
 
 ### Plan
 
-- [ ] In `Admin::BaseController#require_login`, check `session[:last_active_at]`
-- [ ] If more than 4 hours ago, clear session and redirect to login with a notice
-- [ ] Update `session[:last_active_at]` on every admin request via a `before_action`
+- [x] In `Admin::BaseController#require_login`, check `session[:last_active_at]`
+- [x] If more than 4 hours ago, clear session and redirect to login with a notice
+- [x] Update `session[:last_active_at]` on every admin request via a `before_action`
 
 ---
 
@@ -267,15 +267,11 @@ Define two permission tiers:
 **Editor:** create articles, edit own articles, manage own author profile
 **Admin:** everything including delete, manage categories/tags/locations/users/ads
 
-- [ ] Add `require_admin!` method to `Admin::BaseController`
-- [ ] Apply `before_action :require_admin!` to:
-  - Destroy actions across all controllers
-  - `Admin::CategoriesController` (full)
-  - `Admin::LocationsController` (full)
-  - `Admin::TagsController` (full)
-  - `Admin::UsersController` (full)
-  - `Admin::AdsController` (full)
-- [ ] Hide restricted nav items from editor-role users in admin layout
+- [x] `require_admin!` method added to `Admin::BaseController`
+- [x] `before_action :require_admin!` applied to: Categories, Locations, StaticPages, Ads, Users
+- [x] Editors see: Articles, Authors, Tags, Messages
+- [x] Admins see everything
+- [x] Admin nav split into editor/admin sections with `current_user.admin?` guard
 
 ---
 
@@ -288,11 +284,12 @@ in Action Text is not included. This misses most article text.
 
 ### Plan
 
-- [ ] Add `pg_search` gem (PostgreSQL full-text search)
-- [ ] Configure `PgSearch::Multisearch` on `Article` for `title`, `dek`, and Action Text body
-- [ ] Or: use raw `tsvector` column updated via DB trigger (faster, no extra gem)
-- [ ] Update `SearchController#index` to use new search scope
-- [ ] Add weighting: title matches rank higher than body matches
+- [x] Added `search_vector` tsvector column to articles (migration `20260410000004`)
+- [x] PostgreSQL trigger keeps `search_vector` current on title/dek changes
+- [x] Body text from Action Text included in vector via HTML-stripped join
+- [x] Weighting: title (A) > dek (B) > body (C)
+- [x] `Article.search(query)` scope uses `plainto_tsquery` + `ts_rank` ordering
+- [x] `SearchController` updated — no extra gem required
 
 ---
 
@@ -306,12 +303,12 @@ upload images are served everywhere.
 
 ### Plan
 
-- [ ] Define named variants on `Article` (featured image): `:thumb` (400×250), `:medium` (800×500), `:large` (1200×750)
-- [ ] Update article card partials to use `variant(:thumb)` and `variant(:medium)` appropriately
-- [ ] Update article show page to use `variant(:large)`
-- [ ] Define `:thumb` variant on `Author` photo
-- [ ] Add `loading="lazy"` attributes to all non-above-fold images
-- [ ] Confirm Active Storage variant storage backend is configured for production
+- [x] Named variants on `Article#featured_image`: `:thumb` (400×250), `:medium` (800×500), `:large` (1200×800) — all output WebP
+- [x] Named variants on `Author#photo`: `:thumb` (96×96), `:small` (48×48) — WebP
+- [x] All image tags updated to use named variants instead of inline resize options
+- [x] `loading="lazy"` on all non-above-fold images (article cards, related articles)
+- [x] `width`/`height` attributes added to prevent layout shift (CLS)
+- [ ] Confirm Active Storage variant storage backend is configured for production (S3/CDN)
 
 ---
 
@@ -324,11 +321,12 @@ email notifications and any future mailer functionality.
 
 ### Plan
 
-- [ ] Choose provider: **Postmark** (spec recommendation) or **Resend**
-- [ ] Add provider gem to Gemfile
-- [ ] Configure `config/environments/production.rb` with SMTP or API settings via ENV vars
-- [ ] Create `ContactMailer#new_submission` to notify on contact form submissions
-- [ ] Add a `FROM_EMAIL` and `EDITOR_EMAIL` env var to application config docs
+- [x] Production SMTP configured via ENV vars in `config/environments/production.rb` — provider-agnostic (Postmark defaults, works with Resend/SendGrid/etc)
+- [x] Required ENV vars: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `FROM_EMAIL`, `EDITOR_EMAIL`, `APP_HOST`
+- [x] Development: `:test` delivery (inspect `ActionMailer::Base.deliveries`); add `letter_opener_web` gem for browser inbox
+- [x] `ApplicationMailer` from address reads from `FROM_EMAIL` env var
+- [x] `ContactMailer#new_submission` — HTML + text templates, `reply-to` set to submitter's email, direct reply link + admin link
+- [x] `deliver_later` in `PagesController` — delivery is async via Solid Queue
 
 ---
 
@@ -340,11 +338,9 @@ email notifications and any future mailer functionality.
 
 ### Plan
 
-- [ ] Add format validation to `User` model on `password`:
-  - Minimum 12 characters
-  - At least one uppercase, one lowercase, one digit
-- [ ] Or add `strong_password` gem for configurable complexity rules
-- [ ] Ensure validation only applies when password is being set (not on every user update)
+- [x] Password validation on `User`: minimum 12 characters, requires uppercase + lowercase + digit
+- [x] Validation only fires when `password_digest` changes — no impact on other user updates
+- [x] Seed file updated to use `ADMIN_PASSWORD` env var; raises in production if unset; default dev password meets complexity rules
 
 ---
 
@@ -357,10 +353,11 @@ news publication this is important for editorial accountability.
 
 ### Plan
 
-- [ ] Create `AuditLog` model: `user_id`, `action` (string), `resource_type`, `resource_id`, `resource_label`, `metadata` (jsonb), `created_at`
-- [ ] Add `after_action` callback in `Admin::BaseController` to log create/update/destroy actions
-- [ ] Create `/admin/audit_log` index view — admin only, read-only, paginated
-- [ ] Retain for 90 days (add cleanup job)
+- [x] `AuditLog` model with `user_id`, `action`, `resource_type/id/label`, `metadata` (jsonb), `ip_address`
+- [x] `after_action :log_mutation` in `Admin::BaseController` — fires on POST/PATCH/PUT/DELETE with successful/redirect responses
+- [x] Resource resolved by convention (`controller_name.singularize` → instance variable)
+- [x] `/admin/audit_logs` view — admin only, last 200 entries, colour-coded action badges
+- [x] Errors in audit logging are rescued and logged — never break the actual request
 
 ---
 
@@ -373,11 +370,13 @@ form or storage for tips.
 
 ### Plan
 
-- [ ] Create `TipSubmission` model: `name`, `email`, `tip_body`, `read`, `created_at`
-- [ ] Add tip form to the static page (or replace with a dedicated template)
-- [ ] Create `Admin::TipSubmissionsController` (index, show, destroy)
-- [ ] Add rate limiting in Rack::Attack (already in place for contact form — mirror it)
-- [ ] Send email notification on new tip (reuse ContactMailer pattern)
+- [x] Create `TipSubmission` model: `name`, `email`, `tip_body`, `read`, `created_at` (migration `20260410000006`)
+- [x] Add tip form to the submit-a-tip static page — name/email optional, tip_body required
+- [x] `PagesController#submit_tip` action + POST `/submit-a-tip` route
+- [x] `TipMailer#new_tip` — notifies editor on new submission, links to admin inbox
+- [x] Create `Admin::TipSubmissionsController` (index, show, destroy) — amber unread badges
+- [x] Tips nav link added for all users (editor + admin) with live unread count badge
+- [x] Rate limiting in Rack::Attack: 3 tip submissions per IP per minute
 
 ---
 
@@ -390,10 +389,13 @@ for a future newsletter.
 
 ### Plan (minimal — capture only, no send)
 
-- [ ] Create `NewsletterSubscriber` model: `email` (unique), `confirmed_at`, `unsubscribed_at`, `created_at`
-- [ ] Add signup form to homepage sidebar or footer
-- [ ] Confirm email via single-click confirmation mailer
-- [ ] Admin index at `/admin/newsletter_subscribers` — export to CSV
+- [x] Create `NewsletterSubscriber` model: `email` (unique), `confirmed_at`, `unsubscribed_at`, `confirmation_token` (migration `20260410000007`)
+- [x] Add signup form to footer — inline email + subscribe button
+- [x] `NewsletterMailer#confirmation` — single-click email confirmation with secure token
+- [x] `GET /newsletter/confirm?token=…` — confirms and clears token
+- [x] `GET /newsletter/unsubscribe?email=…` — unsubscribes
+- [x] Admin index at `/admin/newsletter_subscribers` — status badges, CSV export (admin-only)
+- [x] Rate limiting: 5 signups per IP per minute
 - [ ] Integration with Mailchimp or Resend audience list (optional, later)
 
 ---
@@ -407,10 +409,30 @@ controls.
 
 ### Plan
 
-- [ ] Add minimal share links to article `show` page: X/Twitter, Facebook, copy-link button
-- [ ] Use plain anchor links (`https://twitter.com/intent/tweet?url=...`) — no third-party
-  JS widget to avoid tracking and CSP complications
-- [ ] Stimulus controller for copy-to-clipboard behavior on the link button
+- [x] Share bar added to article `show` page — X/Twitter, Facebook, copy-link button
+- [x] Plain anchor links (`twitter.com/intent/tweet`, `facebook.com/sharer`) — no third-party JS widgets
+- [x] `clipboard_controller.js` Stimulus controller — copies URL, shows "Copied!" feedback for 2s
+- [x] Rendered via `shared/_share_buttons` partial, positioned between article body and tags
+
+---
+
+## 16. Two-Factor Authentication for Admin
+
+### Background
+
+Admin sessions are protected by password only. TOTP-based 2FA adds a second layer
+that protects against credential theft.
+
+### Plan
+
+- [x] Added `rotp` and `rqrcode` gems
+- [x] Migration `20260410000008`: added `totp_secret` and `totp_enabled_at` to `users`
+- [x] `User` model: `otp_enabled?`, `generate_totp_secret!`, `enable_totp!`, `verify_otp`, `disable_totp!`, `otpauth_uri`
+- [x] Login flow updated: password OK + 2FA enabled → redirect to OTP form, complete login on success
+- [x] `Admin::TwoFactorController` — `show` (setup page with QR), `enable`, `disable`
+- [x] QR code rendered inline as SVG via `rqrcode` — no external requests
+- [x] 2FA nav link in admin header — green when enabled, gray when disabled
+- [x] Works with any TOTP app (Google Authenticator, Authy, 1Password, etc.)
 
 ---
 
@@ -423,9 +445,9 @@ site design.
 
 ### Plan
 
-- [ ] Create `public/404.html` and `public/500.html` with styled, on-brand content
-- [ ] Or: use dynamic error pages via `config.exceptions_app = routes` for full layout support
-- [ ] Ensure 404 page links back to homepage and search
+- [x] Replaced `public/404.html`, `public/422.html`, `public/500.html` with on-brand designs
+- [x] Self-contained inline CSS — Georgia masthead, white background, site colours
+- [x] 404 links to homepage + search; 422 and 500 link to homepage
 
 ---
 
@@ -438,9 +460,10 @@ navigation, ads, and other UI chrome.
 
 ### Plan
 
-- [ ] Add `@media print` styles to `application.css`:
-  - Hide: header, footer, nav, ads, sidebar, share buttons, related articles
-  - Show: article title, byline, body, publication name, URL
+- [x] `app/assets/stylesheets/print.css` added — `@media print` block auto-included via `require_tree`
+- [x] Hides: header, footer, nav, ads, share buttons, related articles sections
+- [x] Shows publication name as page header via `body::before`
+- [x] Prints full URLs after article links in prose body
 
 ---
 
@@ -453,9 +476,9 @@ new articles are published.
 
 ### Plan
 
-- [ ] Add `SitemapRegenerateJob` that calls `SitemapGenerator::Sitemap.create`
-- [ ] Trigger from `Article` model `after_save` when status changes to `published`
-- [ ] Or: run on a nightly schedule via `config/recurring.yml`
+- [x] `RegenerateSitemapJob` wraps `SitemapGenerator::Interpreter.run` with error logging
+- [x] `Article` model triggers `RegenerateSitemapJob.perform_later` via `after_save` when status changes to `published`
+- [x] Nightly fallback schedule at 3am in `config/recurring.yml` (catches bulk publishes from scheduler job)
 
 ---
 

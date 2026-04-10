@@ -1,0 +1,15 @@
+New message via jmdaily.com contact form
+-----------------------------------------
+
+From:     <%= @submission.name %>
+Email:    <%= @submission.email %>
+<% if @submission.subject.present? %>Subject:  <%= @submission.subject %>
+<% end %>Received: <%= @submission.created_at.strftime("%-d %b %Y at %-I:%M %p UTC") %>
+
+Message
+-------
+<%= @submission.message %>
+
+-----------------------------------------
+Reply: <%= @submission.email %>
+View in admin: <%= admin_contact_submission_url(@submission) %>

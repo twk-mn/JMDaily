@@ -1,5 +1,6 @@
 module Admin
   class AdsController < BaseController
+    before_action :require_admin!
     before_action :set_ad, only: [:edit, :update, :destroy]
 
     def index
