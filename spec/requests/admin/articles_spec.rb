@@ -1,0 +1,129 @@
+require 'rails_helper'
+
+RSpec.describe "Admin::Articles", type: :request do
+  let!(:user) { create(:user) }
+  let!(:author) { create(:author) }
+  let!(:category) { create(:category) }
+
+  before { login_as(user) }
+
+  describe "GET /admin/articles" do
+    it "returns success" do
+      get admin_articles_path
+      expect(response).to have_http_status(:success)
+    end
+
+    it "lists articles" do
+      article = create(:article, title: "Test Article", author: author, category: category)
+      get admin_articles_path
+      expect(response.body).to include("Test Article")
+    end
+
+    it "filters by status" do
+      create(:article, :published, title: "Published One", author: author, category: category)
+      create(:article, status: "draft", title: "Draft One", author: author, category: category)
+      get admin_articles_path, params: { status: "draft" }
+      expect(response.body).to include("Draft One")
+      expect(response.body).not_to include("Published One")
+    end
+
+    it "filters by category" do
+      other_cat = create(:category, name: "Other")
+      create(:article, title: "Cat Article", category: category, author: author)
+      create(:article, title: "Other Article", category: other_cat, author: author)
+      get admin_articles_path, params: { category_id: category.id }
+      expect(response.body).to include("Cat Article")
+      expect(response.body).not_to include("Other Article")
+    end
+
+    it "searches by title" do
+      create(:article, title: "Searchable Title", author: author, category: category)
+      create(:article, title: "Other Article", author: author, category: category)
+      get admin_articles_path, params: { q: "Searchable" }
+      expect(response.body).to include("Searchable Title")
+      expect(response.body).not_to include("Other Article")
+    end
+  end
+
+  describe "GET /admin/articles/new" do
+    it "returns success" do
+      get new_admin_article_path
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "POST /admin/articles" do
+    it "creates article with valid params" do
+      expect {
+        post admin_articles_path, params: {
+          article: {
+            title: "New Article", dek: "A dek", status: "draft",
+            author_id: author.id, category_id: category.id
+          }
+        }
+      }.to change(Article, :count).by(1)
+      expect(response).to redirect_to(edit_admin_article_path(Article.last))
+    end
+
+    it "re-renders form with invalid params" do
+      post admin_articles_path, params: {
+        article: { title: "", author_id: author.id, category_id: category.id }
+      }
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+  end
+
+  describe "GET /admin/articles/:id (show)" do
+    it "redirects to edit" do
+      article = create(:article, author: author, category: category)
+      get "/admin/articles/#{article.id}"
+      expect(response).to have_http_status(:redirect)
+      expect(response.location).to include("/admin/articles/")
+      expect(response.location).to include("/edit")
+    end
+  end
+
+  describe "GET /admin/articles/:id/edit" do
+    it "returns success" do
+      article = create(:article, author: author, category: category)
+      get "/admin/articles/#{article.id}/edit"
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "PATCH /admin/articles/:id" do
+    let!(:article) { create(:article, author: author, category: category) }
+
+    it "updates article" do
+      patch "/admin/articles/#{article.id}", params: {
+        article: { title: "Updated Title" }
+      }
+      expect(article.reload.title).to eq("Updated Title")
+    end
+
+    it "re-renders form with invalid params" do
+      patch "/admin/articles/#{article.id}", params: {
+        article: { title: "" }
+      }
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+  end
+
+  describe "DELETE /admin/articles/:id" do
+    it "destroys article" do
+      article = create(:article, author: author, category: category)
+      expect {
+        delete "/admin/articles/#{article.id}"
+      }.to change(Article, :count).by(-1)
+      expect(response).to redirect_to(admin_articles_path)
+    end
+  end
+
+  describe "authentication" do
+    it "redirects to login when not authenticated" do
+      reset!
+      get admin_articles_path
+      expect(response).to redirect_to(admin_login_path)
+    end
+  end
+end

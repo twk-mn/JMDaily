@@ -1,0 +1,157 @@
+<% content_for :title, @article.effective_seo_title %>
+<% content_for :meta_description, @article.effective_meta_description %>
+<% content_for :og_type, "article" %>
+<% if @article.featured_image.attached? %>
+  <% content_for :og_image, url_for(@article.featured_image) %>
+<% end %>
+<% if @article.canonical_url.present? %>
+  <% content_for :canonical_url, @article.canonical_url %>
+<% end %>
+
+<% content_for :head do %>
+  <!-- Article Schema -->
+  <script type="application/ld+json">
+    <%= raw({
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      "headline": @article.title,
+      "description": @article.effective_meta_description,
+      "datePublished": @article.published_at&.iso8601,
+      "dateModified": @article.updated_at.iso8601,
+      "author": {
+        "@type": "Person",
+        "name": @article.author.name,
+        "url": author_url(@article.author, slug: @article.author.slug)
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Joetsu-Myoko Daily"
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": article_url(@article)
+      }
+    }.tap { |h|
+      if @article.featured_image.attached?
+        h[:image] = url_for(@article.featured_image)
+      end
+    }.to_json) %>
+  </script>
+<% end %>
+
+<article class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Article header -->
+  <header class="mb-8">
+    <div class="flex items-center gap-2 mb-3">
+      <%= link_to @article.category.name, "/#{@article.category.slug}",
+          class: "text-sm font-medium text-indigo-600 uppercase tracking-wide hover:text-indigo-800" %>
+      <% if @article.breaking? %>
+        <span class="bg-red-600 text-white text-xs font-bold uppercase px-2 py-0.5 rounded">Breaking</span>
+      <% end %>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight" style="font-family: Georgia, serif;">
+      <%= @article.title %>
+    </h1>
+
+    <% if @article.dek.present? %>
+      <p class="mt-4 text-xl text-gray-600 leading-relaxed"><%= @article.dek %></p>
+    <% end %>
+
+    <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 border-t border-b border-gray-200 py-4">
+      <div class="flex items-center gap-2">
+        <% if @article.author.photo.attached? %>
+          <%= image_tag @article.author.photo.variant(resize_to_fill: [48, 48]),
+              class: "w-8 h-8 rounded-full object-cover", alt: @article.author.name %>
+        <% end %>
+        <span>By <%= link_to @article.author.name, author_path(@article.author, slug: @article.author.slug),
+            class: "font-medium text-gray-900 hover:text-indigo-600" %></span>
+      </div>
+      <time datetime="<%= @article.published_at.iso8601 %>">
+        Published <%= @article.published_at.strftime("%B %-d, %Y at %-I:%M %p") %>
+      </time>
+      <% if @article.updated_at > @article.published_at + 1.hour %>
+        <span class="text-gray-400">·</span>
+        <time datetime="<%= @article.updated_at.iso8601 %>">
+          Updated <%= @article.updated_at.strftime("%B %-d, %Y") %>
+        </time>
+      <% end %>
+    </div>
+  </header>
+
+  <!-- Featured image -->
+  <% if @article.featured_image.attached? %>
+    <figure class="mb-8">
+      <%= image_tag @article.featured_image.variant(resize_to_limit: [1200, 800]),
+          class: "w-full rounded-lg",
+          alt: @article.featured_image_caption.presence || @article.title %>
+      <% if @article.featured_image_caption.present? %>
+        <figcaption class="mt-2 text-sm text-gray-500 text-center"><%= @article.featured_image_caption %></figcaption>
+      <% end %>
+    </figure>
+  <% end %>
+
+  <!-- Inline ad (before body) -->
+  <%= ad_for("article_inline") %>
+
+  <!-- Article body -->
+  <div class="prose prose-lg max-w-none prose-headings:font-bold prose-a:text-indigo-600 prose-img:rounded-lg">
+    <%= @article.body %>
+  </div>
+
+  <!-- Article footer ad -->
+  <%= ad_for("article_footer") %>
+
+  <!-- Tags and locations -->
+  <footer class="mt-10 pt-6 border-t border-gray-200">
+    <% if @article.locations.any? %>
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <span class="text-sm text-gray-500">Location:</span>
+        <% @article.locations.each do |location| %>
+          <%= link_to location.name, location_path(location),
+              class: "inline-block bg-gray-100 text-gray-700 text-sm px-3 py-0.5 rounded-full hover:bg-gray-200" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @article.tags.any? %>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-sm text-gray-500">Tags:</span>
+        <% @article.tags.each do |tag| %>
+          <%= link_to tag.name, tag_path(tag, slug: tag.slug),
+              class: "inline-block bg-gray-100 text-gray-700 text-sm px-3 py-0.5 rounded-full hover:bg-gray-200" %>
+        <% end %>
+      </div>
+    <% end %>
+  </footer>
+</article>
+
+<!-- Related articles -->
+<% if @related_articles.any? %>
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-200">
+    <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider border-b-2 border-gray-900 pb-2 mb-6">Related Stories</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <% @related_articles.each do |article| %>
+        <article>
+          <% if article.featured_image.attached? %>
+            <%= link_to article_path(article) do %>
+              <div class="aspect-[16/10] overflow-hidden rounded-md bg-gray-100 mb-3">
+                <%= image_tag article.featured_image.variant(resize_to_fill: [400, 250]),
+                    class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
+                    alt: article.title, loading: "lazy" %>
+              </div>
+            <% end %>
+          <% end %>
+          <%= link_to article_path(article), class: "group" do %>
+            <h3 class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 leading-snug" style="font-family: Georgia, serif;">
+              <%= article.title %>
+            </h3>
+          <% end %>
+          <time class="text-xs text-gray-500 mt-1 block" datetime="<%= article.published_at.iso8601 %>">
+            <%= article.published_at.strftime("%b %-d, %Y") %>
+          </time>
+        </article>
+      <% end %>
+    </div>
+  </section>
+<% end %>

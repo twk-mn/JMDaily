@@ -1,0 +1,36 @@
+<% content_for :title, params[:q].present? ? "Search: #{params[:q]}" : "Search" %>
+
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+  <h1 class="text-3xl font-bold text-gray-900 mb-6" style="font-family: Georgia, serif;">Search</h1>
+
+  <%= form_with url: search_path, method: :get, class: "mb-8 max-w-lg" do %>
+    <div class="flex gap-2">
+      <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search articles..."
+             class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border focus:border-indigo-500 focus:ring-indigo-500"
+             autofocus>
+      <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Search</button>
+    </div>
+  <% end %>
+
+  <% if params[:q].present? %>
+    <p class="text-sm text-gray-500 mb-6">
+      <% if @articles.any? %>
+        Showing results for "<%= params[:q] %>"
+      <% else %>
+        No results found for "<%= params[:q] %>"
+      <% end %>
+    </p>
+
+    <div class="space-y-8">
+      <% @articles.each do |article| %>
+        <%= render "shared/article_card", article: article %>
+      <% end %>
+    </div>
+
+    <% if @pagy && @pagy.pages > 1 %>
+      <nav class="mt-8 flex justify-center">
+        <%== @pagy.series_nav(self) %>
+      </nav>
+    <% end %>
+  <% end %>
+</div>
