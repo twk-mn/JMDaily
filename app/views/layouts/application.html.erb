@@ -36,6 +36,21 @@
   <body class="bg-white text-gray-900 antialiased">
     <%= render "shared/header" %>
 
+    <% if notice %>
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pt-4">
+        <div class="rounded-md bg-green-50 border border-green-200 p-4">
+          <p class="text-sm text-green-800"><%= notice %></p>
+        </div>
+      </div>
+    <% end %>
+    <% if alert %>
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pt-4">
+        <div class="rounded-md bg-red-50 border border-red-200 p-4">
+          <p class="text-sm text-red-800"><%= alert %></p>
+        </div>
+      </div>
+    <% end %>
+
     <main class="min-h-screen">
       <%= yield %>
     </main>

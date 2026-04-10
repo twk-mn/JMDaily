@@ -3,12 +3,13 @@ module Admin
     before_action :require_admin!
 
     def index
-      @subscribers = NewsletterSubscriber.recent
       @confirmed_count = NewsletterSubscriber.confirmed.count
       @active_count    = NewsletterSubscriber.active.count
 
       respond_to do |format|
-        format.html
+        format.html do
+          @pagy, @subscribers = pagy(:offset, NewsletterSubscriber.recent, limit: 50)
+        end
         format.csv do
           send_data csv_export, filename: "subscribers-#{Date.current}.csv",
                                 type: "text/csv", disposition: "attachment"

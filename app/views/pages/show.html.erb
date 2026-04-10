@@ -50,12 +50,6 @@
     <div class="mt-12 border-t border-gray-200 pt-8">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Send us a message</h2>
 
-      <% if flash[:notice] %>
-        <div class="mb-6 rounded-md bg-green-50 p-4">
-          <p class="text-sm text-green-700"><%= flash[:notice] %></p>
-        </div>
-      <% end %>
-
       <%= form_with model: @contact_submission, url: contact_path, class: "space-y-4 max-w-lg" do |f| %>
         <% if @contact_submission.errors.any? %>
           <div class="rounded-md bg-red-50 p-4">

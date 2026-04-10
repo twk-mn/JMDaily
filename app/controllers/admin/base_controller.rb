@@ -1,5 +1,7 @@
 module Admin
   class BaseController < ApplicationController
+    include Pagy::Method
+
     SESSION_TIMEOUT = 4.hours
 
     before_action :require_login

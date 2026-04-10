@@ -3,11 +3,12 @@ module Admin
     before_action :set_article, only: [:show, :edit, :update, :destroy]
 
     def index
-      @articles = Article.includes(:author, :category).order(updated_at: :desc)
-      @articles = @articles.where(status: params[:status]) if params[:status].present?
-      @articles = @articles.where(category_id: params[:category_id]) if params[:category_id].present?
-      @articles = @articles.where(author_id: params[:author_id]) if params[:author_id].present?
-      @articles = @articles.where("title ILIKE ?", "%#{Article.sanitize_sql_like(params[:q])}%") if params[:q].present?
+      scope = Article.includes(:author, :category).order(updated_at: :desc)
+      scope = scope.where(status: params[:status]) if params[:status].present?
+      scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
+      scope = scope.where(author_id: params[:author_id]) if params[:author_id].present?
+      scope = scope.where("title ILIKE ?", "%#{Article.sanitize_sql_like(params[:q])}%") if params[:q].present?
+      @pagy, @articles = pagy(:offset, scope, limit: 25)
     end
 
     def show

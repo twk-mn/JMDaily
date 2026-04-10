@@ -3,7 +3,7 @@ module Admin
     before_action :set_tip, only: [:show, :destroy]
 
     def index
-      @tips = TipSubmission.recent
+      @pagy, @tips = pagy(:offset, TipSubmission.recent, limit: 25)
       @unread_count = TipSubmission.unread.count
     end
 

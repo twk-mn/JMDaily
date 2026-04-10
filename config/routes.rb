@@ -38,14 +38,14 @@ Rails.application.routes.draw do
   get "search", to: "search#index"
 
   # Static pages
-  get "about", to: "pages#show", defaults: { slug: "about" }
-  get "contact", to: "pages#show", defaults: { slug: "contact" }
-  post "contact", to: "pages#submit_contact"
-  get  "submit-a-tip", to: "pages#show",       defaults: { slug: "submit-a-tip" }
-  post "submit-a-tip", to: "pages#submit_tip", as: :submit_tip
-  get "privacy-policy", to: "pages#show", defaults: { slug: "privacy-policy" }
-  get "terms", to: "pages#show", defaults: { slug: "terms" }
-  get "corrections-policy", to: "pages#show", defaults: { slug: "corrections-policy" }
+  get  "about",            to: "pages#show",          defaults: { slug: "about" },            as: :about
+  get  "contact",          to: "pages#show",          defaults: { slug: "contact" },           as: :contact
+  post "contact",          to: "pages#submit_contact",                                         as: :submit_contact
+  get  "submit-a-tip",     to: "pages#show",          defaults: { slug: "submit-a-tip" },      as: :submit_a_tip
+  post "submit-a-tip",     to: "pages#submit_tip",                                             as: :submit_tip
+  get  "privacy-policy",   to: "pages#show",          defaults: { slug: "privacy-policy" },    as: :privacy_policy
+  get  "terms",            to: "pages#show",          defaults: { slug: "terms" },             as: :terms
+  get  "corrections-policy", to: "pages#show",        defaults: { slug: "corrections-policy" }, as: :corrections_policy
 
   # Content pages
   resources :articles, only: [:show], path: "articles"

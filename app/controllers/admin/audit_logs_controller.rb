@@ -3,7 +3,7 @@ module Admin
     before_action :require_admin!
 
     def index
-      @audit_logs = AuditLog.recent.includes(:user).limit(200)
+      @pagy, @audit_logs = pagy(:offset, AuditLog.recent.includes(:user), limit: 50)
     end
   end
 end

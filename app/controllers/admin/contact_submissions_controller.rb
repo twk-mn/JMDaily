@@ -3,7 +3,7 @@ module Admin
     before_action :set_submission, only: [:show, :destroy]
 
     def index
-      @submissions = ContactSubmission.recent
+      @pagy, @submissions = pagy(:offset, ContactSubmission.recent, limit: 25)
       @unread_count = ContactSubmission.unread.count
     end
 
