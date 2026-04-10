@@ -1,5 +1,6 @@
 module Admin
   class StaticPagesController < BaseController
+    before_action :require_admin!
     before_action :set_page, only: [:edit, :update, :destroy]
 
     def index

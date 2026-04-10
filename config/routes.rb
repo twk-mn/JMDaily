@@ -4,9 +4,15 @@ Rails.application.routes.draw do
 
   # Admin
   namespace :admin do
-    get "login", to: "sessions#new"
-    post "login", to: "sessions#create"
-    delete "logout", to: "sessions#destroy"
+    get    "login",          to: "sessions#new"
+    post   "login",          to: "sessions#create"
+    delete "logout",         to: "sessions#destroy"
+    get    "login/verify",   to: "sessions#verify_otp",   as: :two_factor_verify
+    post   "login/verify",   to: "sessions#confirm_otp",  as: :two_factor_confirm
+
+    get    "two-factor",         to: "two_factor#show",    as: :two_factor
+    post   "two-factor/enable",  to: "two_factor#enable",  as: :two_factor_enable
+    delete "two-factor",         to: "two_factor#disable", as: :two_factor_disable
 
     resources :articles
     resources :categories
@@ -15,6 +21,11 @@ Rails.application.routes.draw do
     resources :authors
     resources :static_pages
     resources :ads
+    resources :contact_submissions, only: [:index, :show, :destroy]
+    resources :tip_submissions, only: [:index, :show, :destroy]
+    resources :newsletter_subscribers, only: [:index, :destroy]
+    resources :users
+    resources :audit_logs, only: [:index]
   end
 
   # Ad click tracking
@@ -30,7 +41,8 @@ Rails.application.routes.draw do
   get "about", to: "pages#show", defaults: { slug: "about" }
   get "contact", to: "pages#show", defaults: { slug: "contact" }
   post "contact", to: "pages#submit_contact"
-  get "submit-a-tip", to: "pages#show", defaults: { slug: "submit-a-tip" }
+  get  "submit-a-tip", to: "pages#show",       defaults: { slug: "submit-a-tip" }
+  post "submit-a-tip", to: "pages#submit_tip", as: :submit_tip
   get "privacy-policy", to: "pages#show", defaults: { slug: "privacy-policy" }
   get "terms", to: "pages#show", defaults: { slug: "terms" }
   get "corrections-policy", to: "pages#show", defaults: { slug: "corrections-policy" }
@@ -51,6 +63,11 @@ Rails.application.routes.draw do
   get "weather-travel", to: "categories#show", defaults: { slug: "weather-travel" }
   get "events", to: "categories#show", defaults: { slug: "events" }
   get "opinion", to: "categories#show", defaults: { slug: "opinion" }
+
+  # Newsletter
+  post "newsletter/subscribe",   to: "newsletter_subscriptions#create",      as: :newsletter_subscribe
+  get  "newsletter/confirm",     to: "newsletter_subscriptions#confirm",      as: :confirm_newsletter
+  get  "newsletter/unsubscribe", to: "newsletter_subscriptions#unsubscribe",  as: :newsletter_unsubscribe
 
   # RSS
   get "feed", to: "feed#index", defaults: { format: :rss }

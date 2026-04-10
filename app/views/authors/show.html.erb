@@ -3,9 +3,10 @@
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
   <header class="mb-8 flex items-start gap-6">
     <% if @author.photo.attached? %>
-      <%= image_tag @author.photo.variant(resize_to_fill: [128, 128]),
+      <%= image_tag @author.photo.variant(:thumb),
           class: "w-24 h-24 rounded-full object-cover flex-shrink-0",
-          alt: @author.name %>
+          alt: @author.name,
+          width: 96, height: 96 %>
     <% end %>
     <div>
       <h1 class="text-3xl font-bold text-gray-900" style="font-family: Georgia, serif;"><%= @author.name %></h1>

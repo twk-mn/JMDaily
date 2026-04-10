@@ -87,3 +87,10 @@ gem "inline_svg"
 
 # Rack attack for rate limiting
 gem "rack-attack"
+
+# Background jobs (PostgreSQL-backed, no Redis required)
+gem "solid_queue"
+
+# Two-factor authentication (TOTP)
+gem "rotp"
+gem "rqrcode"

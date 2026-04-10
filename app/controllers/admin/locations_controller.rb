@@ -1,5 +1,6 @@
 module Admin
   class LocationsController < BaseController
+    before_action :require_admin!
     before_action :set_location, only: [:edit, :update, :destroy]
 
     def index

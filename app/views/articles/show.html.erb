@@ -61,8 +61,10 @@
     <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 border-t border-b border-gray-200 py-4">
       <div class="flex items-center gap-2">
         <% if @article.author.photo.attached? %>
-          <%= image_tag @article.author.photo.variant(resize_to_fill: [48, 48]),
-              class: "w-8 h-8 rounded-full object-cover", alt: @article.author.name %>
+          <%= image_tag @article.author.photo.variant(:small),
+              class: "w-8 h-8 rounded-full object-cover",
+              alt: @article.author.name,
+              width: 48, height: 48 %>
         <% end %>
         <span>By <%= link_to @article.author.name, author_path(@article.author, slug: @article.author.slug),
             class: "font-medium text-gray-900 hover:text-indigo-600" %></span>
@@ -82,9 +84,10 @@
   <!-- Featured image -->
   <% if @article.featured_image.attached? %>
     <figure class="mb-8">
-      <%= image_tag @article.featured_image.variant(resize_to_limit: [1200, 800]),
+      <%= image_tag @article.featured_image.variant(:large),
           class: "w-full rounded-lg",
-          alt: @article.featured_image_caption.presence || @article.title %>
+          alt: @article.featured_image_caption.presence || @article.title,
+          width: 1200, height: 800 %>
       <% if @article.featured_image_caption.present? %>
         <figcaption class="mt-2 text-sm text-gray-500 text-center"><%= @article.featured_image_caption %></figcaption>
       <% end %>
@@ -101,6 +104,9 @@
 
   <!-- Article footer ad -->
   <%= ad_for("article_footer") %>
+
+  <!-- Share buttons -->
+  <%= render "shared/share_buttons", article: @article %>
 
   <!-- Tags and locations -->
   <footer class="mt-10 pt-6 border-t border-gray-200">
@@ -136,9 +142,11 @@
           <% if article.featured_image.attached? %>
             <%= link_to article_path(article) do %>
               <div class="aspect-[16/10] overflow-hidden rounded-md bg-gray-100 mb-3">
-                <%= image_tag article.featured_image.variant(resize_to_fill: [400, 250]),
+                <%= image_tag article.featured_image.variant(:thumb),
                     class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
-                    alt: article.title, loading: "lazy" %>
+                    alt: article.title,
+                    loading: "lazy",
+                    width: 400, height: 250 %>
               </div>
             <% end %>
           <% end %>
