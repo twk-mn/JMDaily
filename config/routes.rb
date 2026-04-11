@@ -14,7 +14,9 @@ Rails.application.routes.draw do
     post   "two-factor/enable",  to: "two_factor#enable",  as: :two_factor_enable
     delete "two-factor",         to: "two_factor#disable", as: :two_factor_disable
 
-    resources :articles
+    resources :articles do
+      member { get :preview }
+    end
     resources :categories
     resources :tags
     resources :locations

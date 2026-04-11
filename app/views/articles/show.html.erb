@@ -39,6 +39,10 @@
   </script>
 <% end %>
 
+<% if !@article.published? && current_user %>
+  <%= render "shared/preview_banner", article: @article %>
+<% end %>
+
 <article class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
   <!-- Article header -->
   <header class="mb-8">
@@ -69,10 +73,12 @@
         <span>By <%= link_to @article.author.name, author_path(@article.author, slug: @article.author.slug),
             class: "font-medium text-gray-900 hover:text-indigo-600" %></span>
       </div>
-      <time datetime="<%= @article.published_at.iso8601 %>">
-        Published <%= @article.published_at.strftime("%B %-d, %Y at %-I:%M %p") %>
-      </time>
-      <% if @article.updated_at > @article.published_at + 1.hour %>
+      <% if @article.published_at %>
+        <time datetime="<%= @article.published_at.iso8601 %>">
+          Published <%= @article.published_at.strftime("%B %-d, %Y at %-I:%M %p") %>
+        </time>
+      <% end %>
+      <% if @article.published_at && @article.updated_at > @article.published_at + 1.hour %>
         <span class="text-gray-400">·</span>
         <time datetime="<%= @article.updated_at.iso8601 %>">
           Updated <%= @article.updated_at.strftime("%B %-d, %Y") %>

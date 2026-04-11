@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_10_000006) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -177,6 +177,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000006) do
     t.index ["slug"], name: "index_locations_on_slug", unique: true
   end
 
+  create_table "newsletter_subscribers", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "unsubscribed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["confirmation_token"], name: "index_newsletter_subscribers_on_confirmation_token", unique: true
+    t.index ["email"], name: "index_newsletter_subscribers_on_email", unique: true
+  end
+
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
     t.bigint "job_id", null: false
     t.string "queue_name", null: false
@@ -333,6 +344,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000006) do
     t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "totp_secret"
+    t.datetime "totp_enabled_at"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 

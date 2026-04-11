@@ -101,6 +101,10 @@
           <%= f.submit article.persisted? ? "Update Article" : "Create Article",
               class: "w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
 
+          <% if article.persisted? %>
+            <%= link_to "Preview →", preview_admin_article_path(article), target: "_blank",
+                class: "block text-center text-sm text-amber-600 hover:text-amber-500" %>
+          <% end %>
           <% if article.persisted? && article.published? %>
             <%= link_to "View on site →", article_path(article), target: "_blank",
                 class: "block text-center text-sm text-indigo-600 hover:text-indigo-500" %>

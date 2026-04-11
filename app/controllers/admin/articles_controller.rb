@@ -15,6 +15,16 @@ module Admin
       redirect_to edit_admin_article_path(@article)
     end
 
+    def preview
+      @article = Article.includes(:author, :category, :tags, :locations).find(params[:id])
+      @related_articles = Article.published
+                                 .where(category: @article.category)
+                                 .where.not(id: @article.id)
+                                 .order(published_at: :desc)
+                                 .limit(4)
+      render "articles/show", layout: "application"
+    end
+
     def new
       @article = Article.new(status: "draft")
     end
