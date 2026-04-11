@@ -27,6 +27,8 @@ class Ad < ApplicationRecord
   validates :placement_zone, inclusion: { in: PLACEMENT_ZONES }
   validates :status, inclusion: { in: STATUSES }
   validates :link_url, presence: true, if: -> { ad_type == "direct" }
+  validates :link_url, format: { with: /\Ahttps?:\/\/.+\z/i, message: "must start with http:// or https://" },
+                       allow_blank: true
   validates :script_code, presence: true, if: -> { ad_type.in?(%w[adsense custom_html]) }
   validate :ends_at_after_starts_at
 
