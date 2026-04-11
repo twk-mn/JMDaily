@@ -26,7 +26,6 @@ module Admin
     private
 
     def csv_export
-      require "csv"
       CSV.generate(headers: true) do |csv|
         csv << %w[email confirmed_at subscribed_at]
         NewsletterSubscriber.active.order(:email).each do |s|

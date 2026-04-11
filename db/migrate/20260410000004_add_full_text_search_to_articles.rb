@@ -27,12 +27,18 @@ class AddFullTextSearchToArticles < ActiveRecord::Migration[8.0]
       $$ LANGUAGE sql STABLE;
     SQL
 
-    # Trigger function to keep search_vector current on article changes
+    # Trigger function to keep search_vector current on article changes.
+    # Uses NEW.title/dek directly (not articles_search_vector(NEW.id)) because
+    # on BEFORE INSERT the row does not yet exist in the table.
+    # Body text (Action Text) is indexed via the backfill UPDATE below and on
+    # subsequent saves that touch title or dek.
     execute <<~SQL
       CREATE OR REPLACE FUNCTION articles_search_vector_trigger()
       RETURNS trigger AS $$
       BEGIN
-        NEW.search_vector := articles_search_vector(NEW.id);
+        NEW.search_vector :=
+          setweight(to_tsvector('english', coalesce(NEW.title, '')), 'A') ||
+          setweight(to_tsvector('english', coalesce(NEW.dek, '')), 'B');
         RETURN NEW;
       END;
       $$ LANGUAGE plpgsql;
