@@ -1,7 +1,7 @@
 module Admin
   class AdsController < BaseController
     before_action :require_admin!
-    before_action :set_ad, only: [:edit, :update, :destroy]
+    before_action :set_ad, only: [ :edit, :update, :destroy ]
 
     def index
       @ads = Ad.order(placement_zone: :asc, priority: :desc, created_at: :desc)

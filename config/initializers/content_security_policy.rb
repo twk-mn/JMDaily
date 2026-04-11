@@ -36,7 +36,7 @@ Rails.application.configure do
 
   # Attach a nonce to every importmap <script> tag so they pass the script-src policy.
   config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
-  config.content_security_policy_nonce_directives = %w(script-src)
+  config.content_security_policy_nonce_directives = %w[script-src]
 
   # To test without breaking anything, switch to report-only mode first:
   # config.content_security_policy_report_only = true

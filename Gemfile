@@ -63,6 +63,9 @@ group :development, :test do
   # Security
   gem "brakeman", require: false
   gem "bundler-audit", require: false
+
+  # Linting
+  gem "rubocop-rails-omakase", require: false
 end
 
 group :development do

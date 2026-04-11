@@ -1,6 +1,6 @@
 module Admin
   class ArticlesController < BaseController
-    before_action :set_article, only: [:show, :edit, :update, :destroy]
+    before_action :set_article, only: [ :show, :edit, :update, :destroy ]
 
     def index
       scope = Article.includes(:author, :category).order(updated_at: :desc)

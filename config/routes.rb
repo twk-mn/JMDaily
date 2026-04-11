@@ -23,11 +23,11 @@ Rails.application.routes.draw do
     resources :authors
     resources :static_pages
     resources :ads
-    resources :contact_submissions, only: [:index, :show, :destroy]
-    resources :tip_submissions, only: [:index, :show, :destroy]
-    resources :newsletter_subscribers, only: [:index, :destroy]
+    resources :contact_submissions, only: [ :index, :show, :destroy ]
+    resources :tip_submissions, only: [ :index, :show, :destroy ]
+    resources :newsletter_subscribers, only: [ :index, :destroy ]
     resources :users
-    resources :audit_logs, only: [:index]
+    resources :audit_logs, only: [ :index ]
   end
 
   # Ad click tracking
@@ -50,9 +50,9 @@ Rails.application.routes.draw do
   get  "corrections-policy", to: "pages#show",        defaults: { slug: "corrections-policy" }, as: :corrections_policy
 
   # Content pages
-  resources :articles, only: [:show], path: "articles"
-  resources :authors, only: [:show], param: :slug
-  resources :tags, only: [:show], param: :slug
+  resources :articles, only: [ :show ], path: "articles"
+  resources :authors, only: [ :show ], param: :slug
+  resources :tags, only: [ :show ], param: :slug
 
   # Location pages
   get "locations/:slug", to: "locations#show", as: :location

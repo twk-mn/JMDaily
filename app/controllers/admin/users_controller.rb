@@ -1,7 +1,7 @@
 module Admin
   class UsersController < BaseController
     before_action :require_admin!
-    before_action :set_user, only: [:edit, :update, :destroy]
+    before_action :set_user, only: [ :edit, :update, :destroy ]
 
     def index
       @users = User.order(:name)
