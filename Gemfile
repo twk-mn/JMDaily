@@ -94,3 +94,6 @@ gem "solid_queue"
 # Two-factor authentication (TOTP)
 gem "rotp"
 gem "rqrcode"
+
+# CSV (removed from Ruby stdlib autoload in 3.x)
+gem "csv"
