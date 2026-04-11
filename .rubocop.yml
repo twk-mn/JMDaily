@@ -1,0 +1,43 @@
+inherit_gem:
+  rubocop-rails-omakase: rubocop.yml
+
+# Project-specific overrides
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+    - 'coverage/**/*'
+
+# Relax line length — ERB and Rails tend to produce longer lines
+Layout/LineLength:
+  Max: 150
+  Exclude:
+    - 'spec/**/*'
+
+# Allow longer blocks in specs (describe/context/it blocks)
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'config/routes.rb'
+
+# Allow longer methods in controllers and specs
+Metrics/MethodLength:
+  Max: 20
+  Exclude:
+    - 'spec/**/*'
+
+# Allow more complexity in specs
+Metrics/AbcSize:
+  Exclude:
+    - 'spec/**/*'
+
+# Migrations often need rubocop disabled for older patterns
+Metrics/ClassLength:
+  Exclude:
+    - 'spec/**/*'

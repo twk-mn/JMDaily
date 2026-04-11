@@ -30,7 +30,7 @@ RSpec.describe Category, type: :model do
     it 'orders by position' do
       cat_b = create(:category, position: 2)
       cat_a = create(:category, position: 1)
-      expect(Category.all.to_a).to eq([cat_a, cat_b])
+      expect(Category.all.to_a).to eq([ cat_a, cat_b ])
     end
   end
 

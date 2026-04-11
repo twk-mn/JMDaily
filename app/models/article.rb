@@ -8,9 +8,9 @@ class Article < ApplicationRecord
   has_many :locations, through: :article_locations
 
   has_one_attached :featured_image do |attachable|
-    attachable.variant :thumb,  resize_to_fill: [400, 250],   format: :webp
-    attachable.variant :medium, resize_to_fill: [800, 500],   format: :webp
-    attachable.variant :large,  resize_to_limit: [1200, 800], format: :webp
+    attachable.variant :thumb,  resize_to_fill: [ 400, 250 ],   format: :webp
+    attachable.variant :medium, resize_to_fill: [ 800, 500 ],   format: :webp
+    attachable.variant :large,  resize_to_limit: [ 1200, 800 ], format: :webp
   end
   has_rich_text :body
 
@@ -35,7 +35,7 @@ class Article < ApplicationRecord
   scope :by_location, ->(location) { joins(:locations).where(locations: { id: location.id }) }
   scope :search, ->(query) {
     return none if query.blank?
-    sanitized = sanitize_sql_array(["plainto_tsquery('english', ?)", query])
+    sanitized = sanitize_sql_array([ "plainto_tsquery('english', ?)", query ])
     published
       .where("search_vector @@ #{sanitized}")
       .order(Arel.sql("ts_rank(search_vector, #{sanitized}) DESC"))

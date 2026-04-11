@@ -1,6 +1,6 @@
 module Admin
   class ContactSubmissionsController < BaseController
-    before_action :set_submission, only: [:show, :destroy]
+    before_action :set_submission, only: [ :show, :destroy ]
 
     def index
       @pagy, @submissions = pagy(:offset, ContactSubmission.recent, limit: 25)

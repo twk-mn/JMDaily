@@ -1,6 +1,6 @@
 module Admin
   class TipSubmissionsController < BaseController
-    before_action :set_tip, only: [:show, :destroy]
+    before_action :set_tip, only: [ :show, :destroy ]
 
     def index
       @pagy, @tips = pagy(:offset, TipSubmission.recent, limit: 25)

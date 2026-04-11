@@ -33,7 +33,7 @@ end
 puts "Categories created."
 
 # Locations
-["Joetsu", "Myoko", "Itoigawa"].each do |name|
+[ "Joetsu", "Myoko", "Itoigawa" ].each do |name|
   Location.find_or_create_by!(slug: name.parameterize) do |l|
     l.name = name
   end

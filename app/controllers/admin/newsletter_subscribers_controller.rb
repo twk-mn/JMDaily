@@ -29,7 +29,7 @@ module Admin
       CSV.generate(headers: true) do |csv|
         csv << %w[email confirmed_at subscribed_at]
         NewsletterSubscriber.active.order(:email).each do |s|
-          csv << [s.email, s.confirmed_at&.iso8601, s.created_at.iso8601]
+          csv << [ s.email, s.confirmed_at&.iso8601, s.created_at.iso8601 ]
         end
       end
     end

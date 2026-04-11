@@ -133,7 +133,7 @@ RSpec.describe Article, type: :model do
 
   describe '#display_date' do
     it 'returns published_at when available' do
-      time = 2.hours.ago
+      time = 2.hours.ago.change(usec: 0)
       article = build(:article, published_at: time)
       expect(article.display_date).to eq(time)
     end

@@ -37,10 +37,10 @@ module Admin
       return unless resource
 
       action = case request.method
-               when "POST"   then "create"
-               when "PATCH", "PUT" then "update"
-               when "DELETE" then "destroy"
-               end
+      when "POST"   then "create"
+      when "PATCH", "PUT" then "update"
+      when "DELETE" then "destroy"
+      end
 
       AuditLog.record(
         user:     current_user,
