@@ -18,10 +18,11 @@
           <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <span class="text-white font-bold text-lg">JMDaily Admin</span>
+                <%= link_to admin_root_path, class: "text-white font-bold text-lg hover:text-gray-200" do %>JMDaily Admin<% end %>
               </div>
               <div class="ml-10 flex items-baseline space-x-4">
                 <%# Always visible %>
+                <%= link_to "Dashboard", admin_root_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                 <%= link_to "Articles", admin_articles_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                 <%= link_to "Authors", admin_authors_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                 <%= link_to "Tags", admin_tags_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
