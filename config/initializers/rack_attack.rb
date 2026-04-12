@@ -27,6 +27,13 @@ class Rack::Attack
     end
   end
 
+  # Throttle comment submissions
+  throttle("comments/submit", limit: 3, period: 10.minutes) do |req|
+    if req.path.end_with?("/comments") && req.post?
+      req.ip
+    end
+  end
+
   # General request throttle
   throttle("req/ip", limit: 300, period: 5.minutes) do |req|
     req.ip unless req.path.start_with?("/assets")

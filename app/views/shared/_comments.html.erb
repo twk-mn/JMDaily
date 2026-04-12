@@ -10,7 +10,7 @@
     <div class="space-y-6 mb-10">
       <% approved_comments.each do |comment| %>
         <div class="flex gap-4">
-          <div class="flex-shrink-0 w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+          <div class="shrink-0 w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
             <span class="text-sm font-semibold text-indigo-600"><%= comment.name.first.upcase %></span>
           </div>
           <div class="flex-1 min-w-0">
@@ -31,6 +31,11 @@
   <div id="comment-form" class="bg-gray-50 rounded-lg p-6">
     <h3 class="text-sm font-semibold text-gray-900 mb-4">Leave a comment</h3>
     <%= form_with url: article_comments_path(article), class: "space-y-4" do |f| %>
+      <%# Honeypot — hidden from humans, filled by bots %>
+      <div style="display:none" aria-hidden="true">
+        <%= label_tag :website, "Website" %>
+        <%= text_field_tag :website, nil, tabindex: -1, autocomplete: "off" %>
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <%= label_tag :name, "Name *", class: "block text-sm font-medium text-gray-700 mb-1" %>

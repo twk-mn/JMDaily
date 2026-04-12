@@ -2,6 +2,13 @@ class CommentsController < ApplicationController
   before_action :set_article
 
   def create
+    # Honeypot — bots fill the hidden website field, humans don't
+    if params[:website].present?
+      redirect_to article_path(@article, anchor: "comments"),
+        notice: "Your comment has been submitted and is awaiting moderation."
+      return
+    end
+
     @comment = @article.comments.new(comment_params)
     @comment.ip_address = request.remote_ip
 
