@@ -36,7 +36,10 @@ Rails.application.routes.draw do
       end
     end
     resources :newsletter_issues do
-      member { post :send_issue }
+      member do
+        post :send_issue
+        get  :preview
+      end
     end
     resources :users
     resources :audit_logs, only: [ :index ]
