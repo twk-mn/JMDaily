@@ -27,6 +27,9 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : "Joetsu-Myoko Daily" %>">
     <meta name="twitter:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "English-language local news for Joetsu, Myoko, and the surrounding region." %>">
+    <% if content_for?(:og_image) %>
+      <meta name="twitter:image" content="<%= yield(:og_image) %>">
+    <% end %>
 
     <%= yield(:head) if content_for?(:head) %>
 
