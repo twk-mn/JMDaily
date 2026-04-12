@@ -119,6 +119,46 @@ RSpec.describe "Admin::Articles", type: :request do
     end
   end
 
+  describe "POST /admin/articles/bulk" do
+    let!(:article1) { create(:article, author: author, category: category) }
+    let!(:article2) { create(:article, author: author, category: category) }
+
+    it "archives selected articles" do
+      post bulk_admin_articles_path, params: {
+        article_ids: [ article1.id, article2.id ],
+        bulk_action: "archive"
+      }
+      expect(article1.reload.status).to eq("archived")
+      expect(article2.reload.status).to eq("archived")
+      expect(response).to redirect_to(admin_articles_path)
+    end
+
+    it "publishes selected articles" do
+      post bulk_admin_articles_path, params: {
+        article_ids: [ article1.id ],
+        bulk_action: "publish"
+      }
+      expect(article1.reload.status).to eq("published")
+    end
+
+    it "deletes selected articles" do
+      expect {
+        post bulk_admin_articles_path, params: {
+          article_ids: [ article1.id ],
+          bulk_action: "delete"
+        }
+      }.to change(Article, :count).by(-1)
+    end
+
+    it "redirects with alert for unknown action" do
+      post bulk_admin_articles_path, params: {
+        article_ids: [ article1.id ],
+        bulk_action: "unknown"
+      }
+      expect(response).to redirect_to(admin_articles_path)
+    end
+  end
+
   describe "authentication" do
     it "redirects to login when not authenticated" do
       reset!

@@ -1,7 +1,7 @@
 module Admin
   class NewsletterIssuesController < BaseController
     before_action :require_admin!
-    before_action :set_issue, only: [ :show, :edit, :update, :destroy, :send_issue ]
+    before_action :set_issue, only: [ :edit, :update, :destroy, :send_issue ]
 
     def index
       @pagy, @issues = pagy(:offset, NewsletterIssue.recent, limit: 20)

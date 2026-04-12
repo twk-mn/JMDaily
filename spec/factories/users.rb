@@ -6,6 +6,10 @@ FactoryBot.define do
     password_confirmation { "Password123secure" }
     role { "admin" }
 
+    trait :admin do
+      role { "admin" }
+    end
+
     trait :editor do
       role { "editor" }
     end

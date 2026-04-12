@@ -4,6 +4,7 @@ RSpec.describe Article, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:author) }
     it { is_expected.to belong_to(:category) }
+    it { is_expected.to have_many(:comments).dependent(:destroy) }
     it { is_expected.to have_many(:article_tags).dependent(:destroy) }
     it { is_expected.to have_many(:tags).through(:article_tags) }
     it { is_expected.to have_many(:article_locations).dependent(:destroy) }
@@ -172,6 +173,22 @@ RSpec.describe Article, type: :model do
     it 'returns slug' do
       article = build(:article, slug: "test-article")
       expect(article.to_param).to eq("test-article")
+    end
+  end
+
+  describe '#reading_time' do
+    it 'returns at least 1 minute for short articles' do
+      article = create(:article)
+      expect(article.reading_time).to be >= 1
+    end
+
+    it 'increases with more words' do
+      short = create(:article)
+      long = create(:article)
+      # Simulate body text via plain text length check indirectly
+      allow(long.body).to receive(:to_plain_text).and_return("word " * 400)
+      allow(short.body).to receive(:to_plain_text).and_return("word " * 100)
+      expect(long.reading_time).to be > short.reading_time
     end
   end
 end
