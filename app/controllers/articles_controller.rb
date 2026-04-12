@@ -6,5 +6,6 @@ class ArticlesController < ApplicationController
       .where.not(id: @article.id)
       .order(published_at: :desc)
       .limit(4)
+    @approved_comments = @article.comments.approved.recent
   end
 end

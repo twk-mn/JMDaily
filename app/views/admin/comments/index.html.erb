@@ -1,0 +1,67 @@
+<% content_for :title, "Comments" %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-gray-900">Comments</h1>
+  <span class="text-sm text-gray-500"><%= Comment.pending.count %> pending moderation</span>
+</div>
+
+<!-- Filter tabs -->
+<div class="mb-4 border-b border-gray-200">
+  <nav class="-mb-px flex gap-6">
+    <% [["All", nil], ["Pending", "pending"], ["Approved", "approved"], ["Rejected", "rejected"]].each do |label, value| %>
+      <%= link_to label, admin_comments_path(status: value),
+          class: "pb-3 text-sm font-medium border-b-2 #{params[:status].to_s == value.to_s ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}" %>
+    <% end %>
+  </nav>
+</div>
+
+<div class="bg-white shadow rounded-lg overflow-hidden">
+  <% if @comments.any? %>
+    <ul class="divide-y divide-gray-200">
+      <% @comments.each do |comment| %>
+        <li class="p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-1">
+                <span class="text-sm font-semibold text-gray-900"><%= comment.name %></span>
+                <% if comment.email.present? %>
+                  <span class="text-xs text-gray-400"><%= comment.email %></span>
+                <% end %>
+                <time class="text-xs text-gray-400"><%= comment.created_at.strftime("%b %-d, %Y at %-I:%M %p") %></time>
+                <% case comment.status %>
+                <% when "pending" %>
+                  <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">Pending</span>
+                <% when "approved" %>
+                  <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Approved</span>
+                <% when "rejected" %>
+                  <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Rejected</span>
+                <% end %>
+              </div>
+              <p class="text-sm text-gray-700 mb-2"><%= comment.body %></p>
+              <p class="text-xs text-gray-400">
+                On: <%= link_to comment.article.title, article_path(comment.article), target: "_blank",
+                    class: "text-indigo-600 hover:text-indigo-500" %>
+              </p>
+            </div>
+            <div class="flex-shrink-0 flex items-center gap-2">
+              <% unless comment.approved? %>
+                <%= button_to "Approve", approve_admin_comment_path(comment),
+                    class: "rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-500 cursor-pointer" %>
+              <% end %>
+              <% unless comment.status == "rejected" %>
+                <%= button_to "Reject", reject_admin_comment_path(comment),
+                    class: "rounded-md bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200 cursor-pointer" %>
+              <% end %>
+              <%= button_to "Delete", admin_comment_path(comment), method: :delete,
+                  class: "rounded-md bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 cursor-pointer",
+                  data: { turbo_confirm: "Delete this comment?" } %>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+  <% else %>
+    <div class="px-6 py-12 text-center text-sm text-gray-400">No comments found.</div>
+  <% end %>
+</div>

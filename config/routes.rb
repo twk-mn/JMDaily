@@ -28,6 +28,12 @@ Rails.application.routes.draw do
     resources :contact_submissions, only: [ :index, :show, :destroy ]
     resources :tip_submissions, only: [ :index, :show, :destroy ]
     resources :newsletter_subscribers, only: [ :index, :destroy ]
+    resources :comments, only: [ :index, :destroy ] do
+      member do
+        post :approve
+        post :reject
+      end
+    end
     resources :newsletter_issues do
       member { post :send_issue }
     end
@@ -55,7 +61,9 @@ Rails.application.routes.draw do
   get  "corrections-policy", to: "pages#show",        defaults: { slug: "corrections-policy" }, as: :corrections_policy
 
   # Content pages
-  resources :articles, only: [ :show ], path: "articles"
+  resources :articles, only: [ :show ], path: "articles" do
+    resources :comments, only: [ :create ], param: :article_slug, shallow: true
+  end
   resources :authors, only: [ :show ], param: :slug
   resources :tags, only: [ :show ], param: :slug
 

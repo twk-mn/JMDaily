@@ -13,6 +13,7 @@ module Admin
       # Inbox
       @unread_contacts = ContactSubmission.unread.count
       @unread_tips = TipSubmission.unread.count
+      @pending_comments = Comment.pending.count
 
       # Newsletter
       @subscriber_count = NewsletterSubscriber.active.count
