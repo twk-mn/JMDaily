@@ -3,8 +3,11 @@ module Admin
     before_action :require_admin!
 
     def index
-      @confirmed_count = NewsletterSubscriber.confirmed.count
-      @active_count    = NewsletterSubscriber.active.count
+      @confirmed_count    = NewsletterSubscriber.confirmed.count
+      @active_count       = NewsletterSubscriber.active.count
+      @unsubscribed_count = NewsletterSubscriber.unsubscribed.count
+      @new_this_week      = NewsletterSubscriber.active.where("created_at >= ?", 1.week.ago).count
+      @new_this_month     = NewsletterSubscriber.active.where("created_at >= ?", 1.month.ago).count
 
       respond_to do |format|
         format.html do

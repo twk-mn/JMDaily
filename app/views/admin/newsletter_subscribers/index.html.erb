@@ -1,12 +1,29 @@
 <% content_for :title, "Newsletter Subscribers" %>
 
 <div class="flex items-center justify-between mb-6">
-  <div class="flex items-center gap-4">
-    <h1 class="text-2xl font-bold text-gray-900">Newsletter Subscribers</h1>
-    <span class="text-sm text-gray-500"><%= @active_count %> active · <%= @confirmed_count %> confirmed</span>
-  </div>
+  <h1 class="text-2xl font-bold text-gray-900">Newsletter Subscribers</h1>
   <%= link_to "Export CSV", admin_newsletter_subscribers_path(format: :csv),
       class: "rounded-md bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+</div>
+
+<!-- Stats -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white shadow rounded-lg p-4">
+    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Active</p>
+    <p class="mt-1 text-2xl font-bold text-gray-900"><%= @active_count %></p>
+  </div>
+  <div class="bg-white shadow rounded-lg p-4">
+    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">New this week</p>
+    <p class="mt-1 text-2xl font-bold text-<%= @new_this_week > 0 ? "green" : "gray" %>-600">+<%= @new_this_week %></p>
+  </div>
+  <div class="bg-white shadow rounded-lg p-4">
+    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">New this month</p>
+    <p class="mt-1 text-2xl font-bold text-gray-900">+<%= @new_this_month %></p>
+  </div>
+  <div class="bg-white shadow rounded-lg p-4">
+    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Unsubscribed</p>
+    <p class="mt-1 text-2xl font-bold text-gray-400"><%= @unsubscribed_count %></p>
+  </div>
 </div>
 
 <div class="bg-white shadow rounded-lg overflow-hidden">
