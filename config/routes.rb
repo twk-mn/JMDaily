@@ -28,6 +28,9 @@ Rails.application.routes.draw do
     resources :contact_submissions, only: [ :index, :show, :destroy ]
     resources :tip_submissions, only: [ :index, :show, :destroy ]
     resources :newsletter_subscribers, only: [ :index, :destroy ]
+    resources :newsletter_issues do
+      member { post :send_issue }
+    end
     resources :users
     resources :audit_logs, only: [ :index ]
   end

@@ -1,5 +1,6 @@
 class NewsletterSubscriber < ApplicationRecord
   before_create :generate_confirmation_token
+  before_create :generate_unsubscribe_token
 
   validates :email, presence: true,
                     uniqueness: { case_sensitive: false },
@@ -30,5 +31,9 @@ class NewsletterSubscriber < ApplicationRecord
 
   def generate_confirmation_token
     self.confirmation_token = SecureRandom.urlsafe_base64(32)
+  end
+
+  def generate_unsubscribe_token
+    self.unsubscribe_token = SecureRandom.urlsafe_base64(32)
   end
 end

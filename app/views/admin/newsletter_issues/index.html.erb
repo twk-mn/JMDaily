@@ -1,0 +1,62 @@
+<% content_for :title, "Newsletter Issues" %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-gray-900">Newsletter Issues</h1>
+  <%= link_to "New Issue", new_admin_newsletter_issue_path,
+      class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" %>
+</div>
+
+<div class="bg-white shadow rounded-lg overflow-hidden">
+  <% if @issues.any? %>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipients</th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @issues.each do |issue| %>
+          <tr>
+            <td class="px-6 py-4">
+              <p class="text-sm font-medium text-gray-900"><%= issue.subject %></p>
+              <p class="text-xs text-gray-400 mt-0.5">Created <%= issue.created_at.strftime("%b %-d, %Y") %></p>
+            </td>
+            <td class="px-6 py-4">
+              <% if issue.sent? %>
+                <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">Sent</span>
+              <% else %>
+                <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">Draft</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              <%= issue.sent_at ? issue.sent_at.strftime("%b %-d, %Y at %-I:%M %p") : "—" %>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              <%= issue.recipients_count > 0 ? issue.recipients_count : "—" %>
+            </td>
+            <td class="px-6 py-4 text-right text-sm space-x-3 whitespace-nowrap">
+              <% unless issue.sent? %>
+                <%= link_to "Edit", edit_admin_newsletter_issue_path(issue), class: "text-indigo-600 hover:text-indigo-500" %>
+                <%= button_to "Send now", send_issue_admin_newsletter_issue_path(issue),
+                    class: "text-green-600 hover:text-green-500 bg-transparent border-0 p-0 cursor-pointer text-sm",
+                    data: { turbo_confirm: "Send \"#{issue.subject}\" to #{NewsletterSubscriber.active.count} subscribers?" } %>
+                <%= button_to "Delete", admin_newsletter_issue_path(issue), method: :delete,
+                    class: "text-red-500 hover:text-red-400 bg-transparent border-0 p-0 cursor-pointer text-sm",
+                    data: { turbo_confirm: "Delete this draft?" } %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+  <% else %>
+    <div class="px-6 py-12 text-center text-sm text-gray-400">
+      No newsletter issues yet. <%= link_to "Create one", new_admin_newsletter_issue_path, class: "text-indigo-600 hover:text-indigo-500" %>.
+    </div>
+  <% end %>
+</div>

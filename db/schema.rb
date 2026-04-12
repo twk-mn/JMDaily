@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_12_012834) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -177,6 +177,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
     t.index ["slug"], name: "index_locations_on_slug", unique: true
   end
 
+  create_table "newsletter_issues", force: :cascade do |t|
+    t.string "subject", null: false
+    t.text "body", null: false
+    t.string "status", default: "draft", null: false
+    t.datetime "sent_at"
+    t.integer "recipients_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "newsletter_subscribers", force: :cascade do |t|
     t.string "email", null: false
     t.string "confirmation_token"
@@ -184,8 +194,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
     t.datetime "unsubscribed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "unsubscribe_token"
     t.index ["confirmation_token"], name: "index_newsletter_subscribers_on_confirmation_token", unique: true
     t.index ["email"], name: "index_newsletter_subscribers_on_email", unique: true
+    t.index ["unsubscribe_token"], name: "index_newsletter_subscribers_on_unsubscribe_token", unique: true
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
