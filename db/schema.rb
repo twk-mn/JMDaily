@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_12_014822) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_12_113118) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,6 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_12_014822) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.tsvector "search_vector"
+    t.string "featured_image_alt"
     t.index ["author_id"], name: "index_articles_on_author_id"
     t.index ["category_id"], name: "index_articles_on_category_id"
     t.index ["search_vector"], name: "index_articles_on_search_vector", using: :gin

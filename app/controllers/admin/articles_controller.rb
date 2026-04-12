@@ -83,7 +83,7 @@ module Admin
     def article_params
       params.require(:article).permit(
         :title, :slug, :dek, :status, :published_at,
-        :featured_image, :featured_image_caption,
+        :featured_image, :featured_image_alt, :featured_image_caption,
         :seo_title, :meta_description, :canonical_url,
         :source_notes, :article_type, :featured, :breaking,
         :author_id, :category_id, :body,
