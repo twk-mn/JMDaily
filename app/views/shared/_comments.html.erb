@@ -1,0 +1,56 @@
+<section id="comments" class="mt-10 pt-8 border-t border-gray-200">
+  <h2 class="text-lg font-bold text-gray-900 mb-6">
+    Comments
+    <% if approved_comments.any? %>
+      <span class="text-sm font-normal text-gray-400">(<%= approved_comments.size %>)</span>
+    <% end %>
+  </h2>
+
+  <% if approved_comments.any? %>
+    <div class="space-y-6 mb-10">
+      <% approved_comments.each do |comment| %>
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+            <span class="text-sm font-semibold text-indigo-600"><%= comment.name.first.upcase %></span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <span class="text-sm font-semibold text-gray-900"><%= comment.name %></span>
+              <time class="text-xs text-gray-400" datetime="<%= comment.created_at.iso8601 %>">
+                <%= comment.created_at.strftime("%B %-d, %Y") %>
+              </time>
+            </div>
+            <p class="text-sm text-gray-700 leading-relaxed"><%= comment.body %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Comment form -->
+  <div id="comment-form" class="bg-gray-50 rounded-lg p-6">
+    <h3 class="text-sm font-semibold text-gray-900 mb-4">Leave a comment</h3>
+    <%= form_with url: article_comments_path(article), class: "space-y-4" do |f| %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= label_tag :name, "Name *", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= text_field_tag "comment[name]", nil, required: true,
+              class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+        <div>
+          <%= label_tag :email, "Email (not published)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= email_field_tag "comment[email]", nil,
+              class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+      <div>
+        <%= label_tag :body, "Comment *", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= text_area_tag "comment[body]", nil, rows: 4, required: true,
+            class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+      </div>
+      <p class="text-xs text-gray-400">Comments are moderated and may take a short time to appear.</p>
+      <%= submit_tag "Post comment",
+          class: "rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer" %>
+    <% end %>
+  </div>
+</section>

@@ -26,7 +26,11 @@ class NewsletterSubscriptionsController < ApplicationController
   end
 
   def unsubscribe
-    subscriber = NewsletterSubscriber.find_by(email: params[:email].to_s.strip.downcase)
+    subscriber = if params[:token].present?
+      NewsletterSubscriber.find_by(unsubscribe_token: params[:token])
+    else
+      NewsletterSubscriber.find_by(email: params[:email].to_s.strip.downcase)
+    end
     subscriber&.unsubscribe!
     redirect_to root_path, notice: "You have been unsubscribed."
   end

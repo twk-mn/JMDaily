@@ -79,6 +79,10 @@ group :development do
   # gem "spring"
 end
 
+# Error monitoring
+gem "sentry-ruby"
+gem "sentry-rails"
+
 # Sitemap generation
 gem "sitemap_generator"
 

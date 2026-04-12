@@ -18,10 +18,11 @@
           <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <span class="text-white font-bold text-lg">JMDaily Admin</span>
+                <%= link_to admin_root_path, class: "text-white font-bold text-lg hover:text-gray-200" do %>JMDaily Admin<% end %>
               </div>
               <div class="ml-10 flex items-baseline space-x-4">
                 <%# Always visible %>
+                <%= link_to "Dashboard", admin_root_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                 <%= link_to "Articles", admin_articles_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                 <%= link_to "Authors", admin_authors_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                 <%= link_to "Tags", admin_tags_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
@@ -29,6 +30,12 @@
                   Messages
                   <% count = unread_messages_count; if count > 0 %>
                     <span class="inline-flex items-center justify-center rounded-full bg-indigo-500 text-white text-xs font-bold w-5 h-5"><%= count %></span>
+                  <% end %>
+                <% end %>
+                <%= link_to admin_comments_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-1.5" do %>
+                  Comments
+                  <% pending = Comment.pending.count; if pending > 0 %>
+                    <span class="inline-flex items-center justify-center rounded-full bg-yellow-500 text-white text-xs font-bold w-5 h-5"><%= pending %></span>
                   <% end %>
                 <% end %>
                 <%= link_to admin_tip_submissions_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-1.5" do %>
@@ -45,6 +52,7 @@
                   <%= link_to "Pages", admin_static_pages_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                   <%= link_to "Ads", admin_ads_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                   <%= link_to "Subscribers", admin_newsletter_subscribers_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                  <%= link_to "Newsletter", admin_newsletter_issues_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                   <%= link_to "Users", admin_users_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                   <%= link_to "Activity Log", admin_audit_logs_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
                 <% end %>

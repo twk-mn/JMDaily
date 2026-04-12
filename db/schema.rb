@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_12_113118) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,6 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.tsvector "search_vector"
+    t.string "featured_image_alt"
     t.index ["author_id"], name: "index_articles_on_author_id"
     t.index ["category_id"], name: "index_articles_on_category_id"
     t.index ["search_vector"], name: "index_articles_on_search_vector", using: :gin
@@ -157,6 +158,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
+  create_table "comments", force: :cascade do |t|
+    t.bigint "article_id", null: false
+    t.string "name", null: false
+    t.string "email"
+    t.text "body", null: false
+    t.string "status", default: "pending", null: false
+    t.string "ip_address"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id"], name: "index_comments_on_article_id"
+  end
+
   create_table "contact_submissions", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -177,6 +190,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
     t.index ["slug"], name: "index_locations_on_slug", unique: true
   end
 
+  create_table "newsletter_issues", force: :cascade do |t|
+    t.string "subject", null: false
+    t.text "body", null: false
+    t.string "status", default: "draft", null: false
+    t.datetime "sent_at"
+    t.integer "recipients_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "newsletter_subscribers", force: :cascade do |t|
     t.string "email", null: false
     t.string "confirmation_token"
@@ -184,8 +207,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
     t.datetime "unsubscribed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "unsubscribe_token"
     t.index ["confirmation_token"], name: "index_newsletter_subscribers_on_confirmation_token", unique: true
     t.index ["email"], name: "index_newsletter_subscribers_on_email", unique: true
+    t.index ["unsubscribe_token"], name: "index_newsletter_subscribers_on_unsubscribe_token", unique: true
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
@@ -360,6 +385,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_000008) do
   add_foreign_key "articles", "authors"
   add_foreign_key "articles", "categories"
   add_foreign_key "authors", "users"
+  add_foreign_key "comments", "articles"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

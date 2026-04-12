@@ -2,6 +2,7 @@ class Article < ApplicationRecord
   belongs_to :author
   belongs_to :category
 
+  has_many :comments, dependent: :destroy
   has_many :article_tags, dependent: :destroy
   has_many :tags, through: :article_tags
   has_many :article_locations, dependent: :destroy
@@ -59,6 +60,12 @@ class Article < ApplicationRecord
 
   def effective_meta_description
     meta_description.presence || dek.presence || body.to_plain_text.truncate(160)
+  end
+
+  def reading_time
+    words = body.to_plain_text.split.size
+    minutes = (words / 200.0).ceil
+    minutes < 1 ? 1 : minutes
   end
 
   private

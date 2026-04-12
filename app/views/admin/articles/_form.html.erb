@@ -178,6 +178,12 @@
         </div>
 
         <div>
+          <%= f.label :featured_image_alt, "Alt text", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :featured_image_alt, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Describe the image for screen readers" %>
+          <p class="mt-1 text-xs text-gray-500">Used by screen readers and if the image fails to load. Defaults to caption or title if blank.</p>
+        </div>
+
+        <div>
           <%= f.label :featured_image_caption, "Caption", class: "block text-sm font-medium text-gray-700" %>
           <%= f.text_field :featured_image_caption, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
         </div>
