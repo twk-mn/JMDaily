@@ -25,6 +25,25 @@ module Admin
       render "articles/show", layout: "application"
     end
 
+    def bulk
+      articles = Article.where(id: params[:article_ids])
+      count = articles.size
+
+      case params[:bulk_action]
+      when "publish"
+        articles.each { |a| a.update(status: "published", published_at: a.published_at || Time.current) }
+        redirect_to admin_articles_path, notice: "#{count} #{"article".pluralize(count)} published."
+      when "archive"
+        articles.update_all(status: "archived")
+        redirect_to admin_articles_path, notice: "#{count} #{"article".pluralize(count)} archived."
+      when "delete"
+        articles.destroy_all
+        redirect_to admin_articles_path, notice: "#{count} #{"article".pluralize(count)} deleted."
+      else
+        redirect_to admin_articles_path, alert: "Unknown action."
+      end
+    end
+
     def new
       @article = Article.new(status: "draft")
     end

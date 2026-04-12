@@ -18,6 +18,7 @@ Rails.application.routes.draw do
 
     resources :articles do
       member { get :preview }
+      collection { post :bulk }
     end
     resources :categories
     resources :tags
