@@ -38,5 +38,9 @@ module JmDaily
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # I18n
+    config.i18n.available_locales = %i[en ja]
+    config.i18n.default_locale = :en
   end
 end

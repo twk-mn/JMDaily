@@ -19,43 +19,105 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <!-- Main content column -->
     <div class="lg:col-span-2 space-y-6">
-      <div class="bg-white shadow rounded-lg p-6 space-y-6">
-        <div>
-          <%= f.label :title, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg px-3 py-2 border", autofocus: true %>
-        </div>
 
-        <div>
-          <%= f.label :slug, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_field :slug, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border font-mono", placeholder: "auto-generated-from-title" %>
-          <p class="mt-1 text-xs text-gray-500">Leave blank to auto-generate from title</p>
-        </div>
+      <!-- Translations -->
+      <% locale_labels = { "en" => "🇬🇧 English", "ja" => "🇯🇵 Japanese" } %>
+      <% article.translations.sort_by { |t| t.locale == "en" ? 0 : 1 }.each do |translation| %>
+        <%= f.fields_for :translations, translation do |tf| %>
+          <%= tf.hidden_field :locale %>
+          <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="bg-gray-50 border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+              <h2 class="text-sm font-semibold text-gray-700"><%= locale_labels[translation.locale] || translation.locale.upcase %></h2>
+              <% if translation.persisted? %>
+                <span class="text-xs text-green-600 font-medium">Saved</span>
+              <% else %>
+                <span class="text-xs text-amber-600 font-medium">Not yet saved</span>
+              <% end %>
+            </div>
 
-        <div>
-          <%= f.label :dek, "Summary / Dek", class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_area :dek, rows: 2, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
-        </div>
+            <div class="p-6 space-y-5">
+              <div>
+                <%= tf.label :title, class: "block text-sm font-medium text-gray-700" %>
+                <%= tf.text_field :title,
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg px-3 py-2 border",
+                    autofocus: translation.locale == "en" %>
+              </div>
 
-        <div>
-          <%= f.label :body, class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= f.rich_text_area :body, class: "min-h-[300px]" %>
+              <div>
+                <%= tf.label :slug, class: "block text-sm font-medium text-gray-700" %>
+                <%= tf.text_field :slug,
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border font-mono",
+                    placeholder: "auto-generated from title" %>
+                <p class="mt-1 text-xs text-gray-500">Leave blank to auto-generate from title</p>
+              </div>
+
+              <div>
+                <%= tf.label :dek, "Summary / Dek", class: "block text-sm font-medium text-gray-700" %>
+                <%= tf.text_area :dek, rows: 2,
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+              </div>
+
+              <div>
+                <%= tf.label :body, class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= tf.rich_text_area :body, class: "min-h-[300px]" %>
+              </div>
+
+              <!-- Context box (info box / background) -->
+              <div class="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="text-blue-600">ℹ</span>
+                  <%= tf.label :context_box, "Context Box", class: "block text-sm font-semibold text-blue-800" %>
+                </div>
+                <p class="text-xs text-blue-600 mb-2">Optional background or contextual information shown in a callout on the article page.</p>
+                <%= tf.rich_text_area :context_box, class: "min-h-[100px] bg-white" %>
+              </div>
+
+              <!-- Per-locale SEO -->
+              <details class="group">
+                <summary class="cursor-pointer text-sm font-medium text-gray-600 hover:text-gray-900 list-none flex items-center gap-1">
+                  <span>SEO overrides for this language</span>
+                  <span class="text-gray-400 group-open:rotate-90 transition-transform">›</span>
+                </summary>
+                <div class="mt-3 space-y-3 pl-2 border-l-2 border-gray-200">
+                  <div>
+                    <%= tf.label :seo_title, class: "block text-sm font-medium text-gray-700" %>
+                    <%= tf.text_field :seo_title,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border",
+                        placeholder: "Defaults to article title" %>
+                  </div>
+                  <div>
+                    <%= tf.label :meta_description, class: "block text-sm font-medium text-gray-700" %>
+                    <%= tf.text_area :meta_description, rows: 2,
+                        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border",
+                        placeholder: "Defaults to summary" %>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+
+      <!-- Sources -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Sources</h2>
+        <p class="text-sm text-gray-500 mb-4">Credit the original article(s) this piece was translated or adapted from.</p>
+        <div id="sources-fields" class="space-y-3">
+          <%= f.fields_for :sources do |sf| %>
+            <%= render "admin/articles/source_fields", sf: sf %>
+          <% end %>
         </div>
+        <p class="mt-3 text-xs text-gray-400">Add more sources by saving and re-opening the article, or use the + button below.</p>
       </div>
 
-      <!-- SEO -->
+      <!-- SEO (shared) -->
       <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <h2 class="text-lg font-medium text-gray-900">SEO</h2>
-        <div>
-          <%= f.label :seo_title, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_field :seo_title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Defaults to article title" %>
-        </div>
-        <div>
-          <%= f.label :meta_description, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_area :meta_description, rows: 2, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Defaults to summary" %>
-        </div>
+        <h2 class="text-lg font-medium text-gray-900">SEO (Shared)</h2>
         <div>
           <%= f.label :canonical_url, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.url_field :canonical_url, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Only if republished from another source" %>
+          <%= f.url_field :canonical_url,
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border",
+              placeholder: "Only if republished from another source" %>
         </div>
       </div>
 
@@ -64,7 +126,8 @@
         <h2 class="text-lg font-medium text-gray-900 mb-4">Internal Notes</h2>
         <div>
           <%= f.label :source_notes, "Source / Notes (not published)", class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_area :source_notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+          <%= f.text_area :source_notes, rows: 3,
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
         </div>
       </div>
     </div>
@@ -83,7 +146,8 @@
 
         <div>
           <%= f.label :published_at, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.datetime_local_field :published_at, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+          <%= f.datetime_local_field :published_at,
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
         </div>
 
         <div class="flex items-center gap-4">
@@ -106,8 +170,12 @@
                 class: "block text-center text-sm text-amber-600 hover:text-amber-500" %>
           <% end %>
           <% if article.persisted? && article.published? %>
-            <%= link_to "View on site →", article_path(article), target: "_blank",
-                class: "block text-center text-sm text-indigo-600 hover:text-indigo-500" %>
+            <%# Link to the English version on site %>
+            <% en_translation = article.translations.find { |t| t.locale == "en" } %>
+            <% if en_translation %>
+              <%= link_to "View on site →", article_path(en_translation, locale: "en"), target: "_blank",
+                  class: "block text-center text-sm text-indigo-600 hover:text-indigo-500" %>
+            <% end %>
           <% end %>
         </div>
       </div>
@@ -132,7 +200,8 @@
 
         <div>
           <%= f.label :article_type, "Article type", class: "block text-sm font-medium text-gray-700" %>
-          <%= f.select :article_type, [["News", "news"], ["Analysis", "analysis"], ["Explainer", "explainer"], ["Feature", "feature"], ["Event", "event"]],
+          <%= f.select :article_type,
+              [["News", "news"], ["Analysis", "analysis"], ["Explainer", "explainer"], ["Feature", "feature"], ["Event", "event"]],
               {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
         </div>
 
@@ -179,13 +248,16 @@
 
         <div>
           <%= f.label :featured_image_alt, "Alt text", class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_field :featured_image_alt, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Describe the image for screen readers" %>
-          <p class="mt-1 text-xs text-gray-500">Used by screen readers and if the image fails to load. Defaults to caption or title if blank.</p>
+          <%= f.text_field :featured_image_alt,
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border",
+              placeholder: "Describe the image for screen readers" %>
+          <p class="mt-1 text-xs text-gray-500">Used by screen readers and if the image fails to load.</p>
         </div>
 
         <div>
           <%= f.label :featured_image_caption, "Caption", class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_field :featured_image_caption, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+          <%= f.text_field :featured_image_caption,
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
         </div>
       </div>
 

@@ -3,7 +3,7 @@ class SearchController < ApplicationController
 
   def index
     if params[:q].present?
-      @pagy, @articles = pagy(:offset, Article.search(params[:q]), limit: 12)
+      @pagy, @articles = pagy(:offset, Article.search(params[:q]).includes(:translations), limit: 12)
     else
       @articles = []
     end

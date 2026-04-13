@@ -19,34 +19,37 @@
 
   <!-- Lead story -->
   <% if @lead_story %>
-    <section class="mb-12">
-      <%= link_to article_path(@lead_story), class: "block group" do %>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-          <% if @lead_story.featured_image.attached? %>
-            <div class="aspect-[16/10] overflow-hidden rounded-lg bg-gray-100">
-              <%= image_tag @lead_story.featured_image.variant(:medium),
-                  class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300",
-                  alt: @lead_story.featured_image_caption.presence || @lead_story.title,
-                  width: 800, height: 500 %>
-            </div>
-          <% end %>
-          <div>
-            <span class="text-sm font-medium text-indigo-600 uppercase tracking-wide"><%= @lead_story.category.name %></span>
-            <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight" style="font-family: Georgia, serif;">
-              <%= @lead_story.title %>
-            </h2>
-            <% if @lead_story.dek.present? %>
-              <p class="mt-3 text-lg text-gray-600 leading-relaxed"><%= @lead_story.dek %></p>
+    <% lead_t = @lead_story.translation_for(I18n.locale) || @lead_story.translations.first %>
+    <% if lead_t %>
+      <section class="mb-12">
+        <%= link_to article_path(@lead_story), class: "block group" do %>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <% if @lead_story.featured_image.attached? %>
+              <div class="aspect-16/10 overflow-hidden rounded-lg bg-gray-100">
+                <%= image_tag @lead_story.featured_image.variant(:medium),
+                    class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300",
+                    alt: @lead_story.featured_image_caption.presence || lead_t.title,
+                    width: 800, height: 500 %>
+              </div>
             <% end %>
-            <div class="mt-4 flex items-center text-sm text-gray-500">
-              <span>By <%= @lead_story.author.name %></span>
-              <span class="mx-2">·</span>
-              <time datetime="<%= @lead_story.published_at.iso8601 %>"><%= @lead_story.published_at.strftime("%B %-d, %Y") %></time>
+            <div>
+              <span class="text-sm font-medium text-indigo-600 uppercase tracking-wide"><%= @lead_story.category.name %></span>
+              <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight" style="font-family: Georgia, serif;">
+                <%= lead_t.title %>
+              </h2>
+              <% if lead_t.dek.present? %>
+                <p class="mt-3 text-lg text-gray-600 leading-relaxed"><%= lead_t.dek %></p>
+              <% end %>
+              <div class="mt-4 flex items-center text-sm text-gray-500">
+                <span>By <%= @lead_story.author.name %></span>
+                <span class="mx-2">·</span>
+                <time datetime="<%= @lead_story.published_at.iso8601 %>"><%= @lead_story.published_at.strftime("%B %-d, %Y") %></time>
+              </div>
             </div>
           </div>
-        </div>
-      <% end %>
-    </section>
+        <% end %>
+      </section>
+    <% end %>
   <% end %>
 
   <%= ad_for("homepage_mid") %>

@@ -1,31 +1,45 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  site_name: "Joetsu-Myoko Daily"
+  site_tagline: "Local news in English — Joetsu · Myoko · Niigata"
+
+  nav:
+    news: "News"
+    politics: "Politics"
+    business: "Business"
+    community: "Community"
+    weather_travel: "Weather & Travel"
+    events: "Events"
+    opinion: "Opinion"
+    search_placeholder: "Search..."
+
+  article:
+    by_author: "By %{name}"
+    published_on: "Published %{date}"
+    updated_on: "Updated %{date}"
+    min_read: "%{count} min read"
+    breaking: "Breaking"
+    related: "Related Stories"
+    more_from_author: "More from %{name}"
+    background: "Background"
+    sources: "Source"
+    sources_plural: "Sources"
+    read_in: "Read in %{locale}"
+
+  comments:
+    heading: "Comments"
+    leave_comment: "Leave a comment"
+    name: "Name *"
+    email: "Email (not published)"
+    comment: "Comment *"
+    moderation_note: "Comments are moderated and may take a short time to appear."
+    submit: "Post comment"
+
+  newsletter:
+    subscribe_heading: "Stay informed"
+    subscribe_cta: "Get local news delivered to your inbox."
+    email_placeholder: "your@email.com"
+    subscribe_button: "Subscribe"
+
+  errors:
+    not_found: "Page not found"
+    server_error: "Something went wrong"

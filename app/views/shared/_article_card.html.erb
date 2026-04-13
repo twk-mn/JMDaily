@@ -1,3 +1,5 @@
+<% t = article.translation_for(I18n.locale) || article.translations.first %>
+<% next unless t %>
 <article class="flex gap-4">
   <% if article.featured_image.attached? %>
     <div class="flex-shrink-0 w-32 sm:w-48">
@@ -5,7 +7,7 @@
         <div class="aspect-[16/10] overflow-hidden rounded-md bg-gray-100">
           <%= image_tag article.featured_image.variant(:thumb),
               class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
-              alt: article.featured_image_caption.presence || article.title,
+              alt: article.featured_image_caption.presence || t.title,
               loading: "lazy",
               width: 400, height: 250 %>
         </div>
@@ -21,11 +23,11 @@
     </div>
     <%= link_to article_path(article), class: "group" do %>
       <h3 class="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-snug" style="font-family: Georgia, serif;">
-        <%= article.title %>
+        <%= t.title %>
       </h3>
     <% end %>
-    <% if article.dek.present? %>
-      <p class="mt-1 text-sm text-gray-600 line-clamp-2"><%= article.dek %></p>
+    <% if t.dek.present? %>
+      <p class="mt-1 text-sm text-gray-600 line-clamp-2"><%= t.dek %></p>
     <% end %>
     <div class="mt-2 flex items-center text-xs text-gray-500">
       <span>By <%= article.author.name %></span>

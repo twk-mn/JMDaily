@@ -1,0 +1,45 @@
+ja:
+  site_name: "上越妙高デイリー"
+  site_tagline: "上越・妙高・新潟のローカルニュース（英語）"
+
+  nav:
+    news: "ニュース"
+    politics: "政治"
+    business: "ビジネス"
+    community: "地域"
+    weather_travel: "天気・観光"
+    events: "イベント"
+    opinion: "オピニオン"
+    search_placeholder: "検索..."
+
+  article:
+    by_author: "%{name}"
+    published_on: "%{date}掲載"
+    updated_on: "%{date}更新"
+    min_read: "約%{count}分"
+    breaking: "速報"
+    related: "関連記事"
+    more_from_author: "%{name}の記事"
+    background: "背景"
+    sources: "情報源"
+    sources_plural: "情報源"
+    read_in: "%{locale}で読む"
+
+  comments:
+    heading: "コメント"
+    leave_comment: "コメントを残す"
+    name: "お名前 *"
+    email: "メールアドレス（非公開）"
+    comment: "コメント *"
+    moderation_note: "コメントは確認後に掲載されます。"
+    submit: "投稿する"
+
+  newsletter:
+    subscribe_heading: "ニュースレター登録"
+    subscribe_cta: "最新のローカルニュースをメールでお届けします。"
+    email_placeholder: "メールアドレス"
+    subscribe_button: "登録する"
+
+  errors:
+    not_found: "ページが見つかりません"
+    server_error: "エラーが発生しました"

@@ -1,8 +1,10 @@
 Rails.application.routes.draw do
-  # Health check
+  SUPPORTED_LOCALES = /en|ja/
+
+  # Health check (no locale needed)
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Admin
+  # Admin (English-only, no locale prefix)
   namespace :admin do
     root to: "dashboard#index"
 
@@ -45,49 +47,64 @@ Rails.application.routes.draw do
     resources :audit_logs, only: [ :index ]
   end
 
-  # Ad click tracking
+  # Ad click tracking (no locale needed)
   get "ads/:id/click", to: "ads#click", as: :ad_click
 
-  # Public routes
-  root "home#index"
-
-  # Search
-  get "search", to: "search#index"
-
-  # Static pages
-  get  "about",            to: "pages#show",          defaults: { slug: "about" },            as: :about
-  get  "contact",          to: "pages#show",          defaults: { slug: "contact" },           as: :contact
-  post "contact",          to: "pages#submit_contact",                                         as: :submit_contact
-  get  "submit-a-tip",     to: "pages#show",          defaults: { slug: "submit-a-tip" },      as: :submit_a_tip
-  post "submit-a-tip",     to: "pages#submit_tip",                                             as: :submit_tip
-  get  "privacy-policy",   to: "pages#show",          defaults: { slug: "privacy-policy" },    as: :privacy_policy
-  get  "terms",            to: "pages#show",          defaults: { slug: "terms" },             as: :terms
-  get  "corrections-policy", to: "pages#show",        defaults: { slug: "corrections-policy" }, as: :corrections_policy
-
-  # Content pages
-  resources :articles, only: [ :show ], path: "articles" do
-    resources :comments, only: [ :create ], param: :article_slug, shallow: true
-  end
-  resources :authors, only: [ :show ], param: :slug
-  resources :tags, only: [ :show ], param: :slug
-
-  # Location pages
-  get "locations/:slug", to: "locations#show", as: :location
-
-  # Category pages — these go last to avoid catching other routes
-  get "news", to: "categories#show", defaults: { slug: "news" }
-  get "politics", to: "categories#show", defaults: { slug: "politics" }
-  get "business", to: "categories#show", defaults: { slug: "business" }
-  get "community", to: "categories#show", defaults: { slug: "community" }
-  get "weather-travel", to: "categories#show", defaults: { slug: "weather-travel" }
-  get "events", to: "categories#show", defaults: { slug: "events" }
-  get "opinion", to: "categories#show", defaults: { slug: "opinion" }
-
-  # Newsletter
-  post "newsletter/subscribe",   to: "newsletter_subscriptions#create",      as: :newsletter_subscribe
-  get  "newsletter/confirm",     to: "newsletter_subscriptions#confirm",      as: :confirm_newsletter
-  get  "newsletter/unsubscribe", to: "newsletter_subscriptions#unsubscribe",  as: :newsletter_unsubscribe
-
-  # RSS
+  # RSS / Sitemap (no locale needed)
   get "feed", to: "feed#index", defaults: { format: :rss }
+
+  # Root: detect preferred locale from cookie / Accept-Language and redirect.
+  root to: redirect { |_, req|
+    locale = req.cookies["locale"]
+    locale = "en" unless %w[en ja].include?(locale.to_s)
+    "/#{locale}"
+  }
+
+  # All public routes are scoped under /:locale
+  scope "/:locale", constraints: { locale: SUPPORTED_LOCALES } do
+    # Home
+    root to: "home#index", as: :locale_root
+
+    # Search
+    get "search", to: "search#index"
+
+    # Static pages
+    get  "about",             to: "pages#show", defaults: { slug: "about" },              as: :about
+    get  "contact",           to: "pages#show", defaults: { slug: "contact" },             as: :contact
+    post "contact",           to: "pages#submit_contact",                                  as: :submit_contact
+    get  "submit-a-tip",      to: "pages#show", defaults: { slug: "submit-a-tip" },        as: :submit_a_tip
+    post "submit-a-tip",      to: "pages#submit_tip",                                      as: :submit_tip
+    get  "privacy-policy",    to: "pages#show", defaults: { slug: "privacy-policy" },      as: :privacy_policy
+    get  "terms",             to: "pages#show", defaults: { slug: "terms" },               as: :terms
+    get  "corrections-policy", to: "pages#show", defaults: { slug: "corrections-policy" }, as: :corrections_policy
+
+    # Articles and comments
+    resources :articles, only: [ :show ], path: "articles" do
+      resources :comments, only: [ :create ], shallow: true
+    end
+
+    # Authors, tags
+    resources :authors, only: [ :show ], param: :slug
+    resources :tags, only: [ :show ], param: :slug
+
+    # Locations
+    get "locations/:slug", to: "locations#show", as: :location
+
+    # Category pages — last to avoid catching other routes
+    get "news",           to: "categories#show", defaults: { slug: "news" }
+    get "politics",       to: "categories#show", defaults: { slug: "politics" }
+    get "business",       to: "categories#show", defaults: { slug: "business" }
+    get "community",      to: "categories#show", defaults: { slug: "community" }
+    get "weather-travel", to: "categories#show", defaults: { slug: "weather-travel" }
+    get "events",         to: "categories#show", defaults: { slug: "events" }
+    get "opinion",        to: "categories#show", defaults: { slug: "opinion" }
+
+    # Newsletter subscriptions
+    post "newsletter/subscribe",   to: "newsletter_subscriptions#create",     as: :newsletter_subscribe
+    get  "newsletter/confirm",     to: "newsletter_subscriptions#confirm",     as: :confirm_newsletter
+    get  "newsletter/unsubscribe", to: "newsletter_subscriptions#unsubscribe", as: :newsletter_unsubscribe
+  end
+
+  # Legacy redirect: old /articles/:slug → /en/articles/:slug
+  get "articles/:slug", to: redirect("/en/articles/%{slug}")
 end

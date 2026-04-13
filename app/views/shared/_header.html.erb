@@ -36,7 +36,14 @@
           <%= link_to "Itoigawa", location_path("itoigawa"), class: "px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md" %>
         </div>
 
-        <div class="hidden md:flex items-center">
+        <div class="hidden md:flex items-center gap-3">
+          <!-- Language switcher -->
+          <div class="flex items-center gap-1 text-sm border border-gray-200 rounded-md overflow-hidden">
+            <%= link_to "EN", root_path(locale: "en"),
+                class: "px-2 py-1 #{I18n.locale.to_s == 'en' ? 'bg-indigo-600 text-white font-semibold' : 'text-gray-500 hover:bg-gray-50'}" %>
+            <%= link_to "JP", root_path(locale: "ja"),
+                class: "px-2 py-1 #{I18n.locale.to_s == 'ja' ? 'bg-indigo-600 text-white font-semibold' : 'text-gray-500 hover:bg-gray-50'}" %>
+          </div>
           <%= form_with url: search_path, method: :get, class: "flex items-center" do %>
             <input type="search" name="q" placeholder="Search..." value="<%= params[:q] %>"
                    class="block w-40 rounded-md border-0 py-1 px-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600">
@@ -67,6 +74,12 @@
           <%= link_to "Joetsu", location_path("joetsu"), class: "block px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md" %>
           <%= link_to "Myoko", location_path("myoko"), class: "block px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md" %>
           <%= link_to "Itoigawa", location_path("itoigawa"), class: "block px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-md" %>
+        </div>
+        <div class="border-t border-gray-100 pt-2 mt-2 flex gap-2 px-3">
+          <%= link_to "English", root_path(locale: "en"),
+              class: "text-sm px-3 py-1 rounded border #{I18n.locale.to_s == 'en' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-300 text-gray-600'}" %>
+          <%= link_to "日本語", root_path(locale: "ja"),
+              class: "text-sm px-3 py-1 rounded border #{I18n.locale.to_s == 'ja' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-300 text-gray-600'}" %>
         </div>
       </div>
     </div>
