@@ -4,10 +4,10 @@ class NewsletterSubscriptionsController < ApplicationController
 
     if @subscriber.save
       NewsletterMailer.confirmation(@subscriber).deliver_later
-      redirect_back_or_to root_path,
+      redirect_back_or_to locale_root_path,
         notice: "Thanks! Check your inbox for a confirmation email."
     else
-      redirect_back_or_to root_path,
+      redirect_back_or_to locale_root_path,
         alert: @subscriber.errors.full_messages.first
     end
   end
@@ -17,10 +17,10 @@ class NewsletterSubscriptionsController < ApplicationController
 
     if subscriber
       subscriber.confirm!
-      redirect_to root_path,
+      redirect_to locale_root_path,
         notice: "You're confirmed! You'll hear from us when we launch the newsletter."
     else
-      redirect_to root_path,
+      redirect_to locale_root_path,
         alert: "That confirmation link is invalid or has already been used."
     end
   end
@@ -32,6 +32,6 @@ class NewsletterSubscriptionsController < ApplicationController
       NewsletterSubscriber.find_by(email: params[:email].to_s.strip.downcase)
     end
     subscriber&.unsubscribe!
-    redirect_to root_path, notice: "You have been unsubscribed."
+    redirect_to locale_root_path, notice: "You have been unsubscribed."
   end
 end

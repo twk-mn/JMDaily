@@ -28,6 +28,7 @@ class Article < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :published_at, presence: true, if: -> { status == "published" }
 
+  before_validation :seed_title_from_translations, if: -> { title.blank? }
   before_validation :generate_slug, if: -> { slug.blank? && title.present? }
   after_save :schedule_sitemap_regeneration, if: :status_changed_to_published?
 
@@ -94,6 +95,11 @@ class Article < ApplicationRecord
   end
 
   private
+
+  def seed_title_from_translations
+    en = translations.find { |t| t.locale == "en" }
+    self.title = en.title if en&.title.present?
+  end
 
   def generate_slug
     self.slug = title.to_s.parameterize

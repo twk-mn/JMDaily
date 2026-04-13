@@ -39,12 +39,12 @@ RSpec.describe "NewsletterSubscriptions", type: :request do
 
     it "redirects with notice on valid token" do
       get confirm_newsletter_path(token: subscriber.confirmation_token)
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to(locale_root_path)
     end
 
     it "redirects with alert on invalid token" do
       get confirm_newsletter_path(token: "badtoken")
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to(locale_root_path)
       follow_redirect!
       expect(response.body).to include("invalid").or include("already")
     end
@@ -60,7 +60,7 @@ RSpec.describe "NewsletterSubscriptions", type: :request do
 
     it "redirects to root" do
       get newsletter_unsubscribe_path(email: subscriber.email)
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to(locale_root_path)
     end
   end
 end

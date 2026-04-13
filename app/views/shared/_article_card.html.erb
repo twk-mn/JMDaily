@@ -1,10 +1,10 @@
 <% t = article.translation_for(I18n.locale) || article.translations.first %>
-<% next unless t %>
+<% if t %>
 <article class="flex gap-4">
   <% if article.featured_image.attached? %>
     <div class="flex-shrink-0 w-32 sm:w-48">
       <%= link_to article_path(article) do %>
-        <div class="aspect-[16/10] overflow-hidden rounded-md bg-gray-100">
+        <div class="aspect-16/10 overflow-hidden rounded-md bg-gray-100">
           <%= image_tag article.featured_image.variant(:thumb),
               class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
               alt: article.featured_image_caption.presence || t.title,
@@ -36,3 +36,4 @@
     </div>
   </div>
 </article>
+<% end %>

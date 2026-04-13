@@ -103,7 +103,7 @@ RSpec.describe "Admin::Articles", type: :request do
 
     it "re-renders form with invalid params" do
       patch "/admin/articles/#{article.id}", params: {
-        article: { title: "" }
+        article: { status: "not_a_real_status" }
       }
       expect(response).to have_http_status(:unprocessable_content)
     end

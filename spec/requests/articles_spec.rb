@@ -17,7 +17,7 @@ RSpec.describe "Articles", type: :request do
 
     it "returns 404 for draft articles" do
       article = create(:article, status: "draft")
-      get "/articles/#{article.slug}"
+      get article_path(article)
       expect(response).to have_http_status(:not_found)
     end
 

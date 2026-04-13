@@ -4,6 +4,8 @@ RSpec.describe Article, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:author) }
     it { is_expected.to belong_to(:category) }
+    it { is_expected.to have_many(:translations).dependent(:destroy) }
+    it { is_expected.to have_many(:sources).dependent(:destroy) }
     it { is_expected.to have_many(:comments).dependent(:destroy) }
     it { is_expected.to have_many(:article_tags).dependent(:destroy) }
     it { is_expected.to have_many(:tags).through(:article_tags) }
@@ -146,14 +148,15 @@ RSpec.describe Article, type: :model do
   end
 
   describe '#effective_seo_title' do
-    it 'returns seo_title when present' do
-      article = build(:article, title: "Title", seo_title: "SEO Title")
+    it 'returns article seo_title when present' do
+      article = build(:article, seo_title: "SEO Title")
       expect(article.effective_seo_title).to eq("SEO Title")
     end
 
-    it 'falls back to title' do
-      article = build(:article, title: "Title", seo_title: nil)
-      expect(article.effective_seo_title).to eq("Title")
+    it 'falls back to translation title' do
+      article = build(:article, seo_title: nil, title: "Fallback")
+      translation = build(:article_translation, title: "Translation Title", seo_title: nil)
+      expect(article.effective_seo_title(translation)).to eq("Translation Title")
     end
   end
 
@@ -163,9 +166,10 @@ RSpec.describe Article, type: :model do
       expect(article.effective_meta_description).to eq("Meta desc")
     end
 
-    it 'falls back to dek' do
-      article = build(:article, meta_description: nil, dek: "Article dek")
-      expect(article.effective_meta_description).to eq("Article dek")
+    it 'falls back to translation dek' do
+      article = build(:article, meta_description: nil, dek: nil)
+      translation = build(:article_translation, dek: "Translation dek", meta_description: nil)
+      expect(article.effective_meta_description(translation)).to eq("Translation dek")
     end
   end
 
@@ -177,18 +181,19 @@ RSpec.describe Article, type: :model do
   end
 
   describe '#reading_time' do
-    it 'returns at least 1 minute for short articles' do
+    it 'returns at least 1 minute when no translation body' do
       article = create(:article)
-      expect(article.reading_time).to be >= 1
+      expect(article.reading_time(nil)).to be >= 1
     end
 
     it 'increases with more words' do
-      short = create(:article)
-      long = create(:article)
-      # Simulate body text via plain text length check indirectly
-      allow(long.body).to receive(:to_plain_text).and_return("word " * 400)
-      allow(short.body).to receive(:to_plain_text).and_return("word " * 100)
-      expect(long.reading_time).to be > short.reading_time
+      short_translation = build(:article_translation)
+      long_translation  = build(:article_translation)
+      allow(short_translation.body).to receive(:to_plain_text).and_return("word " * 100)
+      allow(long_translation.body).to receive(:to_plain_text).and_return("word " * 400)
+
+      article = create(:article)
+      expect(article.reading_time(long_translation)).to be > article.reading_time(short_translation)
     end
   end
 end
