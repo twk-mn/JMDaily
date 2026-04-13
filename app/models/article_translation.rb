@@ -6,7 +6,8 @@ class ArticleTranslation < ApplicationRecord
 
   LOCALES = %w[en ja].freeze
 
-  validates :locale, presence: true, inclusion: { in: LOCALES }
+  validates :locale, presence: true, inclusion: { in: LOCALES },
+                    uniqueness: { scope: :article_id, message: "translation already exists for this article" }
   validates :title, presence: true
   validates :slug, presence: true,
                    uniqueness: { scope: :locale, message: "is already taken for this locale" },
