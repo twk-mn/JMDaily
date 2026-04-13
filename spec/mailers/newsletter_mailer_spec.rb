@@ -6,7 +6,7 @@ RSpec.describe NewsletterMailer do
     let(:mail) { described_class.confirmation(subscriber) }
 
     it "is sent to the subscriber" do
-      expect(mail.to).to eq([subscriber.email])
+      expect(mail.to).to eq([ subscriber.email ])
     end
 
     it "has the correct subject" do
@@ -30,7 +30,7 @@ RSpec.describe NewsletterMailer do
       let(:mail) { described_class.broadcast(subscriber, issue) }
 
       it "is sent to the subscriber" do
-        expect(mail.to).to eq([subscriber.email])
+        expect(mail.to).to eq([ subscriber.email ])
       end
 
       it "uses the issue subject" do

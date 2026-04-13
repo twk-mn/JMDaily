@@ -6,7 +6,7 @@ RSpec.describe TipMailer do
     let(:mail) { described_class.new_tip(tip) }
 
     it "is sent to the editor address" do
-      expect(mail.to).to eq([ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com")])
+      expect(mail.to).to eq([ ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com") ])
     end
 
     it "has the correct subject" do

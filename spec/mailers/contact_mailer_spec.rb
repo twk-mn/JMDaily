@@ -6,11 +6,11 @@ RSpec.describe ContactMailer do
     let(:mail) { described_class.new_submission(submission) }
 
     it "is sent to the editor address" do
-      expect(mail.to).to eq([ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com")])
+      expect(mail.to).to eq([ ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com") ])
     end
 
     it "sets reply-to to the submitter" do
-      expect(mail.reply_to).to eq(["jane@example.com"])
+      expect(mail.reply_to).to eq([ "jane@example.com" ])
       expect(mail["reply-to"].value).to include("Jane Doe")
     end
 
