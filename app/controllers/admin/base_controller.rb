@@ -2,7 +2,7 @@ module Admin
   class BaseController < ApplicationController
     include Pagy::Method
 
-    SESSION_TIMEOUT = 4.hours
+    SESSION_TIMEOUT = SiteConfig::ADMIN_SESSION_TIMEOUT
 
     before_action :require_login
     before_action :check_session_timeout
