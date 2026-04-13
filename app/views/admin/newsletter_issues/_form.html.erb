@@ -16,9 +16,19 @@
   <% end %>
 
   <div class="bg-white shadow rounded-lg p-6 space-y-5">
-    <div>
-      <%= f.label :subject, class: "block text-sm font-medium text-gray-700" %>
-      <%= f.text_field :subject, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", autofocus: true %>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="sm:col-span-2">
+        <%= f.label :subject, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :subject, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", autofocus: true %>
+      </div>
+      <div>
+        <%= f.label :locale, "Language", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.select :locale,
+            [["🇬🇧 English", "en"], ["🇯🇵 Japanese", "ja"]],
+            {},
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        <p class="mt-1 text-xs text-gray-500">Sets the language of links in the email.</p>
+      </div>
     </div>
 
     <div>

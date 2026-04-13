@@ -64,7 +64,7 @@ module Admin
     end
 
     def issue_params
-      params.require(:newsletter_issue).permit(:subject, :body)
+      params.require(:newsletter_issue).permit(:subject, :body, :locale)
     end
   end
 end

@@ -99,15 +99,50 @@
       <% end %>
 
       <!-- Sources -->
-      <div class="bg-white shadow rounded-lg p-6">
+      <div class="bg-white shadow rounded-lg p-6"
+           data-controller="nested-fields"
+           data-nested-fields-index-value="<%= article.sources.size %>">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Sources</h2>
         <p class="text-sm text-gray-500 mb-4">Credit the original article(s) this piece was translated or adapted from.</p>
-        <div id="sources-fields" class="space-y-3">
+
+        <div data-nested-fields-target="container" class="space-y-3">
           <%= f.fields_for :sources do |sf| %>
             <%= render "admin/articles/source_fields", sf: sf %>
           <% end %>
         </div>
-        <p class="mt-3 text-xs text-gray-400">Add more sources by saving and re-opening the article, or use the + button below.</p>
+
+        <%# Template for new rows — substitutes __INDEX__ at runtime %>
+        <template data-nested-fields-target="template">
+          <div data-nested-fields-target="row" class="flex items-start gap-3 p-3 bg-gray-50 rounded-md">
+            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Source name</label>
+                <input type="text"
+                       name="article[sources_attributes][__INDEX__][name]"
+                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-1.5 border"
+                       placeholder="e.g. Niigata Nippo">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">URL (optional)</label>
+                <input type="url"
+                       name="article[sources_attributes][__INDEX__][url]"
+                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-1.5 border"
+                       placeholder="https://...">
+              </div>
+            </div>
+            <div class="pt-5">
+              <button type="button"
+                      data-action="nested-fields#remove"
+                      class="text-xs text-red-500 hover:text-red-700">Remove</button>
+            </div>
+          </div>
+        </template>
+
+        <button type="button"
+                data-action="nested-fields#add"
+                class="mt-3 text-sm text-indigo-600 hover:text-indigo-500 font-medium">
+          + Add source
+        </button>
       </div>
 
       <!-- SEO (shared) -->

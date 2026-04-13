@@ -1,7 +1,7 @@
 class NewsletterMailer < ApplicationMailer
   def confirmation(subscriber)
     @subscriber = subscriber
-    @confirm_url = confirm_newsletter_url(token: subscriber.confirmation_token)
+    @confirm_url = confirm_newsletter_url(token: subscriber.confirmation_token, locale: :en)
     mail(
       to:      subscriber.email,
       subject: "Confirm your subscription to Joetsu-Myoko Daily"
@@ -10,8 +10,11 @@ class NewsletterMailer < ApplicationMailer
 
   def broadcast(subscriber, issue)
     @subscriber = subscriber
-    @issue = issue
-    @unsubscribe_url = newsletter_unsubscribe_url(token: subscriber.unsubscribe_token)
+    @issue      = issue
+    locale      = issue.locale.presence || "en"
+    @unsubscribe_url = newsletter_unsubscribe_url(token: subscriber.unsubscribe_token, locale: locale)
+    @home_url        = locale_root_url(locale: locale)
+
     mail(
       to:      subscriber.email,
       subject: issue.subject

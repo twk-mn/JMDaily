@@ -1,5 +1,6 @@
-<div class="flex items-start gap-3 p-3 bg-gray-50 rounded-md">
+<div data-nested-fields-target="row" class="flex items-start gap-3 p-3 bg-gray-50 rounded-md">
   <%= sf.hidden_field :id %>
+  <%= sf.hidden_field :_destroy, value: "0" %>
   <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
     <div>
       <%= sf.label :name, "Source name", class: "block text-xs font-medium text-gray-600 mb-1" %>
@@ -15,9 +16,8 @@
     </div>
   </div>
   <div class="pt-5">
-    <%= sf.label :_destroy, class: "flex items-center gap-1 text-xs text-red-500 cursor-pointer" do %>
-      <%= sf.check_box :_destroy, class: "rounded border-gray-300 text-red-500" %>
-      Remove
-    <% end %>
+    <button type="button"
+            data-action="nested-fields#remove"
+            class="text-xs text-red-500 hover:text-red-700">Remove</button>
   </div>
 </div>
