@@ -1,0 +1,23 @@
+<div class="flex items-start gap-3 p-3 bg-gray-50 rounded-md">
+  <%= sf.hidden_field :id %>
+  <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div>
+      <%= sf.label :name, "Source name", class: "block text-xs font-medium text-gray-600 mb-1" %>
+      <%= sf.text_field :name,
+          class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-1.5 border",
+          placeholder: "e.g. Niigata Nippo" %>
+    </div>
+    <div>
+      <%= sf.label :url, "URL (optional)", class: "block text-xs font-medium text-gray-600 mb-1" %>
+      <%= sf.url_field :url,
+          class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-1.5 border",
+          placeholder: "https://..." %>
+    </div>
+  </div>
+  <div class="pt-5">
+    <%= sf.label :_destroy, class: "flex items-center gap-1 text-xs text-red-500 cursor-pointer" do %>
+      <%= sf.check_box :_destroy, class: "rounded border-gray-300 text-red-500" %>
+      Remove
+    <% end %>
+  </div>
+</div>

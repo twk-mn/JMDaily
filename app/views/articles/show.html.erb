@@ -1,5 +1,5 @@
-<% content_for :title, @article.effective_seo_title %>
-<% content_for :meta_description, @article.effective_meta_description %>
+<% content_for :title, @article.effective_seo_title(@translation) %>
+<% content_for :meta_description, @article.effective_meta_description(@translation) %>
 <% content_for :og_type, "article" %>
 <% if @article.featured_image.attached? %>
   <% content_for :og_image, url_for(@article.featured_image) %>
@@ -14,8 +14,8 @@
     <%= raw({
       "@context": "https://schema.org",
       "@type": "NewsArticle",
-      "headline": @article.title,
-      "description": @article.effective_meta_description,
+      "headline": @translation.title,
+      "description": @article.effective_meta_description(@translation),
       "datePublished": @article.published_at&.iso8601,
       "dateModified": @article.updated_at.iso8601,
       "author": {
@@ -37,6 +37,11 @@
       end
     }.to_json) %>
   </script>
+
+  <%# Alternate language links for SEO %>
+  <% @article.translations.each do |t| %>
+    <link rel="alternate" hreflang="<%= t.locale %>" href="<%= article_url(t, locale: t.locale) %>">
+  <% end %>
 <% end %>
 
 <% if !@article.published? && current_user %>
@@ -47,7 +52,7 @@
   <!-- Article header -->
   <header class="mb-8">
     <div class="flex items-center gap-2 mb-3">
-      <%= link_to @article.category.name, "/#{@article.category.slug}",
+      <%= link_to @article.category.name, "/#{I18n.locale}/#{@article.category.slug}",
           class: "text-sm font-medium text-indigo-600 uppercase tracking-wide hover:text-indigo-800" %>
       <% if @article.breaking? %>
         <span class="bg-red-600 text-white text-xs font-bold uppercase px-2 py-0.5 rounded">Breaking</span>
@@ -55,11 +60,11 @@
     </div>
 
     <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight" style="font-family: Georgia, serif;">
-      <%= @article.title %>
+      <%= @translation.title %>
     </h1>
 
-    <% if @article.dek.present? %>
-      <p class="mt-4 text-xl text-gray-600 leading-relaxed"><%= @article.dek %></p>
+    <% if @translation.dek.present? %>
+      <p class="mt-4 text-xl text-gray-600 leading-relaxed"><%= @translation.dek %></p>
     <% end %>
 
     <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 border-t border-b border-gray-200 py-4">
@@ -79,12 +84,23 @@
         </time>
       <% end %>
       <span class="text-gray-400">·</span>
-      <span><%= @article.reading_time %> min read</span>
+      <span><%= @article.reading_time(@translation) %> min read</span>
       <% if @article.published_at && @article.updated_at > @article.published_at + 1.hour %>
         <span class="text-gray-400">·</span>
         <time datetime="<%= @article.updated_at.iso8601 %>">
           Updated <%= @article.updated_at.strftime("%B %-d, %Y") %>
         </time>
+      <% end %>
+
+      <%# Language switcher — link to other available translations %>
+      <% other_translations = @article.translations.reject { |t| t.locale == I18n.locale.to_s } %>
+      <% if other_translations.any? %>
+        <span class="text-gray-400">·</span>
+        <% other_translations.each do |t| %>
+          <%= link_to t.locale == "ja" ? "日本語" : "English",
+              article_path(t, locale: t.locale),
+              class: "text-indigo-600 hover:text-indigo-500 text-xs font-medium" %>
+        <% end %>
       <% end %>
     </div>
   </header>
@@ -94,7 +110,7 @@
     <figure class="mb-8">
       <%= image_tag @article.featured_image.variant(:large),
           class: "w-full rounded-lg",
-          alt: @article.featured_image_alt.presence || @article.featured_image_caption.presence || @article.title,
+          alt: @article.featured_image_alt.presence || @article.featured_image_caption.presence || @translation.title,
           width: 1200, height: 800 %>
       <% if @article.featured_image_caption.present? %>
         <figcaption class="mt-2 text-sm text-gray-500 text-center"><%= @article.featured_image_caption %></figcaption>
@@ -107,8 +123,18 @@
 
   <!-- Article body -->
   <div class="prose prose-lg max-w-none prose-headings:font-bold prose-a:text-indigo-600 prose-img:rounded-lg">
-    <%= @article.body %>
+    <%= @translation.body %>
   </div>
+
+  <!-- Context box (info / background) -->
+  <% if @translation.context_box.present? && @translation.context_box.body.present? %>
+    <aside class="my-8 border-l-4 border-indigo-400 bg-indigo-50 rounded-r-lg px-6 py-5">
+      <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-3">Background</p>
+      <div class="prose prose-sm max-w-none prose-a:text-indigo-600 text-gray-700">
+        <%= @translation.context_box %>
+      </div>
+    </aside>
+  <% end %>
 
   <!-- Article footer ad -->
   <%= ad_for("article_footer") %>
@@ -116,10 +142,10 @@
   <!-- Share buttons -->
   <%= render "shared/share_buttons", article: @article %>
 
-  <!-- Tags and locations -->
-  <footer class="mt-10 pt-6 border-t border-gray-200">
+  <!-- Tags, locations, and sources -->
+  <footer class="mt-10 pt-6 border-t border-gray-200 space-y-3">
     <% if @article.locations.any? %>
-      <div class="flex flex-wrap items-center gap-2 mb-3">
+      <div class="flex flex-wrap items-center gap-2">
         <span class="text-sm text-gray-500">Location:</span>
         <% @article.locations.each do |location| %>
           <%= link_to location.name, location_path(location),
@@ -137,6 +163,26 @@
         <% end %>
       </div>
     <% end %>
+
+    <!-- Sources -->
+    <% if @article.sources.any? %>
+      <div class="pt-2">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Source<%= "s" if @article.sources.size > 1 %></p>
+        <ul class="space-y-1">
+          <% @article.sources.each do |source| %>
+            <li class="text-sm text-gray-600">
+              <% if (safe_url = safe_external_url(source.url)) %>
+                <%= link_to source.name, safe_url,
+                    target: "_blank", rel: "noopener noreferrer",
+                    class: "text-indigo-600 hover:text-indigo-500 underline" %>
+              <% else %>
+                <%= source.name %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   </footer>
 
   <%= render "shared/comments", article: @article, approved_comments: @approved_comments %>
@@ -150,19 +196,21 @@
     </h2>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
       <% @more_from_author.each do |article| %>
+        <% t = article.translation_for(I18n.locale) || article.translations.first %>
+        <% next unless t %>
         <article>
           <% if article.featured_image.attached? %>
             <%= link_to article_path(article) do %>
               <div class="aspect-16/10 overflow-hidden rounded-md bg-gray-100 mb-3">
                 <%= image_tag article.featured_image.variant(:thumb),
                     class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
-                    alt: article.title, loading: "lazy", width: 400, height: 250 %>
+                    alt: t.title, loading: "lazy", width: 400, height: 250 %>
               </div>
             <% end %>
           <% end %>
           <%= link_to article_path(article), class: "group" do %>
             <h3 class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 leading-snug" style="font-family: Georgia, serif;">
-              <%= article.title %>
+              <%= t.title %>
             </h3>
           <% end %>
           <time class="text-xs text-gray-500 mt-1 block" datetime="<%= article.published_at.iso8601 %>">
@@ -180,21 +228,21 @@
     <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider border-b-2 border-gray-900 pb-2 mb-6">Related Stories</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <% @related_articles.each do |article| %>
+        <% t = article.translation_for(I18n.locale) || article.translations.first %>
+        <% next unless t %>
         <article>
           <% if article.featured_image.attached? %>
             <%= link_to article_path(article) do %>
               <div class="aspect-16/10 overflow-hidden rounded-md bg-gray-100 mb-3">
                 <%= image_tag article.featured_image.variant(:thumb),
                     class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
-                    alt: article.title,
-                    loading: "lazy",
-                    width: 400, height: 250 %>
+                    alt: t.title, loading: "lazy", width: 400, height: 250 %>
               </div>
             <% end %>
           <% end %>
           <%= link_to article_path(article), class: "group" do %>
             <h3 class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 leading-snug" style="font-family: Georgia, serif;">
-              <%= article.title %>
+              <%= t.title %>
             </h3>
           <% end %>
           <time class="text-xs text-gray-500 mt-1 block" datetime="<%= article.published_at.iso8601 %>">

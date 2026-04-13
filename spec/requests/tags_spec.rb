@@ -4,7 +4,7 @@ RSpec.describe "Tags", type: :request do
   describe "GET /tags/:slug" do
     it "returns success" do
       tag = create(:tag)
-      get tag_path(tag)
+      get tag_path(slug: tag.slug)
       expect(response).to have_http_status(:success)
     end
 
@@ -13,7 +13,7 @@ RSpec.describe "Tags", type: :request do
       article = create(:article, :published, title: "Tagged Article")
       create(:article_tag, article: article, tag: tag)
 
-      get tag_path(tag)
+      get tag_path(slug: tag.slug)
       expect(response.body).to include("Tagged Article")
     end
 

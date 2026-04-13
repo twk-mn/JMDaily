@@ -3,7 +3,7 @@ module Admin
     before_action :set_article, only: [ :show, :edit, :update, :destroy ]
 
     def index
-      scope = Article.includes(:author, :category).order(updated_at: :desc)
+      scope = Article.includes(:author, :category, :translations).order(updated_at: :desc)
       scope = scope.where(status: params[:status]) if params[:status].present?
       scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
       scope = scope.where(author_id: params[:author_id]) if params[:author_id].present?
@@ -16,10 +16,12 @@ module Admin
     end
 
     def preview
-      @article = Article.includes(:author, :category, :tags, :locations).find(params[:id])
+      @article = Article.includes(:author, :category, :tags, :locations, :sources, :translations).find(params[:id])
+      @translation = @article.translations.find { |t| t.locale == "en" } || @article.translations.first
       @related_articles = Article.published
                                  .where(category: @article.category)
                                  .where.not(id: @article.id)
+                                 .includes(:translations)
                                  .order(published_at: :desc)
                                  .limit(4)
       render "articles/show", layout: "application"
@@ -46,6 +48,11 @@ module Admin
 
     def new
       @article = Article.new(status: "draft")
+      # Pre-build one translation per supported locale so the form renders all tabs
+      Article::SUPPORTED_LOCALES.each do |locale|
+        @article.translations.build(locale: locale)
+      end
+      @article.sources.build
     end
 
     def create
@@ -59,6 +66,11 @@ module Admin
     end
 
     def edit
+      # Ensure a translation record exists for every supported locale
+      Article::SUPPORTED_LOCALES.each do |locale|
+        @article.translations.find_or_initialize_by(locale: locale)
+      end
+      @article.sources.build if @article.sources.empty?
     end
 
     def update
@@ -77,17 +89,21 @@ module Admin
     private
 
     def set_article
-      @article = Article.find(params[:id])
+      @article = Article.includes(:translations, :sources).find(params[:id])
     end
 
     def article_params
       params.require(:article).permit(
-        :title, :slug, :dek, :status, :published_at,
+        :title, :slug, :status, :published_at,
         :featured_image, :featured_image_alt, :featured_image_caption,
-        :seo_title, :meta_description, :canonical_url,
-        :source_notes, :article_type, :featured, :breaking,
-        :author_id, :category_id, :body,
-        tag_ids: [], location_ids: []
+        :canonical_url, :source_notes, :article_type, :featured, :breaking,
+        :author_id, :category_id,
+        tag_ids: [], location_ids: [],
+        translations_attributes: [
+          :id, :locale, :title, :slug, :dek, :body, :context_box,
+          :seo_title, :meta_description
+        ],
+        sources_attributes: [ :id, :name, :url, :position, :_destroy ]
       )
     end
   end

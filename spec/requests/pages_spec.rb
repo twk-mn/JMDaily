@@ -20,7 +20,7 @@ RSpec.describe "Pages", type: :request do
   describe "GET /privacy-policy" do
     it "returns success" do
       create(:static_page, title: "Privacy Policy", slug: "privacy-policy")
-      get "/privacy-policy"
+      get privacy_policy_path
       expect(response).to have_http_status(:success)
     end
   end
@@ -28,7 +28,7 @@ RSpec.describe "Pages", type: :request do
   describe "GET /terms" do
     it "returns success" do
       create(:static_page, title: "Terms", slug: "terms")
-      get "/terms"
+      get terms_path
       expect(response).to have_http_status(:success)
     end
   end
