@@ -1,7 +1,7 @@
 module Admin
   class NewsletterIssuesController < BaseController
     before_action :require_admin!
-    before_action :set_issue, only: [ :edit, :update, :destroy, :send_issue ]
+    before_action :set_issue, only: [ :edit, :update, :destroy, :send_issue, :preview ]
 
     def index
       @pagy, @issues = pagy(:offset, NewsletterIssue.recent, limit: 20)
@@ -40,6 +40,12 @@ module Admin
         @issue.destroy
         redirect_to admin_newsletter_issues_path, notice: "Issue deleted."
       end
+    end
+
+    def preview
+      # Render the broadcast email HTML inline so editors can check before sending
+      mail = NewsletterMailer.broadcast(NewsletterSubscriber.new(email: current_user.email, unsubscribe_token: "preview"), @issue)
+      render html: mail.html_part.body.decoded.html_safe, layout: false
     end
 
     def send_issue
