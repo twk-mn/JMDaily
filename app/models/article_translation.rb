@@ -34,5 +34,7 @@ class ArticleTranslation < ApplicationRecord
       title: title,
       dek: dek.presence || article.dek
     )
+  rescue ActiveRecord::ActiveRecordError => e
+    Rails.logger.error("ArticleTranslation#sync_search_vector failed for article #{article_id}: #{e.message}")
   end
 end
