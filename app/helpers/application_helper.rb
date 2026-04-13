@@ -19,12 +19,18 @@ module ApplicationHelper
   end
 
   # Renders the highest-priority active ad for the given placement zone.
-  # Returns nil (renders nothing) if no ad is currently running for that zone.
+  # Impression is recorded asynchronously and deduplicated per-session per ad
+  # so repeated page loads by the same visitor don't inflate counts.
   def ad_for(zone)
     ad = Ad.pick_for_zone(zone)
     return unless ad
 
-    ad.increment!(:impressions_count)
+    seen_key = "ad_seen_#{ad.id}"
+    unless session[seen_key]
+      session[seen_key] = true
+      RecordAdImpressionJob.perform_later(ad.id)
+    end
+
     render "shared/ad", ad: ad
   end
 end

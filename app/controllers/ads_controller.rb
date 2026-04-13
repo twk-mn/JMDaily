@@ -3,7 +3,7 @@ class AdsController < ApplicationController
     ad = Ad.find(params[:id])
 
     if ad.ad_type == "direct" && safe_ad_url?(ad.link_url)
-      ad.increment!(:clicks_count)
+      RecordAdClickJob.perform_later(ad.id)
       redirect_to ad.link_url, allow_other_host: true, status: :found
     else
       redirect_to root_path
