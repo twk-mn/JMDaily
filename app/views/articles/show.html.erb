@@ -11,31 +11,7 @@
 <% content_for :head do %>
   <!-- Article Schema -->
   <script type="application/ld+json">
-    <%= raw({
-      "@context": "https://schema.org",
-      "@type": "NewsArticle",
-      "headline": @translation.title,
-      "description": @article.effective_meta_description(@translation),
-      "datePublished": @article.published_at&.iso8601,
-      "dateModified": @article.updated_at.iso8601,
-      "author": {
-        "@type": "Person",
-        "name": @article.author.name,
-        "url": author_url(@article.author, slug: @article.author.slug)
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Joetsu-Myoko Daily"
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": article_url(@article)
-      }
-    }.tap { |h|
-      if @article.featured_image.attached?
-        h[:image] = url_for(@article.featured_image)
-      end
-    }.to_json) %>
+    <%= raw(@json_ld.to_json) %>
   </script>
 
   <%# Alternate language links for SEO %>
@@ -93,10 +69,9 @@
       <% end %>
 
       <%# Language switcher — link to other available translations %>
-      <% other_translations = @article.translations.reject { |t| t.locale == I18n.locale.to_s } %>
-      <% if other_translations.any? %>
+      <% if @other_translations.any? %>
         <span class="text-gray-400">·</span>
-        <% other_translations.each do |t| %>
+        <% @other_translations.each do |t| %>
           <%= link_to t.locale == "ja" ? "日本語" : "English",
               article_path(t, locale: t.locale),
               class: "text-indigo-600 hover:text-indigo-500 text-xs font-medium" %>
