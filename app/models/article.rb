@@ -1,4 +1,7 @@
 class Article < ApplicationRecord
+  include Sluggable
+  include SitemapSchedulable
+
   belongs_to :author
   belongs_to :category
 
@@ -29,8 +32,6 @@ class Article < ApplicationRecord
   validates :published_at, presence: true, if: -> { status == "published" }
 
   before_validation :seed_title_from_translations, if: -> { title.blank? }
-  before_validation :generate_slug, if: -> { slug.blank? && title.present? }
-  after_save :schedule_sitemap_regeneration, if: :status_changed_to_published?
 
   scope :published, -> { where(status: "published").where("published_at <= ?", Time.current) }
   scope :draft, -> { where(status: "draft") }
@@ -58,11 +59,10 @@ class Article < ApplicationRecord
     end
   end
 
-  # Find or build a translation for the given locale.
+  # Find a translation for the given locale, or nil.
   def translation_for(locale)
     locale_str = locale.to_s
-    translations.find { |t| t.locale == locale_str } ||
-      translations.detect { |t| t.locale == locale_str }
+    translations.find { |t| t.locale == locale_str }
   end
 
   def published?
@@ -99,17 +99,5 @@ class Article < ApplicationRecord
   def seed_title_from_translations
     en = translations.find { |t| t.locale == "en" }
     self.title = en.title if en&.title.present?
-  end
-
-  def generate_slug
-    self.slug = title.to_s.parameterize
-  end
-
-  def status_changed_to_published?
-    saved_change_to_status? && status == "published"
-  end
-
-  def schedule_sitemap_regeneration
-    RegenerateSitemapJob.perform_later
   end
 end
