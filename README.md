@@ -1,4 +1,3 @@
-<<<<<<< docs/readme
 # JMDaily
 
 A local news publication platform built with Ruby on Rails. Supports article publishing, newsletters, reader comments, ads, and a full admin CMS.
@@ -114,29 +113,3 @@ The app is a standard Rails 8 application. It expects:
 - Active Storage configured (local disk by default; configure S3 or similar for production)
 
 A `Procfile.dev` is provided for local multi-process development via `bin/dev`.
-=======
-# README
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
->>>>>>> main
