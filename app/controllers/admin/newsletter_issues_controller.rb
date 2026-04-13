@@ -43,9 +43,11 @@ module Admin
     end
 
     def preview
-      # Render the broadcast email HTML inline so editors can check before sending
-      mail = NewsletterMailer.broadcast(NewsletterSubscriber.new(email: current_user.email, unsubscribe_token: "preview"), @issue)
-      render html: mail.html_part.body.decoded.html_safe, layout: false
+      mail = NewsletterMailer.broadcast(
+        NewsletterSubscriber.new(email: current_user.email, unsubscribe_token: "preview"),
+        @issue
+      )
+      @email_html = mail.html_part.body.decoded
     end
 
     def send_issue
