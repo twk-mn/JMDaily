@@ -28,7 +28,12 @@ module Admin
     end
 
     def bulk
-      articles = Article.where(id: params[:article_ids])
+      ids = Array(params[:article_ids]).map(&:to_i).select(&:positive?)
+      if ids.empty?
+        redirect_to admin_articles_path, alert: "No articles selected." and return
+      end
+
+      articles = Article.where(id: ids)
       count = articles.size
 
       case params[:bulk_action]
@@ -39,6 +44,10 @@ module Admin
         articles.update_all(status: "archived")
         redirect_to admin_articles_path, notice: "#{count} #{"article".pluralize(count)} archived."
       when "delete"
+        publishable = articles.where(status: "published").count
+        if publishable > 0
+          redirect_to admin_articles_path, alert: "Cannot delete published articles. Archive them first." and return
+        end
         articles.destroy_all
         redirect_to admin_articles_path, notice: "#{count} #{"article".pluralize(count)} deleted."
       else

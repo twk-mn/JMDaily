@@ -157,6 +157,25 @@ RSpec.describe "Admin::Articles", type: :request do
       }
       expect(response).to redirect_to(admin_articles_path)
     end
+
+    it "redirects with alert when no articles are selected" do
+      post bulk_admin_articles_path, params: { bulk_action: "delete" }
+      expect(response).to redirect_to(admin_articles_path)
+      follow_redirect!
+      expect(response.body).to include("No articles selected")
+    end
+
+    it "refuses to delete published articles" do
+      article1.update!(status: "published", published_at: 1.day.ago)
+      expect {
+        post bulk_admin_articles_path, params: {
+          article_ids: [ article1.id ],
+          bulk_action: "delete"
+        }
+      }.not_to change(Article, :count)
+      follow_redirect!
+      expect(response.body).to include("Archive them first")
+    end
   end
 
   describe "authentication" do
