@@ -1,0 +1,45 @@
+<% content_for :title, "Message from #{@submission.name}" %>
+
+<div class="mb-6 flex items-center justify-between">
+  <%= link_to "← Back to Messages", admin_contact_submissions_path, class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+  <%= button_to "Delete", admin_contact_submission_path(@submission), method: :delete,
+      class: "text-sm text-red-600 hover:text-red-800 cursor-pointer",
+      data: { turbo_confirm: "Delete this message?" } %>
+</div>
+
+<div class="bg-white shadow rounded-lg overflow-hidden max-w-2xl">
+  <div class="px-6 py-5 border-b border-gray-100">
+    <h1 class="text-xl font-bold text-gray-900">
+      <%= @submission.subject.presence || "(No subject)" %>
+    </h1>
+  </div>
+
+  <dl class="px-6 py-4 grid grid-cols-3 gap-4 border-b border-gray-100 text-sm">
+    <div>
+      <dt class="font-medium text-gray-500">From</dt>
+      <dd class="mt-1 text-gray-900"><%= @submission.name %></dd>
+    </div>
+    <div>
+      <dt class="font-medium text-gray-500">Email</dt>
+      <dd class="mt-1">
+        <%= mail_to @submission.email, @submission.email, class: "text-indigo-600 hover:underline" %>
+      </dd>
+    </div>
+    <div>
+      <dt class="font-medium text-gray-500">Received</dt>
+      <dd class="mt-1 text-gray-900"><%= @submission.created_at.strftime("%-d %b %Y at %-I:%M %p") %></dd>
+    </div>
+  </dl>
+
+  <div class="px-6 py-6">
+    <p class="text-sm font-medium text-gray-500 mb-3">Message</p>
+    <div class="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap"><%= @submission.message %></div>
+  </div>
+
+  <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+    <%= mail_to @submission.email,
+        "Reply to #{@submission.name}",
+        subject: "Re: #{@submission.subject}",
+        class: "inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500" %>
+  </div>
+</div>

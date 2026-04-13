@@ -1,0 +1,36 @@
+<article class="flex gap-4">
+  <% if article.featured_image.attached? %>
+    <div class="flex-shrink-0 w-32 sm:w-48">
+      <%= link_to article_path(article) do %>
+        <div class="aspect-[16/10] overflow-hidden rounded-md bg-gray-100">
+          <%= image_tag article.featured_image.variant(:thumb),
+              class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
+              alt: article.featured_image_caption.presence || article.title,
+              loading: "lazy",
+              width: 400, height: 250 %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="flex-1 min-w-0">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="text-xs font-medium text-indigo-600 uppercase tracking-wide"><%= article.category.name %></span>
+      <% if article.breaking? %>
+        <span class="text-xs font-bold text-red-600 uppercase">Breaking</span>
+      <% end %>
+    </div>
+    <%= link_to article_path(article), class: "group" do %>
+      <h3 class="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-snug" style="font-family: Georgia, serif;">
+        <%= article.title %>
+      </h3>
+    <% end %>
+    <% if article.dek.present? %>
+      <p class="mt-1 text-sm text-gray-600 line-clamp-2"><%= article.dek %></p>
+    <% end %>
+    <div class="mt-2 flex items-center text-xs text-gray-500">
+      <span>By <%= article.author.name %></span>
+      <span class="mx-1.5">·</span>
+      <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%B %-d, %Y") %></time>
+    </div>
+  </div>
+</article>

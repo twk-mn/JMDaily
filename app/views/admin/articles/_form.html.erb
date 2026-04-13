@@ -1,0 +1,201 @@
+<% content_for :title, article.persisted? ? "Edit Article" : "New Article" %>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-gray-900"><%= article.persisted? ? "Edit Article" : "New Article" %></h1>
+</div>
+
+<%= form_with model: [:admin, article], class: "space-y-8" do |f| %>
+  <% if article.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <h3 class="text-sm font-medium text-red-800"><%= pluralize(article.errors.count, "error") %> prevented this article from being saved:</h3>
+      <ul class="mt-2 list-disc pl-5 text-sm text-red-700">
+        <% article.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main content column -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white shadow rounded-lg p-6 space-y-6">
+        <div>
+          <%= f.label :title, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg px-3 py-2 border", autofocus: true %>
+        </div>
+
+        <div>
+          <%= f.label :slug, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :slug, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border font-mono", placeholder: "auto-generated-from-title" %>
+          <p class="mt-1 text-xs text-gray-500">Leave blank to auto-generate from title</p>
+        </div>
+
+        <div>
+          <%= f.label :dek, "Summary / Dek", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_area :dek, rows: 2, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <%= f.label :body, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.rich_text_area :body, class: "min-h-[300px]" %>
+        </div>
+      </div>
+
+      <!-- SEO -->
+      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-medium text-gray-900">SEO</h2>
+        <div>
+          <%= f.label :seo_title, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :seo_title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Defaults to article title" %>
+        </div>
+        <div>
+          <%= f.label :meta_description, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_area :meta_description, rows: 2, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Defaults to summary" %>
+        </div>
+        <div>
+          <%= f.label :canonical_url, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.url_field :canonical_url, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Only if republished from another source" %>
+        </div>
+      </div>
+
+      <!-- Internal notes -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Internal Notes</h2>
+        <div>
+          <%= f.label :source_notes, "Source / Notes (not published)", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_area :source_notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Publish controls -->
+      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-medium text-gray-900">Publish</h2>
+
+        <div>
+          <%= f.label :status, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :status, Article::STATUSES.map { |s| [s.titleize, s] },
+              {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <%= f.label :published_at, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.datetime_local_field :published_at, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2">
+            <%= f.check_box :featured, class: "rounded border-gray-300 text-indigo-600" %>
+            <span class="text-sm text-gray-700">Featured</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <%= f.check_box :breaking, class: "rounded border-gray-300 text-red-600" %>
+            <span class="text-sm text-gray-700">Breaking</span>
+          </label>
+        </div>
+
+        <div class="pt-4 border-t space-y-2">
+          <%= f.submit article.persisted? ? "Update Article" : "Create Article",
+              class: "w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+
+          <% if article.persisted? %>
+            <%= link_to "Preview →", preview_admin_article_path(article), target: "_blank",
+                class: "block text-center text-sm text-amber-600 hover:text-amber-500" %>
+          <% end %>
+          <% if article.persisted? && article.published? %>
+            <%= link_to "View on site →", article_path(article), target: "_blank",
+                class: "block text-center text-sm text-indigo-600 hover:text-indigo-500" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Taxonomy -->
+      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-medium text-gray-900">Organization</h2>
+
+        <div>
+          <%= f.label :author_id, "Author", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.collection_select :author_id, Author.order(:name), :id, :name,
+              { prompt: "Select author" },
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <%= f.label :category_id, "Category", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.collection_select :category_id, Category.all, :id, :name,
+              { prompt: "Select category" },
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <%= f.label :article_type, "Article type", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :article_type, [["News", "news"], ["Analysis", "analysis"], ["Explainer", "explainer"], ["Feature", "feature"], ["Event", "event"]],
+              {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+
+        <div>
+          <span class="block text-sm font-medium text-gray-700 mb-2">Tags</span>
+          <div class="space-y-1 max-h-40 overflow-y-auto">
+            <%= f.collection_check_boxes :tag_ids, Tag.order(:name), :id, :name do |b| %>
+              <label class="flex items-center gap-2">
+                <%= b.check_box class: "rounded border-gray-300 text-indigo-600" %>
+                <span class="text-sm text-gray-700"><%= b.text %></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <span class="block text-sm font-medium text-gray-700 mb-2">Locations</span>
+          <div class="space-y-1">
+            <%= f.collection_check_boxes :location_ids, Location.order(:name), :id, :name do |b| %>
+              <label class="flex items-center gap-2">
+                <%= b.check_box class: "rounded border-gray-300 text-indigo-600" %>
+                <span class="text-sm text-gray-700"><%= b.text %></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Image -->
+      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-medium text-gray-900">Featured Image</h2>
+
+        <% if article.featured_image.attached? %>
+          <div class="mb-2">
+            <%= image_tag article.featured_image.variant(resize_to_limit: [400, 300]), class: "rounded-md w-full object-cover" %>
+          </div>
+        <% end %>
+
+        <div>
+          <%= f.label :featured_image, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.file_field :featured_image, accept: "image/*",
+              class: "mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" %>
+        </div>
+
+        <div>
+          <%= f.label :featured_image_alt, "Alt text", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :featured_image_alt, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border", placeholder: "Describe the image for screen readers" %>
+          <p class="mt-1 text-xs text-gray-500">Used by screen readers and if the image fails to load. Defaults to caption or title if blank.</p>
+        </div>
+
+        <div>
+          <%= f.label :featured_image_caption, "Caption", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :featured_image_caption, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        </div>
+      </div>
+
+      <% if article.persisted? %>
+        <div class="bg-white shadow rounded-lg p-6">
+          <%= button_to "Delete Article", admin_article_path(article), method: :delete,
+              class: "w-full rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 cursor-pointer",
+              data: { turbo_confirm: "Are you sure you want to delete this article?" } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

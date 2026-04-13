@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+  <title><%= content_for?(:title) ? "#{yield(:title)} — JMDaily Admin" : "JMDaily Admin" %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="h-full">
+  <% if current_user %>
+    <div class="min-h-full">
+      <nav class="bg-gray-800">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex h-16 items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <%= link_to admin_root_path, class: "text-white font-bold text-lg hover:text-gray-200" do %>JMDaily Admin<% end %>
+              </div>
+              <div class="ml-10 flex items-baseline space-x-4">
+                <%# Always visible %>
+                <%= link_to "Dashboard", admin_root_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                <%= link_to "Articles", admin_articles_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                <%= link_to "Authors", admin_authors_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                <%= link_to "Tags", admin_tags_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                <%= link_to admin_contact_submissions_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-1.5" do %>
+                  Messages
+                  <% count = unread_messages_count; if count > 0 %>
+                    <span class="inline-flex items-center justify-center rounded-full bg-indigo-500 text-white text-xs font-bold w-5 h-5"><%= count %></span>
+                  <% end %>
+                <% end %>
+                <%= link_to admin_comments_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-1.5" do %>
+                  Comments
+                  <% pending = Comment.pending.count; if pending > 0 %>
+                    <span class="inline-flex items-center justify-center rounded-full bg-yellow-500 text-white text-xs font-bold w-5 h-5"><%= pending %></span>
+                  <% end %>
+                <% end %>
+                <%= link_to admin_tip_submissions_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-1.5" do %>
+                  Tips
+                  <% tip_count = unread_tips_count; if tip_count > 0 %>
+                    <span class="inline-flex items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold w-5 h-5"><%= tip_count %></span>
+                  <% end %>
+                <% end %>
+
+                <%# Admin only %>
+                <% if current_user.admin? %>
+                  <%= link_to "Categories", admin_categories_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                  <%= link_to "Locations", admin_locations_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                  <%= link_to "Pages", admin_static_pages_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                  <%= link_to "Ads", admin_ads_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                  <%= link_to "Subscribers", admin_newsletter_subscribers_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                  <%= link_to "Newsletter", admin_newsletter_issues_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                  <%= link_to "Users", admin_users_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                  <%= link_to "Activity Log", admin_audit_logs_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+                <% end %>
+
+                <%= link_to "View Site →", root_path, class: "rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white", target: "_blank" %>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-300 text-sm"><%= current_user.name %></span>
+              <%= link_to admin_two_factor_path, class: "rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 hover:text-white flex items-center gap-1 #{current_user.otp_enabled? ? 'text-green-400' : 'text-gray-400'}", title: current_user.otp_enabled? ? "2FA enabled" : "2FA disabled — click to set up" do %>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 01.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303M12 3c4.477 0 8.268 2.943 9.542 7a11.959 11.959 0 01-1.302 2.898M9.879 16.121A3 3 0 1016.12 9.88M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                2FA
+              <% end %>
+              <%= button_to "Log out", admin_logout_path, method: :delete, class: "rounded-md bg-gray-700 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 hover:text-white" %>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main>
+        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <% if notice %>
+            <div class="mb-4 rounded-md bg-green-50 p-4">
+              <p class="text-sm text-green-700"><%= notice %></p>
+            </div>
+          <% end %>
+          <% if alert %>
+            <div class="mb-4 rounded-md bg-red-50 p-4">
+              <p class="text-sm text-red-700"><%= alert %></p>
+            </div>
+          <% end %>
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  <% else %>
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      <% if alert %>
+        <div class="sm:mx-auto sm:w-full sm:max-w-sm mb-4 rounded-md bg-red-50 p-4">
+          <p class="text-sm text-red-700"><%= alert %></p>
+        </div>
+      <% end %>
+      <%= yield %>
+    </div>
+  <% end %>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<% is_new = !user.persisted?
+   is_self = user == current_user %>
+
+<% content_for :title, is_new ? "New User" : "Edit User" %>
+<h1 class="text-2xl font-bold text-gray-900 mb-6"><%= is_new ? "New User" : "Edit User" %></h1>
+
+<div class="bg-white shadow rounded-lg p-6 max-w-lg">
+  <%= form_with model: [:admin, user], class: "space-y-5" do |f| %>
+    <% if user.errors.any? %>
+      <div class="rounded-md bg-red-50 p-4">
+        <ul class="list-disc pl-5 text-sm text-red-700">
+          <% user.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+    </div>
+
+    <div>
+      <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.email_field :email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border font-mono" %>
+    </div>
+
+    <div>
+      <%= f.label :role, class: "block text-sm font-medium text-gray-700" %>
+      <% if is_self %>
+        <p class="mt-1 text-sm text-gray-500 italic">You cannot change your own role.</p>
+        <%= f.hidden_field :role %>
+      <% else %>
+        <%= f.select :role,
+            [["Editor — can create and edit content", "editor"], ["Admin — full access", "admin"]],
+            {},
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+      <% end %>
+    </div>
+
+    <div class="border-t border-gray-100 pt-4 space-y-4">
+      <% if is_new %>
+        <h3 class="text-sm font-semibold text-gray-700">Password</h3>
+      <% else %>
+        <h3 class="text-sm font-semibold text-gray-700">Change Password <span class="font-normal text-gray-400">(leave blank to keep current)</span></h3>
+      <% end %>
+
+      <div>
+        <%= f.label :password, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.password_field :password,
+            required: is_new,
+            autocomplete: is_new ? "new-password" : "off",
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+      </div>
+      <div>
+        <%= f.label :password_confirmation, "Confirm password", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.password_field :password_confirmation,
+            required: is_new,
+            autocomplete: "off",
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+      <%= f.submit class: "rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+      <%= link_to "Cancel", admin_users_path, class: "text-sm text-gray-500 hover:text-gray-700" %>
+      <% if user.persisted? && user != current_user %>
+        <%= button_to "Delete", admin_user_path(user), method: :delete,
+            class: "ml-auto text-sm text-red-600 hover:text-red-800 cursor-pointer",
+            data: { turbo_confirm: "Delete #{user.name}? This cannot be undone." } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

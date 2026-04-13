@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Keep admin and private paths out of search indexes
+Disallow: /admin/
+Disallow: /rails/
+Disallow: /up
+
+Sitemap: https://jmdaily.com/sitemap.xml.gz

@@ -1,0 +1,47 @@
+<% content_for :title, "Tip from #{@tip.name.presence || 'Anonymous'}" %>
+
+<div class="mb-6 flex items-center justify-between">
+  <%= link_to "← Back to Tips", admin_tip_submissions_path, class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+  <%= button_to "Delete", admin_tip_submission_path(@tip), method: :delete,
+      class: "text-sm text-red-600 hover:text-red-800 cursor-pointer",
+      data: { turbo_confirm: "Delete this tip? This cannot be undone." } %>
+</div>
+
+<div class="bg-white shadow rounded-lg overflow-hidden max-w-2xl">
+  <div class="px-6 py-5 border-b border-gray-100">
+    <h1 class="text-xl font-bold text-gray-900">Tip</h1>
+    <p class="mt-1 text-sm text-gray-500">
+      Received <%= @tip.created_at.strftime("%-d %b %Y at %-I:%M %p") %>
+    </p>
+  </div>
+
+  <dl class="px-6 py-4 grid grid-cols-2 gap-4 border-b border-gray-100 text-sm">
+    <div>
+      <dt class="font-medium text-gray-500">Name</dt>
+      <dd class="mt-1 text-gray-900"><%= @tip.name.presence || "Anonymous" %></dd>
+    </div>
+    <div>
+      <dt class="font-medium text-gray-500">Email</dt>
+      <dd class="mt-1">
+        <% if @tip.email.present? %>
+          <%= mail_to @tip.email, @tip.email, class: "text-indigo-600 hover:underline" %>
+        <% else %>
+          <span class="text-gray-400">Not provided</span>
+        <% end %>
+      </dd>
+    </div>
+  </dl>
+
+  <div class="px-6 py-6">
+    <p class="text-sm font-medium text-gray-500 mb-3">Tip</p>
+    <div class="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap"><%= @tip.tip_body %></div>
+  </div>
+
+  <% if @tip.email.present? %>
+    <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+      <%= mail_to @tip.email,
+          "Reply to #{@tip.name.presence || 'source'}",
+          class: "inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,16 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "e05d97bd8fbc3bf9795c7c3028bea29a71ab7f8d1be909360aac912121a777aa",
+      "note": "Intentional: :role is permitted in user_create_params. This action is behind require_admin! so only admins can assign roles."
+    },
+    {
+      "fingerprint": "2dcd06024c0750e05825c67fc4cb9c9c114d2dc64d5be33b91fa8882dc5f4eee",
+      "note": "Intentional: :role is permitted in user_update_params. This action is behind require_admin! and the controller guards against self-role-change."
+    },
+    {
+      "fingerprint": "64445fa2557864298fcfee6a1da00341707eebb477356e1f9b733fb0e76428a6",
+      "note": "Intentional: redirect to ad.link_url is guarded by safe_ad_url? which enforces http(s) scheme. allow_other_host is required for external ad destinations."
+    }
+  ]
+}

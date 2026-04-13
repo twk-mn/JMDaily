@@ -1,0 +1,14 @@
+New tip received
+================
+<% if @tip.name.present? %>
+Name: <%= @tip.name %>
+<% end %>
+<% if @tip.email.present? %>
+Email: <%= @tip.email %>
+<% end %>
+
+Tip:
+----
+<%= @tip.tip_body %>
+
+View in admin: <%= admin_tip_submission_url(@tip) %>
