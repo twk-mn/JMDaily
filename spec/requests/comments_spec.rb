@@ -47,6 +47,13 @@ RSpec.describe "Comments", type: :request do
       }.not_to change(Comment, :count)
     end
 
+    it "silently discards submissions with the honeypot field filled" do
+      expect {
+        post article_comments_path(article), params: valid_params.merge(website: "http://spam.com")
+      }.not_to change(Comment, :count)
+      expect(response).to redirect_to(article_path(article, anchor: "comments"))
+    end
+
     it "returns 404 for unpublished articles" do
       draft = create(:article, author: author, category: category)
       post article_comments_path(draft), params: valid_params
