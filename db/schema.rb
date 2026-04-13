@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_13_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_100001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -219,11 +219,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_000003) do
   create_table "newsletter_issues", force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
+    t.string "locale", default: "en", null: false
     t.integer "recipients_count", default: 0
     t.datetime "sent_at"
     t.string "status", default: "draft", null: false
     t.string "subject", null: false
     t.datetime "updated_at", null: false
+    t.index ["locale"], name: "index_newsletter_issues_on_locale"
   end
 
   create_table "newsletter_subscribers", force: :cascade do |t|

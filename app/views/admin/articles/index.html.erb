@@ -69,11 +69,12 @@
                      data-action="change->bulk-select#updateCount"
                      data-bulk-select-target="checkbox">
             </td>
+            <% en = article.translations.find { |t| t.locale == "en" } || article.translations.first %>
             <td class="px-6 py-4">
               <div class="text-sm font-medium text-gray-900">
-                <%= link_to article.title, edit_admin_article_path(article), class: "hover:text-indigo-600" %>
+                <%= link_to (en&.title || article.title), edit_admin_article_path(article), class: "hover:text-indigo-600" %>
               </div>
-              <div class="text-sm text-gray-500"><%= article.dek&.truncate(80) %></div>
+              <div class="text-sm text-gray-500"><%= (en&.dek || article.dek)&.truncate(80) %></div>
               <% if article.featured? %>
                 <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">Featured</span>
               <% end %>
