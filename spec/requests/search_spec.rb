@@ -35,5 +35,23 @@ RSpec.describe "Search", type: :request do
       expect(response).to have_http_status(:success)
       expect(Article.count).to be >= 0
     end
+
+    context "with Japanese query" do
+      let!(:article) do
+        a = create(:article, :published, title: "Local news")
+        a.update_columns(ja_search_text: "上越市のニュース 地域情報")
+        a
+      end
+
+      it "finds articles by Japanese title text" do
+        get search_path, params: { q: "上越市" }
+        expect(response.body).to include("Local news")
+      end
+
+      it "does not raise an error for Japanese input" do
+        get search_path, params: { q: "ニュース" }
+        expect(response).to have_http_status(:success)
+      end
+    end
   end
 end

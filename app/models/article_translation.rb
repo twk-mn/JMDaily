@@ -14,7 +14,7 @@ class ArticleTranslation < ApplicationRecord
                    format: { with: /\A[a-z0-9\-]+\z/, message: "must be lowercase letters, numbers, and hyphens" }
 
   before_validation :generate_slug, if: -> { slug.blank? && title.present? }
-  after_save :sync_search_vector, if: -> { locale == "en" && (saved_change_to_title? || saved_change_to_dek?) }
+  after_save :sync_search_vector, if: -> { saved_change_to_title? || saved_change_to_dek? }
 
   def to_param
     slug
@@ -26,14 +26,20 @@ class ArticleTranslation < ApplicationRecord
     self.slug = title.parameterize
   end
 
-  # Keep the search_vector on articles current — the FTS trigger fires on
-  # articles.title / articles.dek changes, so we propagate the English
-  # translation's values back so search continues to work.
+  # Keep denormalised search columns on articles in sync.
+  # English: propagates title/dek back to articles so the PG tsvector trigger fires.
+  # Japanese: updates ja_search_text used for trigram search.
   def sync_search_vector
-    article.update_columns(
-      title: title,
-      dek: dek.presence || article.dek
-    )
+    if locale == "en"
+      article.update_columns(
+        title: title,
+        dek: dek.presence || article.dek
+      )
+    elsif locale == "ja"
+      article.update_columns(
+        ja_search_text: [ title, dek.presence ].compact.join(" ")
+      )
+    end
   rescue ActiveRecord::ActiveRecordError => e
     Rails.logger.error("ArticleTranslation#sync_search_vector failed for article #{article_id}: #{e.message}")
   end
