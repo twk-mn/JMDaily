@@ -4,7 +4,7 @@ module Admin
     before_action :set_category, only: [ :edit, :update, :destroy ]
 
     def index
-      @categories = Category.all
+      @pagy, @categories = pagy(:offset, Category.order(:position, :name), limit: 50)
     end
 
     def new
