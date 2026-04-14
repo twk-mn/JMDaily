@@ -1,6 +1,15 @@
 class ApplicationController < ActionController::Base
   before_action :set_locale
 
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+
+  def not_found
+    respond_to do |format|
+      format.html { render file: Rails.public_path.join("404.html"), status: :not_found, layout: false }
+      format.json { render json: { error: "Not found" }, status: :not_found }
+    end
+  end
+
   private
 
   BROWSER_LOCALES = %w[en ja].freeze

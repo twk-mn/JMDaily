@@ -29,3 +29,19 @@
     </tbody>
   </table>
 </div>
+
+<% if @pagy && @pagy.pages > 1 %>
+  <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+    <span><%= @pagy.from %>–<%= @pagy.to %> of <%= @pagy.count %> locations</span>
+    <nav class="flex gap-1">
+      <% if @pagy.prev %>
+        <%= link_to "← Previous", admin_locations_path(page: @pagy.prev),
+            class: "px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50" %>
+      <% end %>
+      <% if @pagy.next %>
+        <%= link_to "Next →", admin_locations_path(page: @pagy.next),
+            class: "px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50" %>
+      <% end %>
+    </nav>
+  </div>
+<% end %>

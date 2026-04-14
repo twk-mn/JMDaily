@@ -4,7 +4,7 @@ module Admin
     before_action :set_location, only: [ :edit, :update, :destroy ]
 
     def index
-      @locations = Location.order(:name)
+      @pagy, @locations = pagy(:offset, Location.order(:name), limit: 50)
     end
 
     def new
