@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_14_100001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
@@ -133,6 +134,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_000001) do
     t.boolean "featured", default: false, null: false
     t.string "featured_image_alt"
     t.string "featured_image_caption"
+    t.text "ja_search_text", default: ""
     t.text "meta_description"
     t.datetime "published_at"
     t.tsvector "search_vector"
@@ -144,6 +146,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_000001) do
     t.datetime "updated_at", null: false
     t.index ["author_id"], name: "index_articles_on_author_id"
     t.index ["category_id"], name: "index_articles_on_category_id"
+    t.index ["ja_search_text"], name: "index_articles_on_ja_search_text_trgm", opclass: :gin_trgm_ops, using: :gin
     t.index ["search_vector"], name: "index_articles_on_search_vector", using: :gin
     t.index ["slug"], name: "index_articles_on_slug", unique: true
   end

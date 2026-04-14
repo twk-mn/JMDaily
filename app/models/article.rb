@@ -43,11 +43,21 @@ class Article < ApplicationRecord
   scope :by_location, ->(location) { joins(:locations).where(locations: { id: location.id }) }
   scope :search, ->(query) {
     return none if query.blank?
-    sanitized = sanitize_sql_array([ "plainto_tsquery('english', ?)", query ])
-    published
-      .where("search_vector @@ #{sanitized}")
-      .order(Arel.sql("ts_rank(search_vector, #{sanitized}) DESC"))
+    if japanese?(query)
+      published
+        .where("ja_search_text ILIKE ?", "%#{sanitize_sql_like(query)}%")
+        .order(published_at: :desc)
+    else
+      sanitized = sanitize_sql_array([ "plainto_tsquery('english', ?)", query ])
+      published
+        .where("search_vector @@ #{sanitized}")
+        .order(Arel.sql("ts_rank(search_vector, #{sanitized}) DESC"))
+    end
   }
+
+  def self.japanese?(text)
+    text.match?(/[\u3000-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/)
+  end
 
   # Returns the slug for the current I18n locale, falling back to the base slug.
   def to_param
