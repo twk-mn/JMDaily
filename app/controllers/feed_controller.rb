@@ -1,6 +1,13 @@
 class FeedController < ApplicationController
   def index
-    @articles = Article.published.recent.limit(25)
+    requested = params[:locale].to_s
+    @locale = ArticleTranslation::LOCALES.include?(requested) ? requested : "en"
+
+    @articles = Article.published
+      .recent
+      .includes(:author, :category, :translations)
+      .limit(25)
+
     respond_to do |format|
       format.rss { render layout: false }
     end
