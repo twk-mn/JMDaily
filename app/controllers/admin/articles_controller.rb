@@ -16,14 +16,27 @@ module Admin
     end
 
     def preview
-      @article = Article.includes(:author, :category, :tags, :locations, :sources, :translations).find(params[:id])
-      @translation = @article.translations.find { |t| t.locale == "en" } || @article.translations.first
+      @article = Article.includes(:author, :category, :tags, :locations, :sources, :translations,
+                                  featured_image_attachment: :blob).find(params[:id])
+      @translation = @article.translation_for(I18n.locale) || @article.translations.first
+
+      card_includes = [ :translations, { featured_image_attachment: :blob } ]
       @related_articles = Article.published
                                  .where(category: @article.category)
                                  .where.not(id: @article.id)
-                                 .includes(:translations)
+                                 .includes(card_includes)
                                  .order(published_at: :desc)
                                  .limit(4)
+      @more_from_author = Article.published
+                                 .where(author: @article.author)
+                                 .where.not(id: @article.id)
+                                 .includes(card_includes)
+                                 .order(published_at: :desc)
+                                 .limit(3)
+      @approved_comments = @article.comments.approved.recent
+      @other_translations = @article.translations.reject { |t| t.locale == I18n.locale.to_s }
+      @json_ld = build_preview_json_ld
+
       render "articles/show", layout: "application"
     end
 
@@ -114,6 +127,28 @@ module Admin
         ],
         sources_attributes: [ :id, :name, :url, :position, :_destroy ]
       )
+    end
+
+    def build_preview_json_ld
+      schema = {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": @translation&.title,
+        "description": @article.effective_meta_description(@translation),
+        "datePublished": @article.published_at&.iso8601,
+        "dateModified": @article.updated_at.iso8601,
+        "author": {
+          "@type": "Person",
+          "name": @article.author.name,
+          "url": author_url(@article.author, slug: @article.author.slug)
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Joetsu-Myoko Daily"
+        }
+      }
+      schema[:image] = url_for(@article.featured_image) if @article.featured_image.attached?
+      schema
     end
   end
 end
