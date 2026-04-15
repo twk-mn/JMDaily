@@ -46,7 +46,7 @@ Public access lets images be served directly from R2 without going through your 
 1. In the R2 sidebar, click **Manage R2 API Tokens**
 2. Click **Create API Token**
 3. Give it a name (e.g. `jmdaily-production`)
-4. Permissions: **Object Read & Write**
+4. Under **Permissions**, add **Workers R2 Storage** → **Read & Write**
 5. Specify bucket: select `jmdaily-production`
 6. Click **Create API Token**
 7. **Save these immediately** — the secret key is only shown once:
