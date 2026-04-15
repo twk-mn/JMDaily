@@ -21,6 +21,9 @@ FROM base as build
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev libvips pkg-config
 
+# Install the bundler version matching Gemfile.lock
+RUN gem install bundler -v "$(grep -A1 'BUNDLED WITH' Gemfile.lock | tail -1 | tr -d ' ')"
+
 # Install application gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle install && \
