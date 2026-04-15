@@ -2,7 +2,28 @@
 
 # If running the rails server then create or migrate existing database
 if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  ./bin/rails db:prepare
+  echo "[entrypoint] Starting database preparation..."
+
+  # Verify DATABASE_URL is set before attempting to connect
+  if [ -z "${DATABASE_URL}" ]; then
+    echo "[entrypoint] WARNING: DATABASE_URL is not set. Skipping db:prepare."
+  else
+    echo "[entrypoint] DATABASE_URL is set (host: $(echo $DATABASE_URL | sed 's|.*@||' | cut -d'/' -f1))"
+
+    # Run db:prepare with a 30-second timeout so a hung connection doesn't
+    # block the container from starting indefinitely.
+    if timeout 30 ./bin/rails db:prepare 2>&1; then
+      echo "[entrypoint] Database preparation completed successfully."
+    else
+      EXIT_CODE=$?
+      if [ $EXIT_CODE -eq 124 ]; then
+        echo "[entrypoint] ERROR: db:prepare timed out after 30 seconds. The database may be unreachable."
+      else
+        echo "[entrypoint] ERROR: db:prepare failed with exit code $EXIT_CODE."
+      fi
+      echo "[entrypoint] Continuing to start the server so logs are visible. The app may not function correctly."
+    fi
+  fi
 fi
 
 exec "${@}"
