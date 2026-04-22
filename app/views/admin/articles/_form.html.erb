@@ -22,15 +22,38 @@
 
       <!-- Translations -->
       <% locale_labels = { "en" => "🇬🇧 English", "ja" => "🇯🇵 Japanese" } %>
-      <% article.translations.sort_by { |t| t.locale == "en" ? 0 : 1 }.each do |translation| %>
+      <%
+        sorted_translations = article.translations.sort_by do |t|
+          [ArticleTranslation.required_locale?(t.locale) ? 0 : 1, t.locale]
+        end
+        rendered_optional_heading = false
+      %>
+      <% sorted_translations.each do |translation| %>
+        <% required = ArticleTranslation.required_locale?(translation.locale) %>
+
+        <% if !required && !rendered_optional_heading %>
+          <% rendered_optional_heading = true %>
+          <div class="pt-2">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Additional languages</h2>
+            <p class="text-xs text-gray-500 mt-1">Optional — leave any section blank to skip that language for this article.</p>
+          </div>
+        <% end %>
+
         <%= f.fields_for :translations, translation do |tf| %>
           <%= tf.hidden_field :locale %>
           <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="bg-gray-50 border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-              <h2 class="text-sm font-semibold text-gray-700"><%= locale_labels[translation.locale] || translation.locale.upcase %></h2>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm font-semibold text-gray-700"><%= locale_labels[translation.locale] || translation.locale.upcase %></h2>
+                <% if required %>
+                  <span class="text-[10px] font-semibold uppercase tracking-wide bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">Required</span>
+                <% else %>
+                  <span class="text-[10px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Optional</span>
+                <% end %>
+              </div>
               <% if translation.persisted? %>
                 <span class="text-xs text-green-600 font-medium">Saved</span>
-              <% else %>
+              <% elsif required %>
                 <span class="text-xs text-amber-600 font-medium">Not yet saved</span>
               <% end %>
             </div>

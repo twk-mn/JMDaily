@@ -13,7 +13,7 @@ class Article < ApplicationRecord
   has_many :article_locations, dependent: :destroy
   has_many :locations, through: :article_locations
 
-  accepts_nested_attributes_for :translations, allow_destroy: false, reject_if: :all_blank
+  accepts_nested_attributes_for :translations, allow_destroy: false, reject_if: :optional_translation_blank?
   accepts_nested_attributes_for :sources, allow_destroy: true, reject_if: :all_blank
 
   has_one_attached :featured_image do |attachable|
@@ -31,7 +31,10 @@ class Article < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :published_at, presence: true, if: -> { status == "published" }
 
-  before_validation :seed_title_from_translations, if: -> { title.blank? }
+  # Seed the article-level title from the English translation before Sluggable's
+  # generate_slug runs, so the slug can be auto-derived when the editor only fills
+  # in translation titles (the admin form has no article-level title input).
+  before_validation :seed_title_from_translations, prepend: true, if: -> { title.blank? }
 
   scope :published, -> { where(status: "published").where("published_at <= ?", Time.current) }
   scope :draft, -> { where(status: "draft") }
@@ -105,6 +108,18 @@ class Article < ApplicationRecord
   end
 
   private
+
+  # Drop translation rows for optional locales when the editor left every content
+  # field blank. The hidden `locale` input is always populated by the form, so the
+  # default `:all_blank` check never rejects anything — we have to ignore
+  # bookkeeping fields explicitly. Required locales are always kept so their
+  # validations surface instead of silently disappearing.
+  def optional_translation_blank?(attrs)
+    locale = attrs[:locale] || attrs["locale"]
+    return false if ArticleTranslation.required_locale?(locale)
+
+    attrs.except(:id, "id", :locale, "locale", :_destroy, "_destroy").values.all?(&:blank?)
+  end
 
   def seed_title_from_translations
     en = translations.find { |t| t.locale == "en" }

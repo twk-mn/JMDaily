@@ -88,4 +88,19 @@ RSpec.describe ArticleTranslation, type: :model do
       expect(ArticleTranslation::LOCALES).to include("en", "ja")
     end
   end
+
+  describe 'required vs optional locales' do
+    it 'treats English as required' do
+      expect(ArticleTranslation.required_locale?("en")).to be true
+    end
+
+    it 'treats Japanese as optional' do
+      expect(ArticleTranslation.required_locale?("ja")).to be false
+      expect(ArticleTranslation.optional_locales).to include("ja")
+    end
+
+    it 'accepts symbol or string input' do
+      expect(ArticleTranslation.required_locale?(:en)).to be true
+    end
+  end
 end
