@@ -79,6 +79,4 @@ test:
 #
 production:
   <<: *default
-  database: jm_daily_production
-  username: jm_daily
-  password: <%= ENV["JM_DAILY_DATABASE_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>
