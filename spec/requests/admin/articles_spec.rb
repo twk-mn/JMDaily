@@ -87,7 +87,7 @@ RSpec.describe "Admin::Articles", type: :request do
       }.to change(Article, :count).by(1)
 
       article = Article.last
-      expect(article.translations.map(&:locale)).to eq(["en"])
+      expect(article.translations.map(&:locale)).to eq([ "en" ])
     end
 
     it "saves both translations when both are filled in" do

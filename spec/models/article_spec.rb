@@ -193,7 +193,7 @@ RSpec.describe Article, type: :model do
             seo_title: "", meta_description: "" }
         ]
       )
-      expect(article.translations.map(&:locale)).to eq(["en"])
+      expect(article.translations.map(&:locale)).to eq([ "en" ])
     end
 
     it 'still validates required-locale translations when blank' do
