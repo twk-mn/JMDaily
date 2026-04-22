@@ -6,6 +6,20 @@ class ArticleTranslation < ApplicationRecord
 
   LOCALES = %w[en ja].freeze
 
+  # Locales that must be filled in on every article. Other supported locales are
+  # optional — editors can publish without them. English is the primary editorial
+  # language. This list will become settings-driven in a later change; the
+  # distinction is introduced here so callers can rely on it now.
+  REQUIRED_LOCALES = %w[en].freeze
+
+  def self.optional_locales
+    LOCALES - REQUIRED_LOCALES
+  end
+
+  def self.required_locale?(locale)
+    REQUIRED_LOCALES.include?(locale.to_s)
+  end
+
   validates :locale, presence: true, inclusion: { in: LOCALES },
                     uniqueness: { scope: :article_id, message: "translation already exists for this article" }
   validates :title, presence: true

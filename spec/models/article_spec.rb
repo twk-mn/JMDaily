@@ -180,6 +180,44 @@ RSpec.describe Article, type: :model do
     end
   end
 
+  describe 'nested translation attributes' do
+    let(:author) { create(:author) }
+    let(:category) { create(:category) }
+
+    it 'drops blank optional-locale translations on create' do
+      article = Article.create!(
+        status: "draft", author: author, category: category,
+        translations_attributes: [
+          { locale: "en", title: "EN title", slug: "en-title", dek: "d" },
+          { locale: "ja", title: "", slug: "", dek: "", body: "", context_box: "",
+            seo_title: "", meta_description: "" }
+        ]
+      )
+      expect(article.translations.map(&:locale)).to eq(["en"])
+    end
+
+    it 'still validates required-locale translations when blank' do
+      article = Article.new(
+        status: "draft", author: author, category: category,
+        translations_attributes: [
+          { locale: "en", title: "", slug: "", dek: "" }
+        ]
+      )
+      expect(article).not_to be_valid
+    end
+
+    it 'keeps optional-locale translations when any content field is filled' do
+      article = Article.create!(
+        status: "draft", author: author, category: category,
+        translations_attributes: [
+          { locale: "en", title: "EN title", slug: "en-title" },
+          { locale: "ja", title: "JA title", slug: "ja-title", dek: "" }
+        ]
+      )
+      expect(article.translations.map(&:locale)).to match_array(%w[en ja])
+    end
+  end
+
   describe '#reading_time' do
     it 'returns at least 1 minute when no translation body' do
       article = create(:article)

@@ -71,6 +71,37 @@ RSpec.describe "Admin::Articles", type: :request do
       }
       expect(response).to have_http_status(:unprocessable_content)
     end
+
+    it "creates an article with only the required (English) translation filled in" do
+      expect {
+        post admin_articles_path, params: {
+          article: {
+            status: "draft", author_id: author.id, category_id: category.id,
+            translations_attributes: [
+              { locale: "en", title: "EN only", slug: "en-only", dek: "English dek" },
+              { locale: "ja", title: "", slug: "", dek: "", body: "", context_box: "",
+                seo_title: "", meta_description: "" }
+            ]
+          }
+        }
+      }.to change(Article, :count).by(1)
+
+      article = Article.last
+      expect(article.translations.map(&:locale)).to eq(["en"])
+    end
+
+    it "saves both translations when both are filled in" do
+      post admin_articles_path, params: {
+        article: {
+          status: "draft", author_id: author.id, category_id: category.id,
+          translations_attributes: [
+            { locale: "en", title: "EN title", slug: "en-title", dek: "English dek" },
+            { locale: "ja", title: "JA title", slug: "ja-title", dek: "Japanese dek" }
+          ]
+        }
+      }
+      expect(Article.last.translations.map(&:locale)).to match_array(%w[en ja])
+    end
   end
 
   describe "GET /admin/articles/:id (show)" do
