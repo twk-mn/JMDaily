@@ -101,7 +101,9 @@ Rails.application.configure do
   # APP_HOST must be set to your production domain (e.g. jmdaily.com).
   config.hosts = [
     ENV.fetch("APP_HOST", "jmdaily.com"),
-    /.*\.jmdaily\.com/
+    /.*\.jmdaily\.com/,
+    "jmdaily-production.up.railway.app",
+    "jmdaily.railway.internal"
   ]
   # Railway pings /up with its own internal host header — exclude it from host checks.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
