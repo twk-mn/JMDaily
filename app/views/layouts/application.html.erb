@@ -35,6 +35,7 @@
 
     <link rel="alternate" type="application/rss+xml" title="Joetsu-Myoko Daily (English)" href="<%= feed_url(format: :rss, locale: 'en') %>">
     <link rel="alternate" type="application/rss+xml" title="上越妙高デイリー (日本語)" href="<%= feed_url(format: :rss, locale: 'ja') %>">
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
   </head>
 
   <body class="bg-white text-gray-900 antialiased">
