@@ -4,23 +4,27 @@ class ArticleTranslation < ApplicationRecord
   has_rich_text :body
   has_rich_text :context_box
 
-  LOCALES = %w[en ja].freeze
+  # The list of supported locales is settings-driven — see SiteLanguage. We keep
+  # class methods rather than constants so new languages added at runtime are
+  # picked up without a boot restart.
+  def self.supported_locales
+    SiteLanguage.codes
+  end
 
-  # Locales that must be filled in on every article. Other supported locales are
-  # optional — editors can publish without them. English is the primary editorial
-  # language. This list will become settings-driven in a later change; the
-  # distinction is introduced here so callers can rely on it now.
-  REQUIRED_LOCALES = %w[en].freeze
+  def self.required_locales
+    SiteLanguage.required_codes
+  end
 
   def self.optional_locales
-    LOCALES - REQUIRED_LOCALES
+    supported_locales - required_locales
   end
 
   def self.required_locale?(locale)
-    REQUIRED_LOCALES.include?(locale.to_s)
+    SiteLanguage.required_code?(locale)
   end
 
-  validates :locale, presence: true, inclusion: { in: LOCALES },
+  validates :locale, presence: true,
+                    inclusion: { in: ->(_) { SiteLanguage.codes } },
                     uniqueness: { scope: :article_id, message: "translation already exists for this article" }
   validates :title, presence: true
   validates :slug, presence: true,

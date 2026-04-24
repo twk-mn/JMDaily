@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_100001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_24_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -244,6 +244,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_100001) do
     t.index ["confirmation_token"], name: "index_newsletter_subscribers_on_confirmation_token", unique: true
     t.index ["email"], name: "index_newsletter_subscribers_on_email", unique: true
     t.index ["unsubscribe_token"], name: "index_newsletter_subscribers_on_unsubscribe_token", unique: true
+  end
+
+  create_table "settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.datetime "updated_at", null: false
+    t.text "value"
+    t.string "value_type", default: "string", null: false
+    t.index ["key"], name: "index_settings_on_key", unique: true
+  end
+
+  create_table "site_languages", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.boolean "deletable", default: true, null: false
+    t.string "flag_emoji"
+    t.string "name", null: false
+    t.string "native_name"
+    t.integer "position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["active", "position"], name: "index_site_languages_on_active_and_position"
+    t.index ["code"], name: "index_site_languages_on_code", unique: true
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|

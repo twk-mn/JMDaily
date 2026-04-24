@@ -2,7 +2,7 @@ SitemapGenerator::Sitemap.default_host = "https://#{ENV.fetch('APP_HOST', 'jmdai
 
 SitemapGenerator::Sitemap.create do
   # Static pages — both locales
-  ArticleTranslation::LOCALES.each do |locale|
+  SiteLanguage.active_codes.each do |locale|
     add "/#{locale}", changefreq: "daily", priority: 1.0
     add "/#{locale}/about", changefreq: "monthly"
     add "/#{locale}/contact", changefreq: "monthly"
@@ -11,21 +11,24 @@ SitemapGenerator::Sitemap.create do
 
   # Categories
   Category.find_each do |category|
-    ArticleTranslation::LOCALES.each do |locale|
+    SiteLanguage.active_codes.each do |locale|
       add "/#{locale}/#{category.slug}", changefreq: "daily"
     end
   end
 
   # Locations
   Location.find_each do |location|
-    ArticleTranslation::LOCALES.each do |locale|
+    SiteLanguage.active_codes.each do |locale|
       add "/#{locale}/locations/#{location.slug}", changefreq: "daily"
     end
   end
 
-  # Articles — one entry per translation so search engines get the right locale URL
+  # Articles — one entry per translation so search engines get the right locale URL.
+  # Skip translations in deactivated languages; they're not publicly reachable.
+  active_codes = SiteLanguage.active_codes
   Article.published.includes(:translations).find_each do |article|
     article.translations.each do |translation|
+      next unless active_codes.include?(translation.locale)
       add "/#{translation.locale}/articles/#{translation.slug}",
           lastmod: article.updated_at,
           changefreq: "weekly",
@@ -40,7 +43,7 @@ SitemapGenerator::Sitemap.create do
 
   # Tags
   Tag.find_each do |tag|
-    ArticleTranslation::LOCALES.each do |locale|
+    SiteLanguage.active_codes.each do |locale|
       add "/#{locale}/tags/#{tag.slug}", changefreq: "weekly"
     end
   end

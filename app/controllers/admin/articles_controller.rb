@@ -71,7 +71,7 @@ module Admin
     def new
       @article = Article.new(status: "draft")
       # Pre-build one translation per supported locale so the form renders all tabs
-      Article::SUPPORTED_LOCALES.each do |locale|
+      Article.supported_locales.each do |locale|
         @article.translations.build(locale: locale)
       end
       @article.sources.build
@@ -89,7 +89,7 @@ module Admin
 
     def edit
       # Ensure a translation record exists for every supported locale
-      Article::SUPPORTED_LOCALES.each do |locale|
+      Article.supported_locales.each do |locale|
         @article.translations.find_or_initialize_by(locale: locale)
       end
       @article.sources.build if @article.sources.empty?

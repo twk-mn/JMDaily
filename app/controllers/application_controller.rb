@@ -12,15 +12,29 @@ class ApplicationController < ActionController::Base
 
   private
 
-  BROWSER_LOCALES = %w[en ja].freeze
-
   def set_locale
+    # Keep I18n.available_locales in sync with the SiteLanguage table so newly-
+    # added languages are accepted by I18n without requiring a server restart.
+    SiteLanguage.sync_i18n!
+
+    active_codes = SiteLanguage.active_codes
+
+    # Routes accept any /[a-z]{2,3}/ locale segment; 404 explicitly when the
+    # requested locale isn't currently active so deactivated languages don't
+    # fall through to default-locale content (which would be confusing).
+    # Only route-segment locales trigger a 404 — a ?locale= query param on an
+    # unscoped endpoint (e.g. /feed) should fall back gracefully instead.
+    route_locale = request.path_parameters[:locale]
+    if route_locale.present? && !active_codes.include?(route_locale.to_s)
+      raise ActiveRecord::RecordNotFound
+    end
+
     locale = params[:locale] ||
              cookies[:locale] ||
              browser_preferred_locale ||
              I18n.default_locale.to_s
 
-    locale = I18n.default_locale.to_s unless BROWSER_LOCALES.include?(locale)
+    locale = I18n.default_locale.to_s unless active_codes.include?(locale)
     I18n.locale = locale
 
     # Persist preference for one year
@@ -40,6 +54,7 @@ class ApplicationController < ActionController::Base
 
   def browser_preferred_locale
     accept = request.env["HTTP_ACCEPT_LANGUAGE"].to_s
-    accept.scan(/[a-z]{2}/).find { |l| BROWSER_LOCALES.include?(l) }
+    active = SiteLanguage.active_codes
+    accept.scan(/[a-z]{2}/).find { |l| active.include?(l) }
   end
 end

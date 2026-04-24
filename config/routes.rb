@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
-  SUPPORTED_LOCALES = /en|ja/
+  # Routes accept any plausible ISO 639-1 style locale segment. The active list
+  # lives in SiteLanguage; ApplicationController#set_locale 404s requests for
+  # locales that aren't currently active. Keeping the route regex permissive
+  # means admins can add or remove languages at runtime without a server
+  # restart — no route recompilation required.
+  LOCALE_SEGMENT = /[a-z]{2,3}/
 
   # Health check (no locale needed)
   get "up" => "rails/health#show", as: :rails_health_check
@@ -45,6 +50,21 @@ Rails.application.routes.draw do
     end
     resources :users
     resources :audit_logs, only: [ :index ]
+
+    # Settings (admin-only, see Admin::SettingsController)
+    get  "settings",         to: "settings#show",   as: :settings
+    get  "settings/:tab",    to: "settings#show",   as: :settings_tab, constraints: { tab: /general|languages/ }
+    patch "settings",        to: "settings#update"
+
+    resources :site_languages, only: [ :create, :update, :destroy ], path: "settings/languages" do
+      member do
+        post :activate
+        post :deactivate
+      end
+      collection do
+        post :reorder
+      end
+    end
   end
 
   # Ad click tracking (no locale needed)
@@ -56,12 +76,12 @@ Rails.application.routes.draw do
   # Root: detect preferred locale from cookie / Accept-Language and redirect.
   root to: redirect { |_, req|
     locale = req.cookies["locale"]
-    locale = "en" unless %w[en ja].include?(locale.to_s)
+    locale = "en" unless SiteLanguage.active_codes.include?(locale.to_s)
     "/#{locale}"
   }
 
   # All public routes are scoped under /:locale
-  scope "/:locale", constraints: { locale: SUPPORTED_LOCALES } do
+  scope "/:locale", constraints: { locale: LOCALE_SEGMENT } do
     # Home
     root to: "home#index", as: :locale_root
 

@@ -23,7 +23,10 @@ class Article < ApplicationRecord
   end
 
   STATUSES = %w[draft scheduled published archived].freeze
-  SUPPORTED_LOCALES = ArticleTranslation::LOCALES
+
+  def self.supported_locales
+    ArticleTranslation.supported_locales
+  end
 
   validates :title, presence: true
   validates :slug, presence: true, uniqueness: true,
