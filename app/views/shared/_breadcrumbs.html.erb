@@ -1,0 +1,21 @@
+<%# Renders a breadcrumb trail. `items` is an array of { name:, url: } hashes.
+    The final item is the current page and rendered as plain text (no link),
+    per WAI-ARIA breadcrumb guidance. %>
+<% items = local_assigns[:items] || [] %>
+<% if items.any? %>
+  <nav aria-label="Breadcrumb" class="mb-4">
+    <ol class="flex flex-wrap items-center gap-x-2 text-xs text-gray-600 dark:text-gray-400">
+      <% items.each_with_index do |item, i| %>
+        <li class="flex items-center gap-x-2">
+          <% if i == items.size - 1 %>
+            <span aria-current="page" class="text-gray-800 dark:text-gray-200 line-clamp-1"><%= item[:name] %></span>
+          <% else %>
+            <%= link_to item[:name], item[:url],
+                class: "hover:text-gray-900 dark:hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded" %>
+            <span class="text-gray-400 dark:text-gray-600" aria-hidden="true">/</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+  </nav>
+<% end %>
