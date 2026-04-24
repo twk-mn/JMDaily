@@ -1,12 +1,12 @@
-<div class="bg-amber-50 border-b border-amber-200 py-3 px-4 print:hidden">
+<div class="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 py-3 px-4 print:hidden" role="status">
   <div class="mx-auto max-w-7xl flex items-center justify-between gap-4">
     <div class="flex items-center gap-2">
-      <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 uppercase tracking-wide">
+      <span class="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/60 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-200 uppercase tracking-wide">
         Preview — not published
       </span>
-      <span class="text-sm text-amber-700">This is how the article will appear when published.</span>
+      <span class="text-sm text-amber-700 dark:text-amber-300">This is how the article will appear when published.</span>
     </div>
     <%= link_to "← Back to editor", edit_admin_article_path(article),
-        class: "flex-shrink-0 text-sm font-medium text-amber-800 hover:text-amber-900 underline" %>
+        class: "flex-shrink-0 text-sm font-medium text-amber-800 dark:text-amber-200 hover:text-amber-900 dark:hover:text-amber-100 underline" %>
   </div>
 </div>
