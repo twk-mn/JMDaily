@@ -1,6 +1,11 @@
 <% content_for :title, @author.name %>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+  <%= render "shared/breadcrumbs", items: [
+        { name: t("nav.home", default: "Home"), url: locale_root_path },
+        { name: @author.name, url: request.path }
+      ] %>
+
   <header class="mb-8 flex items-start gap-6">
     <% if @author.photo.attached? %>
       <%= image_tag @author.photo.variant(:thumb),
@@ -29,20 +34,17 @@
 
   <div class="border-t border-gray-200 dark:border-gray-800 pt-8">
     <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-6">Articles by <%= @author.name %></h2>
-    <div class="space-y-8">
-      <% @articles.each do |article| %>
-        <%= render "shared/article_card", article: article %>
-      <% end %>
-    </div>
 
-    <% if @articles.empty? %>
-      <p class="text-center py-16 text-gray-600 dark:text-gray-400">No published articles yet.</p>
-    <% end %>
+    <% if @articles.any? %>
+      <div class="space-y-8">
+        <% @articles.each do |article| %>
+          <%= render "shared/article_card", article: article %>
+        <% end %>
+      </div>
 
-    <% if @pagy.pages > 1 %>
-      <nav class="mt-8 flex justify-center" aria-label="Pagination">
-        <%== @pagy.series_nav(self) %>
-      </nav>
+      <%= render "shared/pagination", pagy: @pagy %>
+    <% else %>
+      <%= render "shared/empty_state", heading: "No published articles yet." %>
     <% end %>
   </div>
 </div>

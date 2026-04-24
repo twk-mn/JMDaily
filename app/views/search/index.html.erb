@@ -14,24 +14,22 @@
   <% end %>
 
   <% if params[:q].present? %>
-    <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
-      <% if @articles.any? %>
+    <% if @articles.any? %>
+      <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
         Showing results for "<%= params[:q] %>"
-      <% else %>
-        No results found for "<%= params[:q] %>"
-      <% end %>
-    </p>
+      </p>
 
-    <div class="space-y-8">
-      <% @articles.each do |article| %>
-        <%= render "shared/article_card", article: article %>
-      <% end %>
-    </div>
+      <div class="space-y-8">
+        <% @articles.each do |article| %>
+          <%= render "shared/article_card", article: article %>
+        <% end %>
+      </div>
 
-    <% if @pagy && @pagy.pages > 1 %>
-      <nav class="mt-8 flex justify-center" aria-label="Pagination">
-        <%== @pagy.series_nav(self) %>
-      </nav>
+      <%= render "shared/pagination", pagy: @pagy %>
+    <% else %>
+      <%= render "shared/empty_state",
+          heading: %(No results found for "#{params[:q]}"),
+          body: "Try different keywords or browse the latest news." %>
     <% end %>
   <% end %>
 </div>

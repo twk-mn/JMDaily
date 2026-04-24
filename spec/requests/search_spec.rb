@@ -30,6 +30,12 @@ RSpec.describe "Search", type: :request do
       expect(response).to have_http_status(:success)
     end
 
+    it "renders the shared empty state when a query has no matches" do
+      get search_path, params: { q: "zzznoresultszzz" }
+      expect(response.body).to include("No results found")
+      expect(response.body).to include("Try different keywords")
+    end
+
     it "handles SQL injection safely" do
       get search_path, params: { q: "'; DROP TABLE articles; --" }
       expect(response).to have_http_status(:success)
