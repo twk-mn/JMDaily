@@ -1,0 +1,28 @@
+<%# Standard page header for category / tag / location index pages.
+    Locals:
+      title:        required, displayed as the H1
+      description:  optional subtitle
+      count:        optional integer — rendered as "N articles" if present
+      breadcrumbs:  optional array passed to shared/_breadcrumbs %>
+<% breadcrumbs = local_assigns[:breadcrumbs] %>
+<% title = local_assigns[:title] %>
+<% description = local_assigns[:description] %>
+<% count = local_assigns[:count] %>
+
+<% if breadcrumbs.present? %>
+  <%= render "shared/breadcrumbs", items: breadcrumbs %>
+<% end %>
+
+<header class="mb-8 border-b border-gray-200 dark:border-gray-800 pb-6">
+  <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 font-serif"><%= title %></h1>
+
+  <% if description.present? %>
+    <p class="mt-2 text-lg text-gray-700 dark:text-gray-300 leading-relaxed"><%= description %></p>
+  <% end %>
+
+  <% if count %>
+    <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+      <%= pluralize(count, "article") %>
+    </p>
+  <% end %>
+</header>

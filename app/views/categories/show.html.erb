@@ -4,26 +4,26 @@
 <% end %>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-  <header class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 font-serif"><%= @category.name %></h1>
-    <% if @category.description.present? %>
-      <p class="mt-2 text-lg text-gray-700 dark:text-gray-300"><%= @category.description %></p>
-    <% end %>
-  </header>
+  <%= render "shared/index_header",
+      title: @category.name,
+      description: @category.description,
+      count: @pagy.count,
+      breadcrumbs: [
+        { name: t("nav.home", default: "Home"), url: locale_root_path },
+        { name: @category.name, url: request.path }
+      ] %>
 
-  <div class="space-y-8">
-    <% @articles.each do |article| %>
-      <%= render "shared/article_card", article: article %>
-    <% end %>
-  </div>
+  <% if @articles.any? %>
+    <div class="space-y-8">
+      <% @articles.each do |article| %>
+        <%= render "shared/article_card", article: article %>
+      <% end %>
+    </div>
 
-  <% if @articles.empty? %>
-    <p class="text-center py-16 text-gray-600 dark:text-gray-400">No articles in this category yet.</p>
-  <% end %>
-
-  <% if @pagy.pages > 1 %>
-    <nav class="mt-8 flex justify-center" aria-label="Pagination">
-      <%== @pagy.series_nav(self) %>
-    </nav>
+    <%= render "shared/pagination", pagy: @pagy %>
+  <% else %>
+    <%= render "shared/empty_state",
+        heading: "No articles in this category yet.",
+        body: "Check back soon — we publish every weekday." %>
   <% end %>
 </div>
