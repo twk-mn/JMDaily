@@ -4,6 +4,28 @@ raise "Set ADMIN_PASSWORD env var in production" if Rails.env.production? && ENV
 
 default_password = ENV.fetch("ADMIN_PASSWORD", "JMDaily2024Dev!")
 
+# Site languages — English (required, non-deletable) plus Japanese as the
+# initial optional translation. Admins can add, deactivate, and purge other
+# languages from the admin Settings → Languages tab.
+SiteLanguage.find_or_create_by!(code: "en") do |l|
+  l.name        = "English"
+  l.native_name = "English"
+  l.flag_emoji  = "🇬🇧"
+  l.position    = 0
+  l.active      = true
+  l.deletable   = false
+end
+
+SiteLanguage.find_or_create_by!(code: "ja") do |l|
+  l.name        = "Japanese"
+  l.native_name = "日本語"
+  l.flag_emoji  = "🇯🇵"
+  l.position    = 1
+  l.active      = true
+  l.deletable   = true
+end
+puts "Site languages ready."
+
 admin = User.find_or_create_by!(email: "admin@jmdaily.com") do |u|
   u.name = "Admin"
   u.password = default_password

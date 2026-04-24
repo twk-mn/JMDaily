@@ -12,7 +12,7 @@ RSpec.describe ArticleTranslation, type: :model do
     it { is_expected.to validate_presence_of(:title) }
 
     it 'accepts supported locales' do
-      ArticleTranslation::LOCALES.each do |locale|
+      ArticleTranslation.supported_locales.each do |locale|
         t = build(:article_translation, locale: locale)
         expect(t).to be_valid
       end
@@ -83,9 +83,9 @@ RSpec.describe ArticleTranslation, type: :model do
     end
   end
 
-  describe 'LOCALES constant' do
-    it 'includes english and japanese' do
-      expect(ArticleTranslation::LOCALES).to include("en", "ja")
+  describe '.supported_locales' do
+    it 'includes english and japanese by default' do
+      expect(ArticleTranslation.supported_locales).to include("en", "ja")
     end
   end
 

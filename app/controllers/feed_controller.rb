@@ -1,7 +1,7 @@
 class FeedController < ApplicationController
   def index
     requested = params[:locale].to_s
-    @locale = ArticleTranslation::LOCALES.include?(requested) ? requested : "en"
+    @locale = SiteLanguage.active_codes.include?(requested) ? requested : "en"
 
     @articles = Article.published
       .recent

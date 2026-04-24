@@ -1,0 +1,41 @@
+<div data-site-languages-target="modal"
+     class="fixed inset-0 bg-gray-500 bg-opacity-75 z-50 flex items-center justify-center"
+     style="display: none;"
+     role="dialog" aria-modal="true" aria-labelledby="purge-modal-title">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+    <h3 id="purge-modal-title" class="text-lg font-semibold text-red-700">Permanently delete a language?</h3>
+    <p class="mt-2 text-sm text-gray-700">
+      This will delete
+      <strong data-site-languages-target="name"></strong>
+      and all associated content:
+      <strong><span data-site-languages-target="articles"></span> articles</strong> and
+      <strong><span data-site-languages-target="newsletters"></span> newsletters</strong>.
+    </p>
+    <p class="mt-2 text-sm text-gray-700">
+      This cannot be undone. Type the language code
+      <code class="px-1 py-0.5 bg-gray-100 rounded font-mono text-red-700" data-site-languages-target="codeHint"></code>
+      below to confirm.
+    </p>
+
+    <%= form_with url: "#", method: :delete, local: true, data: { site_languages_target: "form" }, class: "mt-4 space-y-3" do %>
+      <input type="hidden" name="confirm" data-site-languages-target="confirmInput">
+      <input type="text"
+             data-site-languages-target="typedInput"
+             data-action="input->site-languages#onTyped"
+             autocomplete="off"
+             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm font-mono">
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" data-action="site-languages#closePurge"
+                class="rounded-md bg-white border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+          Cancel
+        </button>
+        <button type="submit"
+                data-site-languages-target="submit"
+                disabled
+                class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed">
+          Permanently delete
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>
