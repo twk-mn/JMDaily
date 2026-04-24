@@ -9,26 +9,26 @@
           width: 96, height: 96 %>
     <% end %>
     <div>
-      <h1 class="text-3xl font-bold text-gray-900" style="font-family: Georgia, serif;"><%= @author.name %></h1>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 font-serif"><%= @author.name %></h1>
       <% if @author.role_title.present? %>
-        <p class="text-lg text-indigo-600 font-medium"><%= @author.role_title %></p>
+        <p class="text-lg text-indigo-600 dark:text-indigo-400 font-medium"><%= @author.role_title %></p>
       <% end %>
       <% if @author.bio.present? %>
-        <p class="mt-2 text-gray-600 leading-relaxed"><%= @author.bio %></p>
+        <p class="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed"><%= @author.bio %></p>
       <% end %>
       <div class="mt-3 flex items-center gap-4">
         <% if @author.twitter_url.present? %>
-          <%= link_to "Twitter", @author.twitter_url, class: "text-sm text-gray-500 hover:text-gray-700", target: "_blank", rel: "noopener" %>
+          <%= link_to "Twitter", @author.twitter_url, class: "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white", target: "_blank", rel: "noopener" %>
         <% end %>
         <% if @author.website_url.present? %>
-          <%= link_to "Website", @author.website_url, class: "text-sm text-gray-500 hover:text-gray-700", target: "_blank", rel: "noopener" %>
+          <%= link_to "Website", @author.website_url, class: "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white", target: "_blank", rel: "noopener" %>
         <% end %>
       </div>
     </div>
   </header>
 
-  <div class="border-t border-gray-200 pt-8">
-    <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider border-b-2 border-gray-900 pb-2 mb-6">Articles by <%= @author.name %></h2>
+  <div class="border-t border-gray-200 dark:border-gray-800 pt-8">
+    <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-6">Articles by <%= @author.name %></h2>
     <div class="space-y-8">
       <% @articles.each do |article| %>
         <%= render "shared/article_card", article: article %>
@@ -36,11 +36,11 @@
     </div>
 
     <% if @articles.empty? %>
-      <p class="text-center py-16 text-gray-500">No published articles yet.</p>
+      <p class="text-center py-16 text-gray-600 dark:text-gray-400">No published articles yet.</p>
     <% end %>
 
     <% if @pagy.pages > 1 %>
-      <nav class="mt-8 flex justify-center">
+      <nav class="mt-8 flex justify-center" aria-label="Pagination">
         <%== @pagy.series_nav(self) %>
       </nav>
     <% end %>
