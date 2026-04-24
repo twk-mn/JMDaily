@@ -1,0 +1,15 @@
+<%# Desktop language switcher — compact pill group of short codes. %>
+<% options = language_switcher_options %>
+<% if options.size > 1 %>
+  <div class="flex items-center gap-1 text-sm border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden" role="group" aria-label="Language">
+    <% options.each do |opt| %>
+      <%= link_to opt[:url],
+          class: "px-2 py-1 #{opt[:current] ? 'bg-indigo-600 text-white font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900'} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600",
+          lang: opt[:code],
+          title: opt[:display_name],
+          "aria-current": (opt[:current] ? "true" : nil) do %>
+        <%= opt[:short_label] %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
