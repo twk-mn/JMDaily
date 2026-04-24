@@ -1,0 +1,27 @@
+<%# Small author-bio card rendered below the article body.
+    `author` is required. %>
+<% if author.bio.present? || author.photo.attached? || author.role_title.present? %>
+  <aside class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row gap-4 items-start">
+    <% if author.photo.attached? %>
+      <%= link_to author_path(author, slug: author.slug), class: "flex-shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded-full" do %>
+        <%= image_tag author.photo.variant(:small),
+            class: "w-16 h-16 rounded-full object-cover",
+            alt: author.name,
+            width: 64, height: 64 %>
+      <% end %>
+    <% end %>
+    <div class="flex-1 min-w-0">
+      <p class="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">About the author</p>
+      <h2 class="mt-1 text-lg font-bold text-gray-900 dark:text-gray-100 font-serif">
+        <%= link_to author.name, author_path(author, slug: author.slug),
+            class: "hover:text-indigo-600 dark:hover:text-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded" %>
+      </h2>
+      <% if author.role_title.present? %>
+        <p class="text-sm text-indigo-600 dark:text-indigo-400 font-medium"><%= author.role_title %></p>
+      <% end %>
+      <% if author.bio.present? %>
+        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300 leading-relaxed"><%= author.bio %></p>
+      <% end %>
+    </div>
+  </aside>
+<% end %>
