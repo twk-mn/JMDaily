@@ -72,9 +72,11 @@
       <% if @other_translations.any? %>
         <span class="text-gray-400 dark:text-gray-600" aria-hidden="true">·</span>
         <% @other_translations.each do |t| %>
-          <%= link_to t.locale == "ja" ? "日本語" : "English",
+          <% lang = SiteLanguage.iso_option(t.locale) %>
+          <%= link_to (lang ? lang[:native_name] : t.locale.upcase),
               article_path(t, locale: t.locale),
-              class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-xs font-medium" %>
+              lang: t.locale,
+              class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-xs font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded" %>
         <% end %>
       <% end %>
     </div>

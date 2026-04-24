@@ -33,4 +33,20 @@ module ApplicationHelper
 
     render "shared/ad", ad: ad
   end
+
+  # Active site languages for the header switcher. The switcher always points at
+  # locale_root so switching never 404s on a slug that doesn't exist in the new
+  # language (article/tag/author pages that can resolve the *same* record in a
+  # different locale render their own in-page language links).
+  def language_switcher_options
+    SiteLanguage.active.map do |lang|
+      {
+        code: lang.code,
+        short_label: lang.code.upcase,
+        display_name: lang.display_name,
+        url: locale_root_path(locale: lang.code),
+        current: I18n.locale.to_s == lang.code
+      }
+    end
+  end
 end
