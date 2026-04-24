@@ -35,5 +35,31 @@ RSpec.describe "Home", type: :request do
       get locale_root_path
       expect(response.body).to include("Joetsu Story")
     end
+
+    describe "language switcher" do
+      it "renders a link for every active SiteLanguage" do
+        SiteLanguage.create!(code: "ko", position: 5, active: true)
+
+        get locale_root_path
+        expect(response.body).to include('href="/ko"')
+        expect(response.body).to include('href="/en"')
+        expect(response.body).to include('href="/ja"')
+      end
+
+      it "omits languages that are inactive" do
+        SiteLanguage.find_by(code: "ja").update!(active: false)
+
+        get locale_root_path
+        expect(response.body).not_to include('href="/ja"')
+      end
+
+      it "marks the current locale with aria-current" do
+        get locale_root_path(locale: "en")
+        # Attribute order isn't guaranteed — look for an <a> tag that contains
+        # both href="/en" and aria-current="true".
+        en_link = response.body[/<a\b[^>]*href="\/en"[^>]*>/] || response.body[/<a\b[^>]*aria-current[^>]*href="\/en"[^>]*>/]
+        expect(en_link).to include('aria-current="true"')
+      end
+    end
   end
 end

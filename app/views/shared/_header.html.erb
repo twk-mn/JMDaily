@@ -37,13 +37,7 @@
         </div>
 
         <div class="hidden md:flex items-center gap-3">
-          <!-- Language switcher -->
-          <div class="flex items-center gap-1 text-sm border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden" role="group" aria-label="Language">
-            <%= link_to "EN", root_path(locale: "en"),
-                class: "px-2 py-1 #{I18n.locale.to_s == 'en' ? 'bg-indigo-600 text-white font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900'}" %>
-            <%= link_to "JP", root_path(locale: "ja"),
-                class: "px-2 py-1 #{I18n.locale.to_s == 'ja' ? 'bg-indigo-600 text-white font-semibold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900'}" %>
-          </div>
+          <%= render "shared/language_switcher" %>
 
           <!-- Dark mode toggle -->
           <%= render "shared/theme_toggle" %>
@@ -86,12 +80,7 @@
           <%= link_to "Myoko", location_path("myoko"), class: "block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
           <%= link_to "Itoigawa", location_path("itoigawa"), class: "block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
         </div>
-        <div class="border-t border-gray-100 dark:border-gray-800 pt-2 mt-2 flex gap-2 px-3">
-          <%= link_to "English", root_path(locale: "en"),
-              class: "text-sm px-3 py-1 rounded border #{I18n.locale.to_s == 'en' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300'}" %>
-          <%= link_to "日本語", root_path(locale: "ja"),
-              class: "text-sm px-3 py-1 rounded border #{I18n.locale.to_s == 'ja' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300'}" %>
-        </div>
+        <%= render "shared/language_switcher_mobile" %>
       </div>
     </div>
   </nav>
