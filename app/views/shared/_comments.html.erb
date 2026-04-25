@@ -1,3 +1,16 @@
+<%# Locals:
+      article: required — the Article being commented on
+      approved_comments: required — collection of approved comments
+      pending_comment_preview: optional — the current visitor's just-posted
+        comment (still pending moderation), shown inline with a badge until
+        an admin approves or rejects it. %>
+<% pending_preview = local_assigns[:pending_comment_preview] %>
+<% form_state = flash[:comment_form] || {} %>
+<% form_values = form_state["values"] || {} %>
+<% form_errors = form_state["errors"] || {} %>
+<% has_errors = form_errors.any? %>
+<% body_max = Comment.validators_on(:body).find { |v| v.kind == :length }&.options&.dig(:maximum) || 2000 %>
+
 <section id="comments" class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-800">
   <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6">
     Comments
@@ -6,8 +19,27 @@
     <% end %>
   </h2>
 
-  <% if approved_comments.any? %>
+  <% if approved_comments.any? || pending_preview %>
     <div class="space-y-6 mb-10">
+      <% if pending_preview %>
+        <div class="flex gap-4 rounded-md border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/30 p-4">
+          <div class="shrink-0 w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center">
+            <span class="text-sm font-semibold text-indigo-700 dark:text-indigo-300"><%= pending_preview.name.first.upcase %></span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-baseline gap-2 mb-1">
+              <span class="text-sm font-semibold text-gray-900 dark:text-gray-100"><%= pending_preview.name %></span>
+              <span class="inline-flex items-center text-xs font-medium text-amber-800 dark:text-amber-200 bg-amber-100 dark:bg-amber-900/60 rounded px-2 py-0.5">
+                Awaiting moderation
+              </span>
+            </div>
+            <div class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed prose prose-sm dark:prose-invert max-w-none">
+              <%= simple_format(pending_preview.body) %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
       <% approved_comments.each do |comment| %>
         <div class="flex gap-4">
           <div class="shrink-0 w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center">
@@ -20,39 +52,90 @@
                 <%= comment.created_at.strftime("%B %-d, %Y") %>
               </time>
             </div>
-            <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"><%= comment.body %></p>
+            <div class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed prose prose-sm dark:prose-invert max-w-none">
+              <%= simple_format(comment.body) %>
+            </div>
           </div>
         </div>
       <% end %>
     </div>
+  <% else %>
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-10">No comments yet. Be the first to share your thoughts.</p>
   <% end %>
 
   <!-- Comment form -->
   <div id="comment-form" class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
     <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Leave a comment</h3>
+
+    <% if has_errors %>
+      <div role="alert" aria-live="polite"
+           class="mb-4 rounded-md border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/40 px-4 py-3">
+        <p class="text-sm font-semibold text-red-800 dark:text-red-200 mb-1">There was a problem with your comment:</p>
+        <ul class="list-disc list-inside text-sm text-red-700 dark:text-red-300">
+          <% form_errors.each do |field, messages| %>
+            <% Array(messages).each do |msg| %>
+              <li><%= field.humanize %> <%= msg %></li>
+            <% end %>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <%= form_with url: article_comments_path(article), class: "space-y-4" do |f| %>
       <%# Honeypot — hidden from humans, filled by bots %>
       <div style="display:none" aria-hidden="true">
         <%= label_tag :website, "Website" %>
         <%= text_field_tag :website, nil, tabindex: -1, autocomplete: "off" %>
       </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <%= label_tag :name, "Name *", class: "block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1" %>
-          <%= text_field_tag "comment[name]", nil, required: true,
+          <%= label_tag "comment_name", "Name *", class: "block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1" %>
+          <%= text_field_tag "comment[name]", form_values["name"], required: true,
+              id: "comment_name",
+              autocomplete: "name",
+              "aria-invalid": form_errors["name"].present?,
+              "aria-describedby": (form_errors["name"].present? ? "comment_name_error" : nil),
               class: "block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+          <% if form_errors["name"].present? %>
+            <p id="comment_name_error" class="mt-1 text-xs text-red-700 dark:text-red-300"><%= Array(form_errors["name"]).first %></p>
+          <% end %>
         </div>
         <div>
-          <%= label_tag :email, "Email (not published)", class: "block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1" %>
-          <%= email_field_tag "comment[email]", nil,
+          <%= label_tag "comment_email", "Email * (not published)", class: "block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1" %>
+          <%= email_field_tag "comment[email]", form_values["email"], required: true,
+              id: "comment_email",
+              autocomplete: "email",
+              "aria-invalid": form_errors["email"].present?,
+              "aria-describedby": (form_errors["email"].present? ? "comment_email_error" : nil),
               class: "block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+          <% if form_errors["email"].present? %>
+            <p id="comment_email_error" class="mt-1 text-xs text-red-700 dark:text-red-300"><%= Array(form_errors["email"]).first %></p>
+          <% end %>
         </div>
       </div>
-      <div>
-        <%= label_tag :body, "Comment *", class: "block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1" %>
-        <%= text_area_tag "comment[body]", nil, rows: 4, required: true,
+
+      <div data-controller="character-counter" data-character-counter-max-value="<%= body_max %>">
+        <%= label_tag "comment_body", "Comment *", class: "block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1" %>
+        <%= text_area_tag "comment[body]", form_values["body"], rows: 4, required: true,
+            id: "comment_body",
+            maxlength: body_max,
+            "aria-invalid": form_errors["body"].present?,
+            "aria-describedby": "comment_body_count#{' comment_body_error' if form_errors['body'].present?}",
+            data: { character_counter_target: "input" },
             class: "block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 border" %>
+        <div class="mt-1 flex items-center justify-between">
+          <% if form_errors["body"].present? %>
+            <p id="comment_body_error" class="text-xs text-red-700 dark:text-red-300"><%= Array(form_errors["body"]).first %></p>
+          <% else %>
+            <span></span>
+          <% end %>
+          <p id="comment_body_count" class="text-xs text-gray-600 dark:text-gray-400" data-character-counter-target="count" aria-live="polite">
+            <%= form_values["body"].to_s.length %> / <%= body_max %>
+          </p>
+        </div>
       </div>
+
       <p class="text-xs text-gray-600 dark:text-gray-400">Comments are moderated and may take a short time to appear.</p>
       <%= submit_tag "Post comment",
           class: "rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>

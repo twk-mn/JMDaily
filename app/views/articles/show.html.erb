@@ -184,7 +184,10 @@
     <% end %>
   </footer>
 
-  <%= render "shared/comments", article: @article, approved_comments: @approved_comments %>
+  <%= render "shared/comments",
+      article: @article,
+      approved_comments: @approved_comments,
+      pending_comment_preview: @pending_comment_preview %>
 </article>
 
 <!-- More from this author -->
