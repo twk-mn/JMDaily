@@ -1,17 +1,13 @@
+<% frame_id = "newsletter-signup-home" %>
+<% input_id = "home-newsletter-email" %>
 <section class="my-12 border-t border-gray-200 dark:border-gray-800 pt-10">
-  <div class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-6 py-8 sm:px-10 sm:py-12 max-w-2xl mx-auto text-center">
+  <div class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-6 py-8 sm:px-10 sm:py-12 max-w-2xl mx-auto text-center">
     <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 font-serif">Get the Joetsu-Myoko Daily</h2>
     <p class="mt-2 text-gray-700 dark:text-gray-300">Weekly roundup of the news that matters from our corner of Niigata. No spam, unsubscribe any time.</p>
-    <%= form_with url: newsletter_subscribe_path, method: :post,
-        class: "mt-6 flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto" do |f| %>
-      <label for="home-newsletter-email" class="sr-only">Email address</label>
-      <%= f.email_field :email, required: true,
-          id: "home-newsletter-email",
-          placeholder: "you@example.com",
-          autocomplete: "email",
-          class: "flex-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
-      <%= f.submit "Subscribe",
-          class: "inline-flex items-center justify-center min-h-[44px] rounded-md bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer" %>
-    <% end %>
+    <div class="mt-6 max-w-md mx-auto text-left">
+      <%= turbo_frame_tag frame_id do %>
+        <%= render "newsletter_subscriptions/signup_form", frame_id: frame_id, input_id: input_id %>
+      <% end %>
+    </div>
   </div>
 </section>

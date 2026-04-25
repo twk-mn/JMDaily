@@ -1,14 +1,27 @@
 class NewsletterSubscriptionsController < ApplicationController
   def create
-    @subscriber = NewsletterSubscriber.new(email: params[:email].to_s.strip.downcase)
+    email = params[:email].to_s.strip.downcase
+    @subscriber = NewsletterSubscriber.new(email: email)
+    frame_id = params[:frame_id].presence || "newsletter-signup-home"
+    input_id = params[:input_id].presence || "home-newsletter-email"
 
     if @subscriber.save
       NewsletterMailer.confirmation(@subscriber).deliver_later
-      redirect_back_or_to locale_root_path,
-        notice: "Thanks! Check your inbox for a confirmation email."
+      if turbo_frame_request?
+        render partial: "newsletter_subscriptions/signup_success",
+               locals: { frame_id: frame_id, email: email }
+      else
+        redirect_back_or_to locale_root_path,
+          notice: "Thanks! Check your inbox for a confirmation email."
+      end
     else
-      redirect_back_or_to locale_root_path,
-        alert: @subscriber.errors.full_messages.first
+      message = @subscriber.errors.full_messages.first || "Something went wrong. Please try again."
+      if turbo_frame_request?
+        render partial: "newsletter_subscriptions/signup_error",
+               locals: { frame_id: frame_id, input_id: input_id, message: message }
+      else
+        redirect_back_or_to locale_root_path, alert: message
+      end
     end
   end
 
@@ -17,21 +30,28 @@ class NewsletterSubscriptionsController < ApplicationController
 
     if subscriber
       subscriber.confirm!
-      redirect_to locale_root_path,
-        notice: "You're confirmed! You'll hear from us when we launch the newsletter."
+      @state = :confirmed
+      @subscriber = subscriber
     else
-      redirect_to locale_root_path,
-        alert: "That confirmation link is invalid or has already been used."
+      @state = :invalid
     end
+    render :confirm
   end
 
   def unsubscribe
-    subscriber = if params[:token].present?
+    @subscriber = if params[:token].present?
       NewsletterSubscriber.find_by(unsubscribe_token: params[:token])
     else
       NewsletterSubscriber.find_by(email: params[:email].to_s.strip.downcase)
     end
-    subscriber&.unsubscribe!
-    redirect_to locale_root_path, notice: "You have been unsubscribed."
+
+    if @subscriber
+      already_off = @subscriber.unsubscribed?
+      @subscriber.unsubscribe! unless already_off
+      @state = already_off ? :already_unsubscribed : :unsubscribed
+    else
+      @state = :invalid
+    end
+    render :unsubscribe
   end
 end
