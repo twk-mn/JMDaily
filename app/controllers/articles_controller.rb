@@ -9,6 +9,7 @@ class ArticlesController < ApplicationController
 
     @article = @translation.article
     @approved_comments = @article.comments.approved.recent
+    @pending_comment_preview = lookup_pending_comment_preview(@article)
 
     card_includes = [ :translations, { featured_image_attachment: :blob } ]
 
@@ -32,6 +33,23 @@ class ArticlesController < ApplicationController
   end
 
   private
+
+  # Find this session's just-posted pending comment for the current article,
+  # if any, so we can render it inline with an "awaiting moderation" badge.
+  # Once it's approved (or rejected), drop the session pointer so we don't
+  # keep showing the badge.
+  def lookup_pending_comment_preview(article)
+    pending_id = session.dig(:pending_comments, article.id.to_s)
+    return nil unless pending_id
+
+    comment = article.comments.find_by(id: pending_id)
+    if comment&.status == "pending"
+      comment
+    else
+      session[:pending_comments]&.delete(article.id.to_s)
+      nil
+    end
+  end
 
   def build_json_ld
     schema = {
