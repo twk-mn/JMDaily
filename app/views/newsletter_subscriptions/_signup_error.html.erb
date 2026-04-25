@@ -1,0 +1,18 @@
+<%# Frame replacement shown after a failed subscribe (e.g. invalid email,
+    duplicate). The original form is rendered again below the error so the
+    user can correct and retry without losing their place.
+    Locals:
+      frame_id: required
+      input_id: required
+      message:  required — human-readable error %>
+<% frame_id = local_assigns.fetch(:frame_id) %>
+<% input_id = local_assigns.fetch(:input_id) %>
+<% message  = local_assigns.fetch(:message) %>
+
+<%= turbo_frame_tag frame_id do %>
+  <div role="alert" aria-live="polite"
+       class="rounded-md border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 px-4 py-3 mb-3">
+    <p class="text-sm text-red-800 dark:text-red-200"><%= message %></p>
+  </div>
+  <%= render "newsletter_subscriptions/signup_form", frame_id: frame_id, input_id: input_id %>
+<% end %>
