@@ -36,6 +36,52 @@ RSpec.describe "Home", type: :request do
       expect(response.body).to include("Joetsu Story")
     end
 
+    describe "section layout" do
+      it "renders the hero with up to three stacked secondary stories" do
+        create(:article, :featured, title: "Lead Story")
+        create_list(:article, 4, :published).each_with_index do |a, i|
+          a.translations.first.update!(title: "Recent Story #{i}")
+          a.update!(title: "Recent Story #{i}")
+        end
+
+        get locale_root_path
+        expect(response.body).to include("Lead Story")
+        expect(response.body).to include('aria-label="Top stories"')
+      end
+
+      it "renders a Local News grid from the News category" do
+        news = create(:category, name: "News", slug: "news")
+        # Hero + 3 secondaries consume the four most recent articles, so the
+        # fifth one lands in the Local News grid.
+        5.times { |i| create(:article, :published, category: news, title: "News Item #{i}", published_at: (i + 1).hours.ago) }
+        get locale_root_path
+        expect(response.body).to include("News Item 4")
+        expect(response.body).to match(/>Local News</)
+      end
+
+      it "renders the newsletter capture card with a subscribe form" do
+        get locale_root_path
+        expect(response.body).to include("Get the Joetsu-Myoko Daily")
+        expect(response.body).to include(%(action="#{newsletter_subscribe_path}))
+        expect(response.body).to include('id="home-newsletter-email"')
+      end
+
+      it "honors SiteConfig::HOMEPAGE_SECTIONS ordering" do
+        original = SiteConfig::HOMEPAGE_SECTIONS
+        stub_const("SiteConfig::HOMEPAGE_SECTIONS", %i[newsletter breaking])
+
+        get locale_root_path
+
+        newsletter_idx = response.body.index("Get the Joetsu-Myoko Daily")
+        expect(newsletter_idx).to be_present
+        # Only these two sections are rendered now — hero / local_news / locations
+        # should be absent.
+        expect(response.body).not_to include('aria-label="Top stories"')
+      ensure
+        stub_const("SiteConfig::HOMEPAGE_SECTIONS", original) if original
+      end
+    end
+
     describe "language switcher" do
       it "renders a link for every active SiteLanguage" do
         SiteLanguage.create!(code: "ko", position: 5, active: true)

@@ -1,0 +1,35 @@
+<% has_joetsu = @joetsu_articles.present? %>
+<% has_myoko = @myoko_articles.present? %>
+<% if has_joetsu || has_myoko %>
+  <section class="mb-12 border-t border-gray-200 dark:border-gray-800 pt-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+      <% if has_joetsu %>
+        <div>
+          <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-4">
+            <%= link_to "Joetsu", location_path("joetsu"),
+                class: "hover:text-indigo-600 dark:hover:text-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+          </h2>
+          <div class="space-y-4">
+            <% @joetsu_articles.each do |article| %>
+              <%= render "shared/article_card_small", article: article %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if has_myoko %>
+        <div>
+          <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-4">
+            <%= link_to "Myoko", location_path("myoko"),
+                class: "hover:text-indigo-600 dark:hover:text-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+          </h2>
+          <div class="space-y-4">
+            <% @myoko_articles.each do |article| %>
+              <%= render "shared/article_card_small", article: article %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>

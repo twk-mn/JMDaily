@@ -1,0 +1,14 @@
+<% if @breaking_articles.any? %>
+  <section class="mb-8" role="region" aria-label="Breaking news">
+    <div class="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-md px-4 py-3">
+      <span class="inline-block bg-red-600 text-white text-xs font-bold uppercase px-2 py-0.5 rounded mr-2">Breaking</span>
+      <% @breaking_articles.each_with_index do |article, i| %>
+        <%= link_to article.title, article_path(article),
+            class: "text-sm font-medium text-red-900 dark:text-red-200 hover:text-red-700 dark:hover:text-red-100" %>
+        <% unless i == @breaking_articles.length - 1 %>
+          <span class="text-red-300 dark:text-red-700 mx-2" aria-hidden="true">·</span>
+        <% end %>
+      <% end %>
+    </div>
+  </section>
+<% end %>
