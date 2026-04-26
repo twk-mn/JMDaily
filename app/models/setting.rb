@@ -24,6 +24,36 @@ class Setting < ApplicationRecord
       type: "string", default: "Asia/Tokyo", tab: "general",
       label: "Timezone",
       description: "Default timezone for display of dates and times."
+    },
+    "turnstile_site_key" => {
+      type: "string", default: "", tab: "security",
+      label: "Turnstile site key",
+      description: "Public Cloudflare Turnstile site key. Get one at dash.cloudflare.com → Turnstile."
+    },
+    "turnstile_secret_key" => {
+      type: "string", default: "", tab: "security", input_type: "password",
+      label: "Turnstile secret key",
+      description: "Server-side verification key. Treated as a secret — only shown to admins."
+    },
+    "turnstile_on_comments" => {
+      type: "boolean", default: false, tab: "security",
+      label: "Protect article comments",
+      description: "Require Turnstile verification when posting a comment."
+    },
+    "turnstile_on_contact" => {
+      type: "boolean", default: false, tab: "security",
+      label: "Protect contact form",
+      description: "Require Turnstile verification on the contact form."
+    },
+    "turnstile_on_tips" => {
+      type: "boolean", default: false, tab: "security",
+      label: "Protect tip submissions",
+      description: "Require Turnstile verification on the submit-a-tip form."
+    },
+    "turnstile_on_newsletter" => {
+      type: "boolean", default: false, tab: "security",
+      label: "Protect newsletter signup",
+      description: "Require Turnstile verification on the newsletter subscribe form."
     }
   }.freeze
 

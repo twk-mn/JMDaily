@@ -76,4 +76,13 @@ class ApplicationController < ActionController::Base
     active = SiteLanguage.active_codes
     accept.scan(/[a-z]{2}/).find { |l| active.include?(l) }
   end
+
+  # Returns true when the form is either not Turnstile-protected or the
+  # submitted token verifies. Use this in form-handling actions:
+  #   return render :new, status: :unprocessable_content unless turnstile_passed?(:contact)
+  def turnstile_passed?(form_key)
+    return true unless Turnstile.enabled_for?(form_key)
+
+    Turnstile.verify(params[Turnstile::RESPONSE_PARAM], request.remote_ip)
+  end
 end

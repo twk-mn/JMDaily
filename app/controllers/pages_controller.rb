@@ -7,6 +7,12 @@ class PagesController < ApplicationController
 
   def submit_contact
     @contact_submission = ContactSubmission.new(contact_params)
+    unless turnstile_passed?(:contact)
+      @contact_submission.errors.add(:base, "Please complete the verification challenge.")
+      @page = StaticPage.find_by!(slug: "contact")
+      return render :show, status: :unprocessable_content
+    end
+
     if @contact_submission.save
       ContactMailer.new_submission(@contact_submission).deliver_later
       redirect_to contact_path, notice: "Thank you for your message. We'll get back to you soon."
@@ -18,6 +24,12 @@ class PagesController < ApplicationController
 
   def submit_tip
     @tip_submission = TipSubmission.new(tip_params)
+    unless turnstile_passed?(:tips)
+      @tip_submission.errors.add(:base, "Please complete the verification challenge.")
+      @page = StaticPage.find_by!(slug: "submit-a-tip")
+      return render :show, status: :unprocessable_content
+    end
+
     if @tip_submission.save
       TipMailer.new_tip(@tip_submission).deliver_later
       redirect_to submit_a_tip_path, notice: "Thank you — your tip has been received. We protect the confidentiality of our sources."

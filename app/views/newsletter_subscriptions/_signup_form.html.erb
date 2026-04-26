@@ -19,16 +19,18 @@
 <% button_class = "inline-flex items-center justify-center min-h-[44px] rounded-md bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer" %>
 
 <%= form_with url: newsletter_subscribe_path, method: :post,
-    class: form_class,
     data: { turbo_frame: frame_id } do |f| %>
   <%= hidden_field_tag :frame_id, frame_id %>
   <%= hidden_field_tag :input_id, input_id %>
-  <label for="<%= input_id %>" class="sr-only">Email address</label>
-  <%= f.email_field :email, required: true,
-      id: input_id,
-      placeholder: "you@example.com",
-      autocomplete: "email",
-      class: layout == :stacked ? input_class : "#{input_class} flex-1 min-w-0" %>
-  <%= f.submit submit_label,
-      class: layout == :stacked ? "#{button_class} w-full" : "#{button_class} shrink-0" %>
+  <div class="<%= form_class %>">
+    <label for="<%= input_id %>" class="sr-only">Email address</label>
+    <%= f.email_field :email, required: true,
+        id: input_id,
+        placeholder: "you@example.com",
+        autocomplete: "email",
+        class: layout == :stacked ? input_class : "#{input_class} flex-1 min-w-0" %>
+    <%= f.submit submit_label,
+        class: layout == :stacked ? "#{button_class} w-full" : "#{button_class} shrink-0" %>
+  </div>
+  <%= render "shared/turnstile_widget", form_key: "newsletter" %>
 <% end %>
