@@ -3,7 +3,7 @@
 <% if author.bio.present? || author.photo.attached? || author.role_title.present? %>
   <aside class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row gap-4 items-start">
     <% if author.photo.attached? %>
-      <%= link_to author_path(author, slug: author.slug), class: "flex-shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded-full" do %>
+      <%= link_to author_path(author, slug: author.slug), class: "shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded-full" do %>
         <%= image_tag author.photo.variant(:small),
             class: "w-16 h-16 rounded-full object-cover",
             alt: author.name,

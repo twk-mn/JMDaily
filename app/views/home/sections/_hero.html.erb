@@ -29,7 +29,7 @@
       </div>
 
       <% if @secondary_stories.any? %>
-        <aside class="lg:col-span-1 lg:border-l lg:border-gray-200 lg:dark:border-gray-800 lg:pl-8 space-y-6" aria-label="Top stories">
+        <aside class="lg:col-span-1 lg:border-l lg:border-gray-200 dark:lg:border-gray-800 lg:pl-8 space-y-6" aria-label="Top stories">
           <% @secondary_stories.each do |article| %>
             <% t = article.translation_for(I18n.locale) || article.translations.first %>
             <% next unless t %>

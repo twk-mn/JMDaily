@@ -9,7 +9,7 @@
   <header class="mb-8 flex items-start gap-6">
     <% if @author.photo.attached? %>
       <%= image_tag @author.photo.variant(:thumb),
-          class: "w-24 h-24 rounded-full object-cover flex-shrink-0",
+          class: "w-24 h-24 rounded-full object-cover shrink-0",
           alt: @author.name,
           width: 96, height: 96 %>
     <% end %>
