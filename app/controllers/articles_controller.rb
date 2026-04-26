@@ -32,6 +32,19 @@ class ArticlesController < ApplicationController
     @json_ld = build_json_ld
   end
 
+  # Per-translation hreflang URLs (slugs differ across locales for articles,
+  # so the default path-substitution would produce wrong URLs). Returned as
+  # locale → absolute URL.
+  def alternate_locale_urls
+    return {} unless @article
+    active = SiteLanguage.active_codes
+    host = "https://#{ENV.fetch('APP_HOST', 'jmdaily.com')}"
+    @article.translations.each_with_object({}) do |t, h|
+      next unless active.include?(t.locale)
+      h[t.locale] = "#{host}/#{t.locale}/articles/#{t.slug}"
+    end
+  end
+
   private
 
   # Find this session's just-posted pending comment for the current article,

@@ -52,6 +52,25 @@ class ApplicationController < ActionController::Base
   end
   helper_method :current_user
 
+  # Canonical URL for the current request (no query string). Pages can override
+  # by setting `content_for(:canonical_url, ...)` in the view.
+  def canonical_url_for_current_request
+    "https://#{ENV.fetch('APP_HOST', 'jmdaily.com')}#{request.path}"
+  end
+  helper_method :canonical_url_for_current_request
+
+  # Map of locale → URL for hreflang link tags. The default substitutes the
+  # locale segment in the current path; controllers with per-locale slugs
+  # (notably Articles) override this to use the per-translation URL.
+  def alternate_locale_urls
+    return {} unless params[:locale].present?
+    host = "https://#{ENV.fetch('APP_HOST', 'jmdaily.com')}"
+    SiteLanguage.active_codes.each_with_object({}) do |code, h|
+      h[code] = "#{host}#{request.path.sub(/\A\/[a-z]{2,3}/, "/#{code}")}"
+    end
+  end
+  helper_method :alternate_locale_urls
+
   def browser_preferred_locale
     accept = request.env["HTTP_ACCEPT_LANGUAGE"].to_s
     active = SiteLanguage.active_codes

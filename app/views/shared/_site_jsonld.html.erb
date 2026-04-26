@@ -1,0 +1,34 @@
+<%# Sitewide structured data (Organization + WebSite). Article and other
+    page-specific schema is emitted from the page view itself. %>
+<% site_host = ENV.fetch("APP_HOST", "jmdaily.com") %>
+<% site_url  = "https://#{site_host}" %>
+<script type="application/ld+json">
+  <%= raw({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "#{site_url}#organization",
+        "name": "Joetsu-Myoko Daily",
+        "url": site_url,
+        "logo": "#{site_url}/apple-touch-icon.png"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "#{site_url}#website",
+        "url": site_url,
+        "name": "Joetsu-Myoko Daily",
+        "publisher": { "@id": "#{site_url}#organization" },
+        "inLanguage": SiteLanguage.active_codes,
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "#{site_url}/#{I18n.locale}/search?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  }.to_json) %>
+</script>

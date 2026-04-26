@@ -31,10 +31,6 @@
     }.to_json) %>
   </script>
 
-  <%# Alternate language links for SEO %>
-  <% @article.translations.each do |t| %>
-    <link rel="alternate" hreflang="<%= t.locale %>" href="<%= article_url(t, locale: t.locale) %>">
-  <% end %>
 <% end %>
 
 <% if !@article.published? && current_user %>
