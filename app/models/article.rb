@@ -7,6 +7,7 @@ class Article < ApplicationRecord
 
   has_many :translations, class_name: "ArticleTranslation", dependent: :destroy, inverse_of: :article
   has_many :sources, class_name: "ArticleSource", dependent: :destroy
+  has_many :corrections, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :article_tags, dependent: :destroy
   has_many :tags, through: :article_tags
@@ -15,6 +16,7 @@ class Article < ApplicationRecord
 
   accepts_nested_attributes_for :translations, allow_destroy: false, reject_if: :optional_translation_blank?
   accepts_nested_attributes_for :sources, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :corrections, allow_destroy: true, reject_if: ->(attrs) { attrs[:body].blank? }
 
   has_one_attached :featured_image do |attachable|
     attachable.variant :thumb,  resize_to_fill: [ 400, 250 ],   format: :webp

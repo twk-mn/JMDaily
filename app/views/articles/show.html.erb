@@ -101,6 +101,27 @@
     </div>
   </header>
 
+  <!-- Corrections (if any) -->
+  <% if @article.corrections.any? %>
+    <aside class="mt-6 mb-2 border border-amber-300 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-950/40 rounded-md px-4 py-3"
+           role="region"
+           aria-label="Corrections">
+      <p class="text-xs font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300 mb-2">
+        <%= pluralize(@article.corrections.size, "Correction") %>
+      </p>
+      <ol class="space-y-2">
+        <% @article.corrections.each do |correction| %>
+          <li class="text-sm text-amber-900 dark:text-amber-100">
+            <time datetime="<%= correction.posted_at.iso8601 %>" class="block text-xs text-amber-700 dark:text-amber-300 font-medium mb-0.5">
+              <%= correction.posted_at.strftime("%B %-d, %Y at %-I:%M %p") %>
+            </time>
+            <%= simple_format(correction.body, {}, sanitize: true) %>
+          </li>
+        <% end %>
+      </ol>
+    </aside>
+  <% end %>
+
   <!-- Featured image -->
   <% if @article.featured_image.attached? %>
     <figure class="mb-8">

@@ -138,6 +138,38 @@ RSpec.describe "Admin::Articles", type: :request do
       }
       expect(response).to have_http_status(:unprocessable_content)
     end
+
+    it "adds, updates, and removes corrections via nested attributes" do
+      existing = create(:correction, article: article, body: "Old correction text")
+
+      patch "/admin/articles/#{article.id}", params: {
+        article: {
+          corrections_attributes: [
+            { id: existing.id, body: "Edited correction text" },
+            { body: "Brand new correction", posted_at: "2026-04-25T10:00" },
+            { body: "" } # blank — should be rejected
+          ]
+        }
+      }
+
+      expect(response).to redirect_to(edit_admin_article_path(article))
+      bodies = article.reload.corrections.pluck(:body)
+      expect(bodies).to contain_exactly("Edited correction text", "Brand new correction")
+    end
+
+    it "removes a correction when _destroy is set" do
+      existing = create(:correction, article: article)
+
+      expect {
+        patch "/admin/articles/#{article.id}", params: {
+          article: {
+            corrections_attributes: [
+              { id: existing.id, _destroy: "1" }
+            ]
+          }
+        }
+      }.to change { article.corrections.count }.by(-1)
+    end
   end
 
   describe "DELETE /admin/articles/:id" do

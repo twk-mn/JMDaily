@@ -4,7 +4,7 @@ class ArticlesController < ApplicationController
       .where(locale: I18n.locale.to_s, slug: params[:id])
       .joins(:article)
       .merge(Article.published)
-      .includes(article: [ :author, :category, :tags, :locations, :sources, :translations ])
+      .includes(article: [ :author, :category, :tags, :locations, :sources, :corrections, :translations ])
       .first!
 
     @article = @translation.article
