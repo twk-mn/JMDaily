@@ -68,12 +68,11 @@ RSpec.describe "Home", type: :request do
 
       it "honors SiteConfig::HOMEPAGE_SECTIONS ordering" do
         original = SiteConfig::HOMEPAGE_SECTIONS
-        stub_const("SiteConfig::HOMEPAGE_SECTIONS", %i[newsletter breaking])
+        stub_const("SiteConfig::HOMEPAGE_SECTIONS", %i[newsletter ad_mid])
 
         get locale_root_path
 
-        newsletter_idx = response.body.index("Get the Joetsu-Myoko Daily")
-        expect(newsletter_idx).to be_present
+        expect(response.body).to include("Get the Joetsu-Myoko Daily")
         # Only these two sections are rendered now — hero / local_news / locations
         # should be absent.
         expect(response.body).not_to include('aria-label="Top stories"')

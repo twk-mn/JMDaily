@@ -1,0 +1,36 @@
+<% breaking = current_breaking_articles %>
+<% if breaking.any? %>
+  <div data-controller="breaking-banner"
+       data-breaking-banner-fingerprint-value="<%= breaking_articles_fingerprint %>"
+       class="bg-red-600 dark:bg-red-700 text-white"
+       role="region"
+       aria-label="Breaking news">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-3">
+      <span class="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
+        <span class="relative inline-flex w-2 h-2">
+          <span class="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+          <span class="relative inline-flex w-2 h-2 rounded-full bg-white"></span>
+        </span>
+        Breaking
+      </span>
+      <div class="min-w-0 flex-1 overflow-hidden">
+        <ul class="flex items-center gap-x-4 gap-y-1 text-sm whitespace-nowrap overflow-x-auto scrollbar-none">
+          <% breaking.each do |article| %>
+            <li class="shrink-0">
+              <%= link_to article.title, article_path(article),
+                  class: "text-white hover:underline font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded-sm" %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <button type="button"
+              data-action="click->breaking-banner#dismiss"
+              class="shrink-0 rounded-md text-white/80 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white p-1"
+              aria-label="Dismiss breaking news banner">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+<% end %>
