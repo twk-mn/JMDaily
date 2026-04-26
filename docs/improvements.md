@@ -179,7 +179,7 @@ effectively the same as "draft."
 - [x] Schedule job to run every 5 minutes via `config/recurring.yml`
 - [x] Solid Queue tables created via migration `20260410000002`
 - [x] Active Job adapter set to `:solid_queue` in production
-- [ ] Regenerate sitemap after bulk publish (deferred to sitemap task #19)
+- [x] Regenerate sitemap after bulk publish — `PublishScheduledArticlesJob` enqueues `RegenerateSitemapJob` explicitly (since `update_all` skips the `SitemapSchedulable` callback)
 
 ---
 
@@ -525,18 +525,17 @@ overflows the viewport and forces horizontal scrolling on common laptop widths.
 
 ### Plan
 
-- [ ] Group related items into dropdown menus driven by a small Stimulus
-      `dropdown` controller (click to toggle, click-outside / Escape to close)
-- [ ] Suggested groupings:
+- [x] Grouped into dropdowns driven by a small Stimulus `dropdown` controller
+      (click to toggle, click-outside / Escape to close)
+- [x] Final groupings:
   - Dashboard, Articles, Tags (top-level)
   - **Inbox ▾** — Messages / Comments / Tips with combined unread badge
   - **People ▾** — Authors, Users (admins only see Users)
   - **Promotion ▾** (admin) — Ads, Newsletter, Subscribers
   - **Site ▾** (admin) — Categories, Locations, Pages, Activity Log, Settings
-- [ ] Keep "View Site →" on the right next to user / 2FA / Logout
-- [ ] Verify keyboard navigation and `aria-expanded` / `aria-haspopup` on triggers
-- [ ] Mobile: existing nav already cramped — ensure dropdowns degrade reasonably,
-      revisit a hamburger toggle if needed
+- [x] "View Site →" on the right next to 2FA / user-avatar dropdown (name + email + Log out)
+- [x] `aria-haspopup` / `aria-expanded` set on each trigger; Escape closes
+- [ ] Mobile: revisit hamburger toggle if needed (existing layout still cramps below md)
 
 ---
 
