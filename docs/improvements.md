@@ -535,7 +535,10 @@ overflows the viewport and forces horizontal scrolling on common laptop widths.
   - **Site ▾** (admin) — Categories, Locations, Pages, Activity Log, Settings
 - [x] "View Site →" on the right next to 2FA / user-avatar dropdown (name + email + Log out)
 - [x] `aria-haspopup` / `aria-expanded` set on each trigger; Escape closes
-- [ ] Mobile: revisit hamburger toggle if needed (existing layout still cramps below md)
+- [x] Mobile: hamburger toggle (uses existing `mobile-menu` Stimulus controller)
+      hides desktop nav under `md` and reveals a vertical panel with all
+      sections; combined unread badge on the hamburger surfaces inbox activity
+      without expanding the menu
 
 ---
 

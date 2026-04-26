@@ -25,14 +25,17 @@
         tag.span(count, class: "ml-auto inline-flex items-center justify-center rounded-full #{color} text-white text-xs font-bold min-w-5 h-5 px-1.5")
       } %>
 
-      <nav class="bg-gray-800">
+      <% mobile_link    = "block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" %>
+      <% mobile_section = "px-3 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-500" %>
+
+      <nav class="bg-gray-800" data-controller="mobile-menu">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="flex h-16 items-center justify-between gap-4">
             <div class="flex items-center min-w-0">
               <div class="shrink-0">
                 <%= link_to admin_root_path, class: "text-white font-bold text-lg hover:text-gray-200" do %>JMDaily Admin<% end %>
               </div>
-              <div class="ml-8 flex items-center gap-1">
+              <div class="ml-8 hidden md:flex items-center gap-1">
                 <%= link_to "Dashboard", admin_root_path, class: nav_link %>
                 <%= link_to "Articles", admin_articles_path, class: nav_link %>
                 <%= link_to "Tags", admin_tags_path, class: nav_link %>
@@ -100,7 +103,7 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="hidden md:flex items-center gap-2 shrink-0">
               <%= link_to "View Site →", root_path, class: nav_link, target: "_blank" %>
               <%= link_to admin_two_factor_path, class: "rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 hover:text-white inline-flex items-center gap-1 #{current_user.otp_enabled? ? 'text-green-400' : 'text-gray-400'}", title: current_user.otp_enabled? ? "2FA enabled" : "2FA disabled — click to set up" do %>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -124,6 +127,77 @@
                 </div>
               </div>
             </div>
+
+            <%# Mobile hamburger toggle %>
+            <button type="button"
+                    class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white relative"
+                    data-action="mobile-menu#toggle"
+                    aria-controls="admin-mobile-menu"
+                    aria-expanded="false">
+              <span class="sr-only">Open main menu</span>
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
+              </svg>
+              <% if unread_inbox_count > 0 %>
+                <span class="absolute top-1 right-1 inline-flex items-center justify-center rounded-full bg-indigo-500 text-white text-[10px] font-bold w-4 h-4">
+                  <%= unread_inbox_count > 9 ? "9+" : unread_inbox_count %>
+                </span>
+              <% end %>
+            </button>
+          </div>
+        </div>
+
+        <%# Mobile menu panel — hidden by default, toggled by the hamburger %>
+        <div id="admin-mobile-menu" class="md:hidden hidden border-t border-gray-700" data-mobile-menu-target="menu">
+          <div class="px-2 pt-2 pb-3 space-y-1">
+            <%= link_to "Dashboard", admin_root_path, class: mobile_link %>
+            <%= link_to "Articles", admin_articles_path, class: mobile_link %>
+            <%= link_to "Tags", admin_tags_path, class: mobile_link %>
+
+            <div class="<%= mobile_section %>">Inbox</div>
+            <%= link_to admin_contact_submissions_path, class: "#{mobile_link} flex items-center gap-2" do %>
+              Messages <%= pill.call(unread_messages_count, "bg-indigo-500") %>
+            <% end %>
+            <%= link_to admin_comments_path, class: "#{mobile_link} flex items-center gap-2" do %>
+              Comments <%= pill.call(pending_comments_count, "bg-yellow-500") %>
+            <% end %>
+            <%= link_to admin_tip_submissions_path, class: "#{mobile_link} flex items-center gap-2" do %>
+              Tips <%= pill.call(unread_tips_count, "bg-amber-500") %>
+            <% end %>
+
+            <div class="<%= mobile_section %>">People</div>
+            <%= link_to "Authors", admin_authors_path, class: mobile_link %>
+            <% if current_user.admin? %>
+              <%= link_to "Users", admin_users_path, class: mobile_link %>
+            <% end %>
+
+            <% if current_user.admin? %>
+              <div class="<%= mobile_section %>">Promotion</div>
+              <%= link_to "Ads", admin_ads_path, class: mobile_link %>
+              <%= link_to "Newsletter", admin_newsletter_issues_path, class: mobile_link %>
+              <%= link_to "Subscribers", admin_newsletter_subscribers_path, class: mobile_link %>
+
+              <div class="<%= mobile_section %>">Site</div>
+              <%= link_to "Categories", admin_categories_path, class: mobile_link %>
+              <%= link_to "Locations", admin_locations_path, class: mobile_link %>
+              <%= link_to "Pages", admin_static_pages_path, class: mobile_link %>
+              <%= link_to "Activity Log", admin_audit_logs_path, class: mobile_link %>
+              <%= link_to "Settings", admin_settings_path, class: mobile_link %>
+            <% end %>
+          </div>
+
+          <div class="border-t border-gray-700 px-2 py-3 space-y-1">
+            <div class="px-3 pb-2 text-xs text-gray-400">
+              Signed in as <span class="text-gray-200 font-medium"><%= current_user.email %></span>
+            </div>
+            <%= link_to "View Site →", root_path, class: mobile_link, target: "_blank" %>
+            <%= link_to admin_two_factor_path, class: "#{mobile_link} flex items-center gap-2 #{current_user.otp_enabled? ? 'text-green-400' : ''}" do %>
+              2FA
+              <span class="text-xs <%= current_user.otp_enabled? ? "text-green-400" : "text-gray-500" %>">
+                <%= current_user.otp_enabled? ? "Enabled" : "Not set up" %>
+              </span>
+            <% end %>
+            <%= button_to "Log out", admin_logout_path, method: :delete, class: "#{mobile_link} w-full text-left bg-transparent" %>
           </div>
         </div>
       </nav>
