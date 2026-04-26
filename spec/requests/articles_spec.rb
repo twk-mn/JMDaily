@@ -71,5 +71,33 @@ RSpec.describe "Articles", type: :request do
         expect(response.body).not_to include("About the author")
       end
     end
+
+    describe "corrections" do
+      it "omits the corrections section when there are none" do
+        article = create(:article, :published)
+        get article_path(article)
+        expect(response.body).not_to include('aria-label="Corrections"')
+      end
+
+      it "renders corrections in chronological order with timestamps" do
+        article = create(:article, :published)
+        create(:correction, article: article,
+               body: "Misnamed the venue. The event was at City Hall, not the library.",
+               posted_at: Time.zone.local(2026, 4, 20, 9, 0))
+        create(:correction, article: article,
+               body: "Updated the attendance figure from 200 to 220.",
+               posted_at: Time.zone.local(2026, 4, 22, 14, 30))
+
+        get article_path(article)
+
+        expect(response.body).to include('aria-label="Corrections"')
+        expect(response.body).to include("2 Corrections")
+        # Earlier correction comes first.
+        venue_idx      = response.body.index("City Hall")
+        attendance_idx = response.body.index("attendance figure")
+        expect(venue_idx).to be < attendance_idx
+        expect(response.body).to match(/<time datetime="2026-04-20/)
+      end
+    end
   end
 end

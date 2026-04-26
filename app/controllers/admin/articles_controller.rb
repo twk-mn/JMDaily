@@ -16,7 +16,7 @@ module Admin
     end
 
     def preview
-      @article = Article.includes(:author, :category, :tags, :locations, :sources, :translations,
+      @article = Article.includes(:author, :category, :tags, :locations, :sources, :corrections, :translations,
                                   featured_image_attachment: :blob).find(params[:id])
       @translation = @article.translation_for(I18n.locale) || @article.translations.first
 
@@ -93,6 +93,7 @@ module Admin
         @article.translations.find_or_initialize_by(locale: locale)
       end
       @article.sources.build if @article.sources.empty?
+      @article.corrections.build if @article.corrections.empty?
     end
 
     def update
@@ -111,7 +112,7 @@ module Admin
     private
 
     def set_article
-      @article = Article.includes(:translations, :sources).find(params[:id])
+      @article = Article.includes(:translations, :sources, :corrections).find(params[:id])
     end
 
     def article_params
@@ -125,7 +126,8 @@ module Admin
           :id, :locale, :title, :slug, :dek, :body, :context_box,
           :seo_title, :meta_description
         ],
-        sources_attributes: [ :id, :name, :url, :position, :_destroy ]
+        sources_attributes: [ :id, :name, :url, :position, :_destroy ],
+        corrections_attributes: [ :id, :body, :posted_at, :_destroy ]
       )
     end
 
