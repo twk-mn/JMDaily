@@ -18,6 +18,14 @@ module ApplicationHelper
     @unread_tips_count ||= TipSubmission.unread.count
   end
 
+  def pending_comments_count
+    @pending_comments_count ||= Comment.pending.count
+  end
+
+  def unread_inbox_count
+    unread_messages_count + pending_comments_count + unread_tips_count
+  end
+
   # Renders the highest-priority active ad for the given placement zone.
   # Impression is recorded asynchronously and deduplicated per-session per ad
   # so repeated page loads by the same visitor don't inflate counts.
