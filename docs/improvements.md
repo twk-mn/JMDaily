@@ -157,8 +157,8 @@ AdSense and most ad networks require relaxed CSP rules. When implementing ads:
 - [x] Create `ad_for(zone)` helper and `_ad.html.erb` partial
 - [x] Add click tracking route and `AdsController#click` action
 - [x] Insert `ad_for` calls into layout partials at each zone
-- [ ] Configure CSP to allow ad network scripts
-- [ ] Write specs for Ad model and click tracking
+- [x] Write specs for Ad model and click tracking
+- [ ] Configure CSP to allow ad network scripts (deferred until ad networks are actually wired up)
 
 ---
 
@@ -195,8 +195,8 @@ database access.
 - [x] Create admin views — index list with unread badge + preview, show page with full message + reply link
 - [x] Add to admin nav with live unread count badge
 - [x] Add `read` boolean to `contact_submissions` (migration `20260410000003`), auto-marked on show
-- [ ] Configure email delivery (Postmark or Resend) so new submissions also notify via email
-- [ ] Add mailer: `ContactMailer#new_submission` sends to editor email address stored in env
+- [x] Configure email delivery (covered by item #10 — provider-agnostic SMTP via ENV)
+- [x] `ContactMailer#new_submission` sends to editor email address stored in env (covered by item #10)
 
 ---
 
@@ -214,7 +214,7 @@ editors or change passwords.
 - [x] Edit form: name, email, role — password change section optional (blank = no change)
 - [x] Guards: cannot delete own account, cannot change own role
 - [x] Index shows linked author profile with edit link
-- [ ] Restrict to admin-role users only (part of RBAC task #7)
+- [x] Restrict to admin-role users only (delivered via RBAC task #7 — `require_admin!` on Users)
 
 ---
 
