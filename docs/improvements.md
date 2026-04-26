@@ -31,6 +31,8 @@
 | 18 | Frontend | Print stylesheet for articles | Low |
 | 19 | Ops | Sitemap auto-regeneration job | Low |
 | 20 | Ops | Rotate default seed credentials | Immediate |
+| 21 | Security | Cloudflare Turnstile on public-facing forms | High |
+| 22 | Frontend | Admin nav overflow — group into dropdowns | High |
 
 ---
 
@@ -479,6 +481,61 @@ new articles are published.
 - [x] `RegenerateSitemapJob` wraps `SitemapGenerator::Interpreter.run` with error logging
 - [x] `Article` model triggers `RegenerateSitemapJob.perform_later` via `after_save` when status changes to `published`
 - [x] Nightly fallback schedule at 3am in `config/recurring.yml` (catches bulk publishes from scheduler job)
+
+---
+
+## 21. Cloudflare Turnstile on Public-Facing Forms
+
+### Background
+
+Public forms — comments, contact form, tip submissions, newsletter signup — are
+currently protected only by Rack::Attack rate limiting. That stops volume floods
+but not low-and-slow scripted spam or human-operated form abuse. Cloudflare
+Turnstile is a privacy-friendly, no-puzzle alternative to reCAPTCHA that runs
+invisibly in most cases.
+
+### Plan
+
+- [ ] Add `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` env vars (sandbox keys for dev)
+- [ ] Admin **Settings** toggle: enable/disable Turnstile globally, plus per-form
+      checkboxes (comments, contact, tips, newsletter signup) so admins can
+      tune protection without redeploying
+- [ ] Render the Turnstile widget partial conditionally based on the setting
+- [ ] Server-side token verification helper (`Turnstile.verify(token, ip)`) called
+      from `CommentsController#create`, `PagesController#contact` /
+      `#submit_tip`, and `NewsletterSubscriptionsController#create`
+- [ ] On verification failure: re-render the form with a clear error, do not
+      persist the submission, log the attempt
+- [ ] Skip verification in test env via a stub; document Turnstile's always-pass
+      sandbox keys for development
+- [ ] CSP: allow `https://challenges.cloudflare.com` in `script-src` and `frame-src`
+
+---
+
+## 22. Admin Nav Overflow — Group into Dropdowns
+
+### Background
+
+The admin top nav lists every section in a single horizontal flex row inside a
+`max-w-7xl` container. With editor + admin links combined (Dashboard, Articles,
+Authors, Tags, Messages, Comments, Tips, Categories, Locations, Pages, Ads,
+Subscribers, Newsletter, Users, Activity Log, Settings, View Site) the row
+overflows the viewport and forces horizontal scrolling on common laptop widths.
+
+### Plan
+
+- [ ] Group related items into dropdown menus driven by a small Stimulus
+      `dropdown` controller (click to toggle, click-outside / Escape to close)
+- [ ] Suggested groupings:
+  - Dashboard, Articles, Tags (top-level)
+  - **Inbox ▾** — Messages / Comments / Tips with combined unread badge
+  - **People ▾** — Authors, Users (admins only see Users)
+  - **Promotion ▾** (admin) — Ads, Newsletter, Subscribers
+  - **Site ▾** (admin) — Categories, Locations, Pages, Activity Log, Settings
+- [ ] Keep "View Site →" on the right next to user / 2FA / Logout
+- [ ] Verify keyboard navigation and `aria-expanded` / `aria-haspopup` on triggers
+- [ ] Mobile: existing nav already cramped — ensure dropdowns degrade reasonably,
+      revisit a hamburger toggle if needed
 
 ---
 
