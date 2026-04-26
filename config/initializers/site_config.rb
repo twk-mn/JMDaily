@@ -8,7 +8,7 @@ module SiteConfig
   # Ordered list of homepage section partials. Each entry maps to
   # app/views/home/sections/_<key>.html.erb. Reorder, add, or remove
   # entries to change the homepage without touching the template.
-  HOMEPAGE_SECTIONS = %i[breaking hero ad_mid local_news locations newsletter].freeze
+  HOMEPAGE_SECTIONS = %i[hero ad_mid local_news locations newsletter].freeze
 
   # Admin session expires after this period of inactivity.
   ADMIN_SESSION_TIMEOUT = 2.hours

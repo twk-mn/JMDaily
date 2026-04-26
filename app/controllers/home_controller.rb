@@ -27,7 +27,5 @@ class HomeController < ApplicationController
 
     @joetsu_articles = @joetsu ? Article.published.by_location(@joetsu).recent.includes(:translations).limit(4) : []
     @myoko_articles  = @myoko  ? Article.published.by_location(@myoko).recent.includes(:translations).limit(4) : []
-
-    @breaking_articles = Article.published.breaking.recent.includes(:translations).limit(3)
   end
 end

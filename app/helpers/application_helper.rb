@@ -34,6 +34,20 @@ module ApplicationHelper
     render "shared/ad", ad: ad
   end
 
+  # Currently-active breaking news (memoized per request) so the sitewide
+  # breaking banner and any in-page breaking section share the same query.
+  def current_breaking_articles
+    @current_breaking_articles ||= Article.published.breaking.recent.includes(:translations).limit(3).to_a
+  end
+
+  # A stable fingerprint of the current breaking lineup. The dismiss button
+  # writes this to sessionStorage; if a *new* breaking article appears later,
+  # the fingerprint changes and the banner returns even for visitors who
+  # previously dismissed it.
+  def breaking_articles_fingerprint
+    current_breaking_articles.map(&:id).sort.join(",")
+  end
+
   # Active site languages for the header switcher. The switcher always points at
   # locale_root so switching never 404s on a slug that doesn't exist in the new
   # language (article/tag/author pages that can resolve the *same* record in a
