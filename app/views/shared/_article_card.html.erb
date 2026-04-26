@@ -6,7 +6,7 @@
       <%= link_to article_path(article) do %>
         <div class="aspect-16/10 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
           <%= image_tag article.featured_image.variant(:thumb),
-              class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300",
+              class: "w-full h-full object-cover hover:scale-105 transition-transform duration-300 motion-reduce:transform-none",
               alt: article.featured_image_caption.presence || t.title,
               loading: "lazy",
               width: 400, height: 250 %>
