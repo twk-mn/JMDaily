@@ -1,0 +1,15 @@
+<%# Renders the Cloudflare Turnstile widget for the given form key when enabled
+    in admin Settings → Security. No-op if disabled, so callers can include this
+    partial unconditionally on every protected form.
+
+    Locals:
+      form_key: required — one of Turnstile::FORMS (comments, contact, tips, newsletter) %>
+<% if Turnstile.enabled_for?(local_assigns.fetch(:form_key)) %>
+  <div class="cf-turnstile mt-2"
+       data-sitekey="<%= Turnstile.site_key %>"
+       data-theme="auto"
+       data-size="normal"></div>
+  <%# Loaded once per page; the Turnstile script is idempotent. %>
+  <%= javascript_include_tag "https://challenges.cloudflare.com/turnstile/v0/api.js",
+        async: true, defer: true, "data-turnstile-script": true %>
+<% end %>

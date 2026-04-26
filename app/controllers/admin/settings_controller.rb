@@ -7,7 +7,7 @@ module Admin
     before_action :require_admin!
     before_action :set_tab
 
-    TABS = %w[general languages].freeze
+    TABS = %w[general security languages].freeze
 
     def show
       case @tab
@@ -15,7 +15,7 @@ module Admin
         @site_languages = SiteLanguage.ordered
         @addable_iso_options = SiteLanguage.addable_iso_options
       else
-        @definitions = Setting.definitions_for_tab("general")
+        @definitions = Setting.definitions_for_tab(@tab)
         @values = @definitions.to_h { |key, _| [ key, Setting.get(key) ] }
       end
     end

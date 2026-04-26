@@ -28,9 +28,13 @@ Rails.application.configure do
     policy.font_src    :self, :data
     policy.img_src     :self, :https, :data, :blob
     policy.object_src  :none
-    policy.script_src  :self
+    # Cloudflare Turnstile widget script. Loaded conditionally per-form when
+    # admin enables the protection — kept allowlisted unconditionally so toggling
+    # the setting doesn't require a deploy.
+    policy.script_src  :self, "https://challenges.cloudflare.com"
     policy.style_src   :self, :unsafe_inline
     policy.connect_src :self
+    policy.frame_src   "https://challenges.cloudflare.com"
     policy.frame_ancestors :none
   end
 

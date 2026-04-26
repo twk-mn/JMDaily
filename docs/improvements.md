@@ -496,19 +496,20 @@ invisibly in most cases.
 
 ### Plan
 
-- [ ] Add `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` env vars (sandbox keys for dev)
-- [ ] Admin **Settings** toggle: enable/disable Turnstile globally, plus per-form
-      checkboxes (comments, contact, tips, newsletter signup) so admins can
-      tune protection without redeploying
-- [ ] Render the Turnstile widget partial conditionally based on the setting
-- [ ] Server-side token verification helper (`Turnstile.verify(token, ip)`) called
-      from `CommentsController#create`, `PagesController#contact` /
-      `#submit_tip`, and `NewsletterSubscriptionsController#create`
-- [ ] On verification failure: re-render the form with a clear error, do not
-      persist the submission, log the attempt
-- [ ] Skip verification in test env via a stub; document Turnstile's always-pass
-      sandbox keys for development
-- [ ] CSP: allow `https://challenges.cloudflare.com` in `script-src` and `frame-src`
+- [x] Site key + secret key are admin-managed Settings (Settings → Security tab)
+      — admins can paste them in without a redeploy. Secret key field renders as a password input.
+- [x] Per-form toggles in admin Settings: comments, contact, tips, newsletter signup
+- [x] `shared/_turnstile_widget` partial renders the Cloudflare widget only when
+      the per-form toggle is on AND both keys are configured
+- [x] `Turnstile.verify(token, ip)` server-side helper, fail-closed on network/parse errors
+- [x] Wired into `CommentsController#create`, `PagesController#submit_contact` /
+      `#submit_tip`, `NewsletterSubscriptionsController#create` via
+      `turnstile_passed?(form_key)` on `ApplicationController`
+- [x] Verification failure re-renders the form with a "Please complete the verification
+      challenge" error, does not persist the submission
+- [x] In test env, `Turnstile.test_verification_result` lets specs override the
+      verification result without HTTP calls
+- [x] CSP: `https://challenges.cloudflare.com` allowed in `script-src` and `frame-src`
 
 ---
 

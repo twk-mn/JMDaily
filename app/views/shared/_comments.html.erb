@@ -74,7 +74,7 @@
         <ul class="list-disc list-inside text-sm text-red-700 dark:text-red-300">
           <% form_errors.each do |field, messages| %>
             <% Array(messages).each do |msg| %>
-              <li><%= field.humanize %> <%= msg %></li>
+              <li><%= field == "base" ? msg : "#{field.humanize} #{msg}" %></li>
             <% end %>
           <% end %>
         </ul>
@@ -135,6 +135,8 @@
           </p>
         </div>
       </div>
+
+      <%= render "shared/turnstile_widget", form_key: "comments" %>
 
       <p class="text-xs text-gray-600 dark:text-gray-400">Comments are moderated and may take a short time to appear.</p>
       <%= submit_tag "Post comment",

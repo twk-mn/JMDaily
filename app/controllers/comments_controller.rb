@@ -9,6 +9,14 @@ class CommentsController < ApplicationController
       return
     end
 
+    unless turnstile_passed?(:comments)
+      flash[:comment_form] = {
+        "values" => comment_params.to_h,
+        "errors" => { "base" => [ "Please complete the verification challenge." ] }
+      }
+      redirect_to article_path(@article, anchor: "comment-form") and return
+    end
+
     @comment = @article.comments.new(comment_params)
     @comment.ip_address = request.remote_ip
 

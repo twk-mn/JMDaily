@@ -53,7 +53,7 @@ Rails.application.routes.draw do
 
     # Settings (admin-only, see Admin::SettingsController)
     get  "settings",         to: "settings#show",   as: :settings
-    get  "settings/:tab",    to: "settings#show",   as: :settings_tab, constraints: { tab: /general|languages/ }
+    get  "settings/:tab",    to: "settings#show",   as: :settings_tab, constraints: { tab: /general|security|languages/ }
     patch "settings",        to: "settings#update"
 
     resources :site_languages, only: [ :create, :update, :destroy ], path: "settings/languages" do

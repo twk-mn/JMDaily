@@ -5,6 +5,10 @@ class NewsletterSubscriptionsController < ApplicationController
     frame_id = params[:frame_id].presence || "newsletter-signup-home"
     input_id = params[:input_id].presence || "home-newsletter-email"
 
+    unless turnstile_passed?(:newsletter)
+      return render_failure("Please complete the verification challenge.", frame_id, input_id)
+    end
+
     if @subscriber.save
       NewsletterMailer.confirmation(@subscriber).deliver_later
       if turbo_frame_request?
@@ -16,12 +20,7 @@ class NewsletterSubscriptionsController < ApplicationController
       end
     else
       message = @subscriber.errors.full_messages.first || "Something went wrong. Please try again."
-      if turbo_frame_request?
-        render partial: "newsletter_subscriptions/signup_error",
-               locals: { frame_id: frame_id, input_id: input_id, message: message }
-      else
-        redirect_back_or_to locale_root_path, alert: message
-      end
+      render_failure(message, frame_id, input_id)
     end
   end
 
@@ -53,5 +52,16 @@ class NewsletterSubscriptionsController < ApplicationController
       @state = :invalid
     end
     render :unsubscribe
+  end
+
+  private
+
+  def render_failure(message, frame_id, input_id)
+    if turbo_frame_request?
+      render partial: "newsletter_subscriptions/signup_error",
+             locals: { frame_id: frame_id, input_id: input_id, message: message }
+    else
+      redirect_back_or_to locale_root_path, alert: message
+    end
   end
 end
