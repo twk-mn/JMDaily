@@ -16,8 +16,12 @@ local:
 #
 # Optional but recommended:
 #   R2_PUBLIC_URL        — custom public domain for assets
-#                          (e.g. https://assets.jmdaily.com)
-#                          Set this after enabling public access on the bucket.
+#                          (e.g. https://assets.jmdaily.com). When set, the
+#                          active_storage_cdn initializer rewrites public URLs
+#                          to use this host so blobs are served via the CDN
+#                          instead of the R2 origin endpoint. Configure this
+#                          after enabling public access + a custom domain on
+#                          the R2 bucket.
 cloudflare_r2:
   service: S3
   access_key_id: <%= ENV["R2_ACCESS_KEY_ID"] %>

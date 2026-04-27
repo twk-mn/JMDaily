@@ -310,7 +310,10 @@ upload images are served everywhere.
 - [x] All image tags updated to use named variants instead of inline resize options
 - [x] `loading="lazy"` on all non-above-fold images (article cards, related articles)
 - [x] `width`/`height` attributes added to prevent layout shift (CLS)
-- [ ] Confirm Active Storage variant storage backend is configured for production (S3/CDN)
+- [x] Production backend is Cloudflare R2 (S3-compatible) via `config/storage.yml` →
+      `cloudflare_r2` service, set in `production.rb`. When `R2_PUBLIC_URL` is
+      provided, `config/initializers/active_storage_cdn.rb` rewrites public URLs
+      so variants are served via the CDN host (e.g. `assets.jmdaily.com`).
 
 ---
 
