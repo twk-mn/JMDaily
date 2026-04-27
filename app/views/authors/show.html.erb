@@ -33,14 +33,27 @@
   </header>
 
   <div class="border-t border-gray-200 dark:border-gray-800 pt-8">
-    <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-6">Articles by <%= @author.name %></h2>
+    <div class="flex items-baseline justify-between gap-4 border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-6">
+      <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Articles by <%= @author.name %></h2>
+      <% if @pagy.count.positive? %>
+        <span class="text-xs text-gray-600 dark:text-gray-400 shrink-0"><%= pluralize(@pagy.count, "article") %></span>
+      <% end %>
+    </div>
 
     <% if @articles.any? %>
-      <div class="space-y-8">
-        <% @articles.each do |article| %>
-          <%= render "shared/article_card", article: article %>
-        <% end %>
-      </div>
+      <% lead, *rest = @pagy.page == 1 ? @articles.to_a : [ nil, *@articles ] %>
+
+      <% if lead %>
+        <%= render "shared/lead_story_card", article: lead %>
+      <% end %>
+
+      <% if rest.any? %>
+        <div class="space-y-8">
+          <% rest.each do |article| %>
+            <%= render "shared/article_card", article: article %>
+          <% end %>
+        </div>
+      <% end %>
 
       <%= render "shared/pagination", pagy: @pagy %>
     <% else %>
