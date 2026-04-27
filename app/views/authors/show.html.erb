@@ -33,12 +33,9 @@
   </header>
 
   <div class="border-t border-gray-200 dark:border-gray-800 pt-8">
-    <div class="flex items-baseline justify-between gap-4 border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-6">
-      <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Articles by <%= @author.name %></h2>
-      <% if @pagy.count.positive? %>
-        <span class="text-xs text-gray-600 dark:text-gray-400 shrink-0"><%= pluralize(@pagy.count, "article") %></span>
-      <% end %>
-    </div>
+    <%= render "shared/section_subhead",
+        title: "Articles by #{@author.name}",
+        meta: (@pagy.count.positive? ? content_tag(:span, pluralize(@pagy.count, "article"), class: "text-xs text-gray-600 dark:text-gray-400") : nil) %>
 
     <% if @articles.any? %>
       <% lead, *rest = @pagy.page == 1 ? @articles.to_a : [ nil, *@articles ] %>

@@ -210,9 +210,7 @@
 <!-- More from this author -->
 <% if @more_from_author.any? %>
   <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-200 dark:border-gray-800">
-    <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-6">
-      More from <%= @article.author.name %>
-    </h2>
+    <%= render "shared/section_subhead", title: "More from #{@article.author.name}" %>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
       <% @more_from_author.each do |article| %>
         <%= render "shared/related_card", article: article %>
@@ -224,7 +222,7 @@
 <!-- Related articles -->
 <% if @related_articles.any? %>
   <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-200 dark:border-gray-800">
-    <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider border-b-2 border-gray-900 dark:border-gray-100 pb-2 mb-6">Related Stories</h2>
+    <%= render "shared/section_subhead", title: "Related Stories" %>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <% @related_articles.each do |article| %>
         <%= render "shared/related_card", article: article %>
