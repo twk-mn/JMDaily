@@ -100,9 +100,10 @@ RSpec.describe "Home", type: :request do
 
       it "marks the current locale with aria-current" do
         get locale_root_path(locale: "en")
-        # Attribute order isn't guaranteed — look for an <a> tag that contains
-        # both href="/en" and aria-current="true".
-        en_link = response.body[/<a\b[^>]*href="\/en"[^>]*>/] || response.body[/<a\b[^>]*aria-current[^>]*href="\/en"[^>]*>/]
+        # Scope to the language-switcher pill group so we don't match the
+        # masthead's locale_root_path link, which also points at /en.
+        switcher = response.body[/<div[^>]*aria-label="Language"[^>]*>.*?<\/div>/m]
+        en_link = switcher[/<a\b[^>]*href="\/en"[^>]*>/] || switcher[/<a\b[^>]*aria-current[^>]*href="\/en"[^>]*>/]
         expect(en_link).to include('aria-current="true"')
       end
     end
