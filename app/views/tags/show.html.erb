@@ -9,25 +9,9 @@
         { name: @tag.name, url: request.path }
       ] %>
 
-  <% if @articles.any? %>
-    <% lead, *rest = @pagy.page == 1 ? @articles.to_a : [ nil, *@articles ] %>
-
-    <% if lead %>
-      <%= render "shared/lead_story_card", article: lead %>
-    <% end %>
-
-    <% if rest.any? %>
-      <div class="space-y-8">
-        <% rest.each do |article| %>
-          <%= render "shared/article_card", article: article %>
-        <% end %>
-      </div>
-    <% end %>
-
-    <%= render "shared/pagination", pagy: @pagy %>
-  <% else %>
-    <%= render "shared/empty_state",
-        heading: "No articles with this tag yet.",
-        body: "Try another tag or browse the latest news." %>
-  <% end %>
+  <%= render "shared/paginated_article_list",
+      articles: @articles,
+      pagy: @pagy,
+      empty_heading: "No articles with this tag yet.",
+      empty_body: "Try another tag or browse the latest news." %>
 </div>

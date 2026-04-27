@@ -37,24 +37,9 @@
         title: "Articles by #{@author.name}",
         meta: (@pagy.count.positive? ? content_tag(:span, pluralize(@pagy.count, "article"), class: "text-xs text-gray-600 dark:text-gray-400") : nil) %>
 
-    <% if @articles.any? %>
-      <% lead, *rest = @pagy.page == 1 ? @articles.to_a : [ nil, *@articles ] %>
-
-      <% if lead %>
-        <%= render "shared/lead_story_card", article: lead %>
-      <% end %>
-
-      <% if rest.any? %>
-        <div class="space-y-8">
-          <% rest.each do |article| %>
-            <%= render "shared/article_card", article: article %>
-          <% end %>
-        </div>
-      <% end %>
-
-      <%= render "shared/pagination", pagy: @pagy %>
-    <% else %>
-      <%= render "shared/empty_state", heading: "No published articles yet." %>
-    <% end %>
+    <%= render "shared/paginated_article_list",
+        articles: @articles,
+        pagy: @pagy,
+        empty_heading: "No published articles yet." %>
   </div>
 </div>
