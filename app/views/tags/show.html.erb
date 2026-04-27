@@ -10,11 +10,19 @@
       ] %>
 
   <% if @articles.any? %>
-    <div class="space-y-8">
-      <% @articles.each do |article| %>
-        <%= render "shared/article_card", article: article %>
-      <% end %>
-    </div>
+    <% lead, *rest = @pagy.page == 1 ? @articles.to_a : [ nil, *@articles ] %>
+
+    <% if lead %>
+      <%= render "shared/lead_story_card", article: lead %>
+    <% end %>
+
+    <% if rest.any? %>
+      <div class="space-y-8">
+        <% rest.each do |article| %>
+          <%= render "shared/article_card", article: article %>
+        <% end %>
+      </div>
+    <% end %>
 
     <%= render "shared/pagination", pagy: @pagy %>
   <% else %>

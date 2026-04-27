@@ -2,7 +2,7 @@
 <% if t %>
 <article class="flex gap-4">
   <% if article.featured_image.attached? %>
-    <div class="shrink-0 w-32 sm:w-48">
+    <div class="shrink-0 w-24 sm:w-48">
       <%= link_to article_path(article) do %>
         <div class="aspect-16/10 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
           <%= image_tag article.featured_image.variant(:thumb),
