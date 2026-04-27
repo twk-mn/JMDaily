@@ -1,0 +1,36 @@
+<%# Pagy-paginated article list with the lead-story-on-page-1 treatment
+    used by category, tag, location, and author index pages. The first
+    article on page 1 renders as a lead story; the rest fall through to
+    the standard article-card list. Subsequent pages render the full
+    collection as cards (no second lead).
+
+    Locals:
+      articles:      required — the @pagy items collection
+      pagy:          required — the Pagy::Offset instance
+      empty_heading: required — message shown when articles is empty
+      empty_body:    optional — secondary guidance under empty_heading
+%>
+<% articles = local_assigns.fetch(:articles) %>
+<% pagy = local_assigns.fetch(:pagy) %>
+<% empty_heading = local_assigns.fetch(:empty_heading) %>
+<% empty_body = local_assigns[:empty_body] %>
+
+<% if articles.any? %>
+  <% lead, *rest = pagy.page == 1 ? articles.to_a : [ nil, *articles ] %>
+
+  <% if lead %>
+    <%= render "shared/lead_story_card", article: lead %>
+  <% end %>
+
+  <% if rest.any? %>
+    <div class="space-y-8">
+      <% rest.each do |article| %>
+        <%= render "shared/article_card", article: article %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= render "shared/pagination", pagy: pagy %>
+<% else %>
+  <%= render "shared/empty_state", heading: empty_heading, body: empty_body %>
+<% end %>
