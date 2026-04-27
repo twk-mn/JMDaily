@@ -1,0 +1,29 @@
+<%# Uppercase, tracking-wider H2 with a black bottom-border — used as the
+    section subhead on home columns, section fronts, and article-show
+    related/more-from-author blocks.
+
+    Locals:
+      title:         required (string)
+      link:          optional URL — wraps title in a link (with hover/focus styling)
+      meta:          optional html_safe string — rendered to the right (e.g.
+                     "See all" link, "N articles" count). Caller controls colour.
+      wrapper_class: optional override for the outer div's classes (default
+                     bottom margin "mb-6"). Pass "mb-4" for tighter sections.
+%>
+<% title = local_assigns.fetch(:title) %>
+<% link = local_assigns[:link] %>
+<% meta = local_assigns[:meta] %>
+<% wrapper_class = local_assigns.fetch(:wrapper_class, "mb-6") %>
+
+<div class="flex items-baseline justify-between gap-4 border-b-2 border-gray-900 dark:border-gray-100 pb-2 <%= wrapper_class %>">
+  <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
+    <% if link %>
+      <%= link_to title, link, class: "hover:text-indigo-600 dark:hover:text-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+    <% else %>
+      <%= title %>
+    <% end %>
+  </h2>
+  <% if meta.present? %>
+    <span class="shrink-0"><%= meta %></span>
+  <% end %>
+</div>
