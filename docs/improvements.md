@@ -401,7 +401,10 @@ for a future newsletter.
 - [x] `GET /newsletter/unsubscribe?email=…` — unsubscribes
 - [x] Admin index at `/admin/newsletter_subscribers` — status badges, CSV export (admin-only)
 - [x] Rate limiting: 5 signups per IP per minute
-- [ ] Integration with Mailchimp or Resend audience list (optional, later)
+- [x] Optional Resend audience integration — admin sets provider/API key/audience ID
+      under Settings → Newsletter; `NewsletterSubscriber#confirm!` and `#unsubscribe!`
+      enqueue a `SyncNewsletterAudienceJob` that calls the Resend Contacts API.
+      Fails closed (logs + skips) when keys are missing or the API errors.
 
 ---
 

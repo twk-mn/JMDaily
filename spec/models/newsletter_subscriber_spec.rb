@@ -56,6 +56,25 @@ RSpec.describe NewsletterSubscriber, type: :model do
         .to change { subscriber.reload.confirmed_at }.from(nil)
         .and change { subscriber.confirmation_token }.to(nil)
     end
+
+    context 'when an audience provider is configured' do
+      before do
+        Setting.set("newsletter_provider", "resend")
+        Setting.set("newsletter_api_key", "re_abc")
+        Setting.set("newsletter_audience_id", "aud_123")
+      end
+
+      it 'enqueues a SyncNewsletterAudienceJob with the subscribe action' do
+        subscriber = create(:newsletter_subscriber)
+        expect { subscriber.confirm! }
+          .to have_enqueued_job(SyncNewsletterAudienceJob).with(subscriber.id, "subscribe")
+      end
+    end
+
+    it 'does not enqueue an audience sync when no provider is configured' do
+      subscriber = create(:newsletter_subscriber)
+      expect { subscriber.confirm! }.not_to have_enqueued_job(SyncNewsletterAudienceJob)
+    end
   end
 
   describe '#unsubscribe!' do
@@ -63,6 +82,20 @@ RSpec.describe NewsletterSubscriber, type: :model do
       subscriber = create(:newsletter_subscriber, :confirmed)
       expect { subscriber.unsubscribe! }
         .to change { subscriber.reload.unsubscribed_at }.from(nil)
+    end
+
+    context 'when an audience provider is configured' do
+      before do
+        Setting.set("newsletter_provider", "resend")
+        Setting.set("newsletter_api_key", "re_abc")
+        Setting.set("newsletter_audience_id", "aud_123")
+      end
+
+      it 'enqueues a SyncNewsletterAudienceJob with the unsubscribe action' do
+        subscriber = create(:newsletter_subscriber, :confirmed)
+        expect { subscriber.unsubscribe! }
+          .to have_enqueued_job(SyncNewsletterAudienceJob).with(subscriber.id, "unsubscribe")
+      end
     end
   end
 

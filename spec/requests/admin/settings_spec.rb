@@ -32,6 +32,14 @@ RSpec.describe "Admin::Settings", type: :request do
       expect(response.body).to include("Site languages")
     end
 
+    it "renders the newsletter tab with a provider dropdown" do
+      get admin_settings_tab_path(tab: "newsletter")
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("Audience provider")
+      expect(response.body).to include("<select")
+      expect(response.body).to include("Resend")
+    end
+
     it "404s for an unknown tab (blocked by route constraint)" do
       get "/admin/settings/bogus"
       expect(response.status).to eq(404)

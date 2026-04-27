@@ -21,10 +21,12 @@ class NewsletterSubscriber < ApplicationRecord
 
   def confirm!
     update!(confirmed_at: Time.current, confirmation_token: nil)
+    SyncNewsletterAudienceJob.perform_later(id, "subscribe") if NewsletterAudience.configured?
   end
 
   def unsubscribe!
     update!(unsubscribed_at: Time.current)
+    SyncNewsletterAudienceJob.perform_later(id, "unsubscribe") if NewsletterAudience.configured?
   end
 
   private
