@@ -1,5 +1,13 @@
+<%# Compact horizontal article list card.
+    Locals:
+      article: required
+      highlight_terms: optional Array<String> — wraps matches in <mark> on title + dek %>
 <% t = article.translation_for(I18n.locale) || article.translations.first %>
 <% if t %>
+<%
+  highlight_terms = local_assigns[:highlight_terms]
+  mark_html = '<mark class="bg-yellow-100 dark:bg-yellow-700/40 text-inherit rounded px-0.5">\1</mark>'
+%>
 <article class="flex gap-4">
   <% if article.featured_image.attached? %>
     <div class="shrink-0 w-24 sm:w-48">
@@ -23,11 +31,13 @@
     </div>
     <%= link_to article_path(article), class: "group" do %>
       <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug font-serif">
-        <%= t.title %>
+        <%= highlight_terms.present? ? highlight(t.title, highlight_terms, highlighter: mark_html) : t.title %>
       </h3>
     <% end %>
     <% if t.dek.present? %>
-      <p class="mt-1 text-sm text-gray-700 dark:text-gray-300 line-clamp-2"><%= t.dek %></p>
+      <p class="mt-1 text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+        <%= highlight_terms.present? ? highlight(t.dek, highlight_terms, highlighter: mark_html) : t.dek %>
+      </p>
     <% end %>
     <div class="mt-2 flex items-center text-xs text-gray-600 dark:text-gray-400">
       <span>By <%= article.author.name %></span>
