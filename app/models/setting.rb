@@ -54,6 +54,23 @@ class Setting < ApplicationRecord
       type: "boolean", default: false, tab: "security",
       label: "Protect newsletter signup",
       description: "Require Turnstile verification on the newsletter subscribe form."
+    },
+    "newsletter_provider" => {
+      type: "string", default: "none", tab: "newsletter",
+      input_type: "select",
+      options: [ [ "Disabled", "none" ], [ "Resend", "resend" ] ],
+      label: "Audience provider",
+      description: "External email service that confirmed subscribers are synced to. Leave disabled to keep the list in this app only."
+    },
+    "newsletter_api_key" => {
+      type: "string", default: "", tab: "newsletter", input_type: "password",
+      label: "API key",
+      description: "Server-side API key for the selected provider. Treated as a secret."
+    },
+    "newsletter_audience_id" => {
+      type: "string", default: "", tab: "newsletter",
+      label: "Audience ID",
+      description: "ID of the audience or list to sync confirmed subscribers into."
     }
   }.freeze
 

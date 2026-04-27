@@ -7,7 +7,7 @@ module Admin
     before_action :require_admin!
     before_action :set_tab
 
-    TABS = %w[general security languages].freeze
+    TABS = %w[general security newsletter languages].freeze
 
     def show
       case @tab

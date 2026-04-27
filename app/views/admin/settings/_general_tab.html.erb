@@ -18,11 +18,20 @@
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"><%= @values[key] %></textarea>
         <% else %>
           <% input_type = defn[:input_type] || (defn[:type] == "integer" ? "number" : "text") %>
-          <input type="<%= input_type %>"
-                 id="settings_<%= key %>" name="settings[<%= key %>]"
-                 value="<%= @values[key] %>"
-                 <%= 'autocomplete="off"'.html_safe if input_type == "password" %>
-                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+          <% if input_type == "select" %>
+            <select id="settings_<%= key %>" name="settings[<%= key %>]"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              <% Array(defn[:options]).each do |label, value| %>
+                <option value="<%= value %>" <%= "selected" if @values[key].to_s == value.to_s %>><%= label %></option>
+              <% end %>
+            </select>
+          <% else %>
+            <input type="<%= input_type %>"
+                   id="settings_<%= key %>" name="settings[<%= key %>]"
+                   value="<%= @values[key] %>"
+                   <%= 'autocomplete="off"'.html_safe if input_type == "password" %>
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+          <% end %>
         <% end %>
         <% if defn[:description].present? %>
           <p class="mt-1 text-sm text-gray-500"><%= defn[:description] %></p>
