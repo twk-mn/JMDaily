@@ -119,6 +119,32 @@ RSpec.describe "Articles", type: :request do
 
         expect(response.body).not_to include("About the author")
       end
+
+      it "renders Twitter and Website links when set on the author" do
+        author = create(:author, bio: "Bio.",
+                                 twitter_url: "https://twitter.com/jane",
+                                 website_url: "https://jane.example")
+        article = create(:article, :published, author: author)
+
+        get article_path(article)
+
+        expect(response.body).to include('href="https://twitter.com/jane"')
+        expect(response.body).to include('>Twitter</a>')
+        expect(response.body).to include('href="https://jane.example"')
+        expect(response.body).to include('>Website</a>')
+      end
+
+      it "drops non-http(s) author URLs" do
+        author = create(:author, bio: "Bio.",
+                                 twitter_url: "javascript:alert(1)",
+                                 website_url: nil)
+        article = create(:article, :published, author: author)
+
+        get article_path(article)
+
+        expect(response.body).not_to include("javascript:alert")
+        expect(response.body).not_to include(">Twitter</a>")
+      end
     end
 
     describe "corrections" do
