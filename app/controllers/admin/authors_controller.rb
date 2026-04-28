@@ -45,7 +45,10 @@ module Admin
     end
 
     def author_params
-      params.require(:author).permit(:name, :slug, :bio, :role_title, :twitter_url, :website_url, :photo, :user_id)
+      params.require(:author).permit(
+        :name, :slug, :bio, :role_title, :photo, :user_id,
+        *Author::SOCIAL_LINK_FIELDS.map(&:first)
+      )
     end
   end
 end

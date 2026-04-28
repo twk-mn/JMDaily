@@ -21,14 +21,19 @@
       <% if @author.bio.present? %>
         <p class="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed"><%= @author.bio %></p>
       <% end %>
-      <div class="mt-3 flex items-center gap-4">
-        <% if @author.twitter_url.present? %>
-          <%= link_to "Twitter", @author.twitter_url, class: "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white", target: "_blank", rel: "noopener" %>
-        <% end %>
-        <% if @author.website_url.present? %>
-          <%= link_to "Website", @author.website_url, class: "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white", target: "_blank", rel: "noopener" %>
-        <% end %>
-      </div>
+      <% social_links = Author::SOCIAL_LINK_FIELDS.filter_map { |attr, label|
+           href = safe_external_url(@author.public_send(attr))
+           [ label, href ] if href
+         } %>
+      <% if social_links.any? %>
+        <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <% social_links.each do |label, href| %>
+            <%= link_to label, href,
+                class: "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white",
+                target: "_blank", rel: "noopener noreferrer" %>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   </header>
 
