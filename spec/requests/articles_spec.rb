@@ -51,6 +51,26 @@ RSpec.describe "Articles", type: :request do
       end
     end
 
+    describe "JSON-LD article type" do
+      it "emits NewsArticle for default 'news' articles" do
+        article = create(:article, :published, article_type: "news")
+        get article_path(article)
+        expect(response.body).to include('"@type":"NewsArticle"')
+      end
+
+      it "emits AnalysisNewsArticle for analysis pieces" do
+        article = create(:article, :published, article_type: "analysis")
+        get article_path(article)
+        expect(response.body).to include('"@type":"AnalysisNewsArticle"')
+      end
+
+      it "emits BackgroundNewsArticle for explainers" do
+        article = create(:article, :published, article_type: "explainer")
+        get article_path(article)
+        expect(response.body).to include('"@type":"BackgroundNewsArticle"')
+      end
+    end
+
     describe "author bio" do
       it "renders an author bio card when the author has a bio" do
         author = create(:author, name: "Jane Doe", bio: "Jane has covered Niigata for a decade.")
