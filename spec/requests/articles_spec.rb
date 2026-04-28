@@ -71,6 +71,35 @@ RSpec.describe "Articles", type: :request do
       end
     end
 
+    describe "JSON-LD discovery fields" do
+      it "emits articleSection from the article's category name" do
+        category = create(:category, name: "Politics")
+        article = create(:article, :published, category: category)
+        get article_path(article)
+        expect(response.body).to include('"articleSection":"Politics"')
+      end
+
+      it "emits inLanguage matching the served translation locale" do
+        article = create(:article, :published)
+        get article_path(article)
+        expect(response.body).to include('"inLanguage":"en"')
+      end
+
+      it "emits keywords as an array of tag names when tags are present" do
+        article = create(:article, :published)
+        article.tags << create(:tag, name: "Niigata")
+        article.tags << create(:tag, name: "Mayor")
+        get article_path(article)
+        expect(response.body).to include('"keywords":["Niigata","Mayor"]')
+      end
+
+      it "omits keywords entirely when the article has no tags" do
+        article = create(:article, :published)
+        get article_path(article)
+        expect(response.body).not_to include('"keywords"')
+      end
+    end
+
     describe "author bio" do
       it "renders an author bio card when the author has a bio" do
         author = create(:author, name: "Jane Doe", bio: "Jane has covered Niigata for a decade.")

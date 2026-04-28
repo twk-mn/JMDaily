@@ -72,6 +72,8 @@ class ArticlesController < ApplicationController
       "description": @article.effective_meta_description(@translation),
       "datePublished": @article.published_at&.iso8601,
       "dateModified": @article.updated_at.iso8601,
+      "inLanguage": @translation.locale,
+      "articleSection": @article.category.name,
       "author": {
         "@type": "Person",
         "name": @article.author.name,
@@ -86,6 +88,8 @@ class ArticlesController < ApplicationController
         "@id": article_url(@article)
       }
     }
+    tag_names = @article.tags.map(&:name)
+    schema[:keywords] = tag_names if tag_names.any?
     schema[:image] = url_for(@article.featured_image) if @article.featured_image.attached?
     schema
   end
