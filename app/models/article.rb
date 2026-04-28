@@ -26,6 +26,17 @@ class Article < ApplicationRecord
 
   STATUSES = %w[draft scheduled published archived].freeze
 
+  # Public-facing label for non-default article types ("Analysis",
+  # "Explainer", "Feature", "Event"). Default "news" returns nil so the
+  # caller can suppress the badge — every news article would otherwise
+  # carry redundant chrome.
+  TYPE_LABELS = {
+    "analysis"  => "Analysis",
+    "explainer" => "Explainer",
+    "feature"   => "Feature",
+    "event"     => "Event"
+  }.freeze
+
   def self.supported_locales
     ArticleTranslation.supported_locales
   end
@@ -109,6 +120,10 @@ class Article < ApplicationRecord
       featured_image_caption.presence ||
       translation&.title.presence ||
       title
+  end
+
+  def type_label
+    TYPE_LABELS[article_type]
   end
 
   def reading_time(translation = nil)

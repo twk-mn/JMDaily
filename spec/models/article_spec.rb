@@ -173,6 +173,25 @@ RSpec.describe Article, type: :model do
     end
   end
 
+  describe '#type_label' do
+    it 'returns nil for the default "news" type' do
+      article = build(:article, article_type: "news")
+      expect(article.type_label).to be_nil
+    end
+
+    it 'returns the humanized label for non-default types' do
+      expect(build(:article, article_type: "analysis").type_label).to eq("Analysis")
+      expect(build(:article, article_type: "explainer").type_label).to eq("Explainer")
+      expect(build(:article, article_type: "feature").type_label).to eq("Feature")
+      expect(build(:article, article_type: "event").type_label).to eq("Event")
+    end
+
+    it 'returns nil for unknown types' do
+      article = build(:article, article_type: "obituary")
+      expect(article.type_label).to be_nil
+    end
+  end
+
   describe '#effective_alt_text' do
     it 'prefers featured_image_alt when present' do
       article = build(:article,
