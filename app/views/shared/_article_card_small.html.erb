@@ -7,7 +7,7 @@
     </h3>
   <% end %>
   <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">
-    <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%b %-d") %></time>
+    <%= article_time_tag(article.published_at, format: :compact) %>
   </div>
 </article>
 <% end %>

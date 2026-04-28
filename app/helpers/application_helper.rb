@@ -71,4 +71,24 @@ module ApplicationHelper
       }
     end
   end
+
+  # Named strftime patterns for the public-facing <time> tags. Centralised
+  # so we don't drift between, say, "%B %-d, %Y" on a card and "%b %-d, %Y"
+  # on a sibling card — every public surface picks from the same four shapes.
+  ARTICLE_TIME_FORMATS = {
+    long:     "%B %-d, %Y",                  # April 28, 2026
+    short:    "%b %-d, %Y",                  # Apr 28, 2026
+    compact:  "%b %-d",                      # Apr 28  (no year)
+    datetime: "%B %-d, %Y at %-I:%M %p"      # April 28, 2026 at 1:30 PM
+  }.freeze
+
+  # Renders <time datetime="<iso8601>">[prefix ]<formatted>...</time>.
+  # Returns nil for nil time so callers can drop the wrapper without an extra
+  # `if`. Extra HTML options (e.g. class:) flow through to the <time> tag.
+  def article_time_tag(time, format: :short, prefix: nil, **html_options)
+    return nil unless time
+    text = time.strftime(ARTICLE_TIME_FORMATS.fetch(format))
+    text = "#{prefix} #{text}" if prefix.present?
+    time_tag(time, text, **html_options)
+  end
 end

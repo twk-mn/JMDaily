@@ -17,10 +17,6 @@
         <%= t.title %>
       </h3>
     <% end %>
-    <% if article.published_at %>
-      <time class="text-xs text-gray-600 dark:text-gray-400 mt-1 block" datetime="<%= article.published_at.iso8601 %>">
-        <%= article.published_at.strftime("%b %-d, %Y") %>
-      </time>
-    <% end %>
+    <%= article_time_tag(article.published_at, format: :short, class: "text-xs text-gray-600 dark:text-gray-400 mt-1 block") %>
   </article>
 <% end %>
