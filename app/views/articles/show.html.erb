@@ -123,7 +123,7 @@
     <figure class="mb-8">
       <%= image_tag @article.featured_image.variant(:large),
           class: "w-full rounded-lg",
-          alt: @article.featured_image_alt.presence || @article.featured_image_caption.presence || @translation.title,
+          alt: @article.effective_alt_text(@translation),
           width: 1200, height: 800 %>
       <% if @article.featured_image_caption.present? %>
         <figcaption class="mt-2 text-sm text-gray-600 dark:text-gray-400 text-center"><%= @article.featured_image_caption %></figcaption>
