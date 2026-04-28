@@ -37,6 +37,14 @@ class Article < ApplicationRecord
     "event"     => "Event"
   }.freeze
 
+  # Schema.org subtype mapping for article_type. Only "analysis" and
+  # "explainer" have well-known NewsArticle subtypes; the rest fall back
+  # to plain NewsArticle. Google News uses these to categorize coverage.
+  SCHEMA_TYPES = {
+    "analysis"  => "AnalysisNewsArticle",
+    "explainer" => "BackgroundNewsArticle"
+  }.freeze
+
   def self.supported_locales
     ArticleTranslation.supported_locales
   end
@@ -124,6 +132,10 @@ class Article < ApplicationRecord
 
   def type_label
     TYPE_LABELS[article_type]
+  end
+
+  def schema_type
+    SCHEMA_TYPES.fetch(article_type, "NewsArticle")
   end
 
   def reading_time(translation = nil)

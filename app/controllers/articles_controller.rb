@@ -67,7 +67,7 @@ class ArticlesController < ApplicationController
   def build_json_ld
     schema = {
       "@context": "https://schema.org",
-      "@type": "NewsArticle",
+      "@type": @article.schema_type,
       "headline": @translation.title,
       "description": @article.effective_meta_description(@translation),
       "datePublished": @article.published_at&.iso8601,

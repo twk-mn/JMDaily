@@ -192,6 +192,29 @@ RSpec.describe Article, type: :model do
     end
   end
 
+  describe '#schema_type' do
+    it 'returns NewsArticle for the default "news" type' do
+      expect(build(:article, article_type: "news").schema_type).to eq("NewsArticle")
+    end
+
+    it 'returns AnalysisNewsArticle for "analysis"' do
+      expect(build(:article, article_type: "analysis").schema_type).to eq("AnalysisNewsArticle")
+    end
+
+    it 'returns BackgroundNewsArticle for "explainer"' do
+      expect(build(:article, article_type: "explainer").schema_type).to eq("BackgroundNewsArticle")
+    end
+
+    it 'falls back to NewsArticle for types without a specific subtype' do
+      expect(build(:article, article_type: "feature").schema_type).to eq("NewsArticle")
+      expect(build(:article, article_type: "event").schema_type).to eq("NewsArticle")
+    end
+
+    it 'falls back to NewsArticle for unknown types' do
+      expect(build(:article, article_type: "obituary").schema_type).to eq("NewsArticle")
+    end
+  end
+
   describe '#effective_alt_text' do
     it 'prefers featured_image_alt when present' do
       article = build(:article,
