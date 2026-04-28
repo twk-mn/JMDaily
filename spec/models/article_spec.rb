@@ -173,6 +173,43 @@ RSpec.describe Article, type: :model do
     end
   end
 
+  describe '#effective_alt_text' do
+    it 'prefers featured_image_alt when present' do
+      article = build(:article,
+                      featured_image_alt: "Editor-authored alt",
+                      featured_image_caption: "Caption text",
+                      title: "Seed title")
+      translation = build(:article_translation, title: "Translation title")
+      expect(article.effective_alt_text(translation)).to eq("Editor-authored alt")
+    end
+
+    it 'falls back to caption when alt is blank' do
+      article = build(:article,
+                      featured_image_alt: nil,
+                      featured_image_caption: "Caption text",
+                      title: "Seed title")
+      translation = build(:article_translation, title: "Translation title")
+      expect(article.effective_alt_text(translation)).to eq("Caption text")
+    end
+
+    it 'falls back to translation title when alt and caption are blank' do
+      article = build(:article,
+                      featured_image_alt: nil,
+                      featured_image_caption: nil,
+                      title: "Seed title")
+      translation = build(:article_translation, title: "Translation title")
+      expect(article.effective_alt_text(translation)).to eq("Translation title")
+    end
+
+    it 'falls back to article title when no translation given' do
+      article = build(:article,
+                      featured_image_alt: nil,
+                      featured_image_caption: nil,
+                      title: "Seed title")
+      expect(article.effective_alt_text).to eq("Seed title")
+    end
+  end
+
   describe '#to_param' do
     it 'returns slug' do
       article = build(:article, slug: "test-article")

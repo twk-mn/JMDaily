@@ -104,6 +104,13 @@ class Article < ApplicationRecord
       ""
   end
 
+  def effective_alt_text(translation = nil)
+    featured_image_alt.presence ||
+      featured_image_caption.presence ||
+      translation&.title.presence ||
+      title
+  end
+
   def reading_time(translation = nil)
     body = translation&.body
     return 1 unless body
