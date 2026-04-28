@@ -25,7 +25,7 @@
           <div class="mt-4 flex items-center text-sm text-gray-600 dark:text-gray-400">
             <span>By <%= lead.author.name %></span>
             <span class="mx-2" aria-hidden="true">·</span>
-            <time datetime="<%= lead.published_at.iso8601 %>"><%= lead.published_at.strftime("%B %-d, %Y") %></time>
+            <%= article_time_tag(lead.published_at, format: :long) %>
           </div>
         <% end %>
       </div>
@@ -55,7 +55,7 @@
                     <%= t.title %>
                   </h3>
                   <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                    <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%b %-d, %Y") %></time>
+                    <%= article_time_tag(article.published_at, format: :short) %>
                   </div>
                 </div>
               <% end %>

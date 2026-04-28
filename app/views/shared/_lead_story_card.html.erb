@@ -32,7 +32,7 @@
       <div class="mt-4 flex items-center text-sm text-gray-600 dark:text-gray-400">
         <span>By <%= article.author.name %></span>
         <span class="mx-2" aria-hidden="true">·</span>
-        <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%B %-d, %Y") %></time>
+        <%= article_time_tag(article.published_at, format: :long) %>
       </div>
     <% end %>
   </article>

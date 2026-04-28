@@ -72,18 +72,12 @@
         <span>By <%= link_to @article.author.name, author_path(@article.author, slug: @article.author.slug),
             class: "font-medium text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400" %></span>
       </div>
-      <% if @article.published_at %>
-        <time datetime="<%= @article.published_at.iso8601 %>">
-          Published <%= @article.published_at.strftime("%B %-d, %Y at %-I:%M %p") %>
-        </time>
-      <% end %>
+      <%= article_time_tag(@article.published_at, format: :datetime, prefix: "Published") %>
       <span class="text-gray-400 dark:text-gray-600" aria-hidden="true">·</span>
       <span><%= @article.reading_time(@translation) %> min read</span>
       <% if @article.published_at && @article.updated_at > @article.published_at + 1.hour %>
         <span class="text-gray-400 dark:text-gray-600" aria-hidden="true">·</span>
-        <time datetime="<%= @article.updated_at.iso8601 %>">
-          Updated <%= @article.updated_at.strftime("%B %-d, %Y") %>
-        </time>
+        <%= article_time_tag(@article.updated_at, format: :long, prefix: "Updated") %>
       <% end %>
 
       <%# Language switcher — link to other available translations %>
@@ -111,9 +105,7 @@
       <ol class="space-y-2">
         <% @article.corrections.each do |correction| %>
           <li class="text-sm text-amber-900 dark:text-amber-100">
-            <time datetime="<%= correction.posted_at.iso8601 %>" class="block text-xs text-amber-700 dark:text-amber-300 font-medium mb-0.5">
-              <%= correction.posted_at.strftime("%B %-d, %Y at %-I:%M %p") %>
-            </time>
+            <%= article_time_tag(correction.posted_at, format: :datetime, class: "block text-xs text-amber-700 dark:text-amber-300 font-medium mb-0.5") %>
             <%= simple_format(correction.body, {}, sanitize: true) %>
           </li>
         <% end %>
