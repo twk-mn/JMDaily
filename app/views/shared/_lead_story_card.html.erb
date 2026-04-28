@@ -16,6 +16,9 @@
         </div>
       <% end %>
       <div class="flex items-center gap-2">
+        <% if article.type_label %>
+          <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide"><%= article.type_label %></span>
+        <% end %>
         <% if article.breaking? %>
           <span class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Breaking</span>
         <% end %>

@@ -45,6 +45,9 @@
     <div class="flex items-center gap-2 mb-3">
       <%= link_to @article.category.name, "/#{I18n.locale}/#{@article.category.slug}",
           class: "text-sm font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide hover:text-indigo-800 dark:hover:text-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded" %>
+      <% if @article.type_label %>
+        <span class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide" aria-label="Article type">· <%= @article.type_label %></span>
+      <% end %>
       <% if @article.breaking? %>
         <span class="bg-red-600 text-white text-xs font-bold uppercase px-2 py-0.5 rounded">Breaking</span>
       <% end %>
