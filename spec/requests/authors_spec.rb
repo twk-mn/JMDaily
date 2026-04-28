@@ -34,5 +34,23 @@ RSpec.describe "Authors", type: :request do
       get author_path(author)
       expect(response.body).to include("No published articles yet")
     end
+
+    it "renders all configured social links on the author page" do
+      author = create(:author,
+                      twitter_url:   "https://twitter.com/jane",
+                      bluesky_url:   "https://bsky.app/profile/jane",
+                      mastodon_url:  "https://mastodon.social/@jane",
+                      instagram_url: "https://instagram.com/jane",
+                      facebook_url:  "https://facebook.com/jane",
+                      linkedin_url:  "https://linkedin.com/in/jane",
+                      youtube_url:   "https://youtube.com/@jane",
+                      website_url:   "https://jane.example")
+
+      get author_path(author)
+
+      %w[Twitter Bluesky Mastodon Instagram Facebook LinkedIn YouTube Website].each do |label|
+        expect(response.body).to include(">#{label}</a>"), "expected author page to render #{label} link"
+      end
+    end
   end
 end

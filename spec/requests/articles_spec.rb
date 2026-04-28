@@ -120,30 +120,58 @@ RSpec.describe "Articles", type: :request do
         expect(response.body).not_to include("About the author")
       end
 
-      it "renders Twitter and Website links when set on the author" do
-        author = create(:author, bio: "Bio.",
-                                 twitter_url: "https://twitter.com/jane",
-                                 website_url: "https://jane.example")
+      it "renders every supported social link when set on the author" do
+        author = create(:author,
+                        bio: "Bio.",
+                        twitter_url:   "https://twitter.com/jane",
+                        bluesky_url:   "https://bsky.app/profile/jane",
+                        mastodon_url:  "https://mastodon.social/@jane",
+                        instagram_url: "https://instagram.com/jane",
+                        facebook_url:  "https://facebook.com/jane",
+                        linkedin_url:  "https://linkedin.com/in/jane",
+                        youtube_url:   "https://youtube.com/@jane",
+                        website_url:   "https://jane.example")
         article = create(:article, :published, author: author)
 
         get article_path(article)
 
-        expect(response.body).to include('href="https://twitter.com/jane"')
-        expect(response.body).to include('>Twitter</a>')
-        expect(response.body).to include('href="https://jane.example"')
-        expect(response.body).to include('>Website</a>')
+        %w[Twitter Bluesky Mastodon Instagram Facebook LinkedIn YouTube Website].each do |label|
+          expect(response.body).to include(">#{label}</a>"), "expected bio card to render #{label} link"
+        end
+        expect(response.body).to include('href="https://bsky.app/profile/jane"')
+        expect(response.body).to include('href="https://instagram.com/jane"')
+      end
+
+      it "renders social links in the configured order" do
+        author = create(:author,
+                        bio: "Bio.",
+                        website_url:   "https://jane.example",
+                        twitter_url:   "https://twitter.com/jane",
+                        instagram_url: "https://instagram.com/jane")
+        article = create(:article, :published, author: author)
+
+        get article_path(article)
+
+        # Twitter precedes Instagram precedes Website per Author::SOCIAL_LINK_FIELDS.
+        expect(response.body.index(">Twitter</a>"))
+          .to be < response.body.index(">Instagram</a>")
+        expect(response.body.index(">Instagram</a>"))
+          .to be < response.body.index(">Website</a>")
       end
 
       it "drops non-http(s) author URLs" do
         author = create(:author, bio: "Bio.",
                                  twitter_url: "javascript:alert(1)",
+                                 instagram_url: "ftp://example.com",
                                  website_url: nil)
         article = create(:article, :published, author: author)
 
         get article_path(article)
 
         expect(response.body).not_to include("javascript:alert")
+        expect(response.body).not_to include("ftp://example.com")
         expect(response.body).not_to include(">Twitter</a>")
+        expect(response.body).not_to include(">Instagram</a>")
       end
     end
 
