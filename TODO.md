@@ -12,10 +12,10 @@ Last updated: 2026-04-30.
 These were reported live on the running site. Fix order generally matches risk: the R2 fix landed in #78 and may also resolve some downstream symptoms, so re-test before assuming the rest are still broken.
 
 - [x] **R2 `InvalidRequest` on article publish** — `aws-sdk-s3` was sending checksum headers R2 doesn't support. Fixed in #78.
-- [ ] **Published articles return 404 on the public site** — likely a translation-slug lookup or locale routing mismatch in `ArticlesController#show`.
-- [ ] **Cannot edit articles in admin dashboard** — admin edit action fails. May be related to the S3 error above; re-test after #78 deploys.
-- [ ] **Settings don't persist** — site name, tagline, and other values revert after save. Investigate the `Setting` model read/write path and any env-var overrides clobbering DB values.
-- [ ] **Cloudflare Turnstile API key has no effect** — likely the same root cause as the general settings bug; verify after that fix lands. (Improvements #21.)
+- [x] **Published articles return 404 on the public site** — article-level slug drifted from per-locale translation slug; tag/location/author index pages didn't preload `:translations` so `to_param` fell back to the article slug, which `ArticlesController#show` couldn't resolve. Fixed by preloading translations on those controllers and adding a 301 fallback in `ArticlesController#show` for stale article-slug URLs (sitemap entries, old shares).
+- [x] **Settings don't persist** — `Setting.get` cached reads via `Rails.cache` keyed on a per-process cache version. The default cache store is per-process, so writes in one Puma worker left other workers serving stale values until the TTL expired. Removed the cache layer entirely; the settings table is small and indexed, and AR's per-request query cache covers repeat calls. Same fix applied to `SiteLanguage`.
+- [x] **Cloudflare Turnstile API key has no effect** — same root cause as the settings persistence bug, fixed by the same change.
+- [ ] **Cannot edit articles in admin dashboard** — likely a downstream symptom of the S3 error above (failed featured-image attach blew up `update`). All admin-articles request specs pass locally; re-verify after #78 + the fixes above ship.
 
 ---
 

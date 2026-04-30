@@ -77,19 +77,18 @@ class Setting < ApplicationRecord
   validates :key, presence: true, uniqueness: true
   validates :value_type, inclusion: { in: VALUE_TYPES }
 
-  after_commit :bust_cache
-
   class << self
     # Read a setting value, coerced to its declared type. Falls back to the
-    # default in DEFINITIONS, then to nil. Cached per-key with version-based
-    # invalidation so writes in one process are picked up by others at their
-    # next read.
+    # default in DEFINITIONS, then to nil. We deliberately do not Rails.cache
+    # this lookup: the default Rails cache store is per-process, so a write in
+    # one Puma worker would leave stale values in every other worker until the
+    # cache TTL expired — which is exactly what produced the "settings revert
+    # after save" bug. The settings table is small and indexed by key; a single
+    # find_by per call is cheap.
     def get(key)
       key = key.to_s
-      Rails.cache.fetch(cache_key(key), expires_in: 1.hour) do
-        row = find_by(key: key)
-        row ? coerce(row.value, row.value_type) : default_for(key)
-      end
+      row = find_by(key: key)
+      row ? coerce(row.value, row.value_type) : default_for(key)
     end
 
     # Upsert a value. Uses the declared type from DEFINITIONS if present,
@@ -120,18 +119,6 @@ class Setting < ApplicationRecord
 
     private
 
-    def cache_key(key)
-      "setting:#{key}:v#{cache_version}"
-    end
-
-    def cache_version
-      Rails.cache.fetch("setting:cache_version") { 1 }
-    end
-
-    def bump_cache_version!
-      Rails.cache.write("setting:cache_version", (cache_version + 1))
-    end
-
     def coerce(raw, type)
       return nil if raw.nil?
 
@@ -150,11 +137,5 @@ class Setting < ApplicationRecord
       else value.to_s
       end
     end
-  end
-
-  private
-
-  def bust_cache
-    self.class.send(:bump_cache_version!)
   end
 end

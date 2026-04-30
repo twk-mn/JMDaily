@@ -1,11 +1,25 @@
 class ArticlesController < ApplicationController
   def show
+    article_includes = [ :author, :category, :tags, :locations, :sources, :corrections, :translations ]
+
     @translation = ArticleTranslation
       .where(locale: I18n.locale.to_s, slug: params[:id])
       .joins(:article)
       .merge(Article.published)
-      .includes(article: [ :author, :category, :tags, :locations, :sources, :corrections, :translations ])
-      .first!
+      .includes(article: article_includes)
+      .first
+
+    # Fallback: the article-level slug can drift from the per-locale translation
+    # slug when an editor renames a translation. Old shares and sitemap entries
+    # pointing at the article-level slug should still resolve — pick the best
+    # translation for the requested locale and redirect to its canonical URL.
+    unless @translation
+      article = Article.published.includes(article_includes).find_by(slug: params[:id])
+      raise ActiveRecord::RecordNotFound unless article && article.translations.any?
+
+      target = article.translation_for(I18n.locale) || article.translations.first
+      return redirect_to article_path(target, locale: target.locale), status: :moved_permanently
+    end
 
     @article = @translation.article
     @approved_comments = @article.comments.approved.recent

@@ -4,7 +4,7 @@ class LocationsController < ApplicationController
   def show
     @location = Location.find_by!(slug: params[:slug])
     @pagy, @articles = pagy(:offset,
-      Article.published.by_location(@location).recent,
+      Article.published.by_location(@location).recent.includes(:translations, :author, :category),
       limit: 12
     )
   end

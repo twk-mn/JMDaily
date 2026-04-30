@@ -4,7 +4,7 @@ class TagsController < ApplicationController
   def show
     @tag = Tag.find_by!(slug: params[:slug])
     @pagy, @articles = pagy(:offset,
-      @tag.articles.published.recent,
+      @tag.articles.published.recent.includes(:translations, :author, :category),
       limit: 12
     )
   end

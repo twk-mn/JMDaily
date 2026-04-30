@@ -62,6 +62,19 @@ RSpec.describe Setting, type: :model do
       Setting.set("site_name", "B")
       expect(Setting.get("site_name")).to eq("B")
     end
+
+    # Regression: Setting.get used to wrap reads in Rails.cache with a
+    # version-based key. The default Rails.cache store is per-process, so a
+    # write in one Puma worker left other workers serving stale values until
+    # the TTL expired. We model that by writing directly to the underlying
+    # row and confirming the next read sees it without any cache nudge.
+    it 'reflects out-of-band row updates immediately' do
+      Setting.set("site_name", "first")
+      expect(Setting.get("site_name")).to eq("first")
+
+      Setting.find_by!(key: "site_name").update_columns(value: "second")
+      expect(Setting.get("site_name")).to eq("second")
+    end
   end
 
   describe '.definitions_for_tab' do

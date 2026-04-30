@@ -42,29 +42,35 @@ class SiteLanguage < ApplicationRecord
   validates :position, presence: true, numericality: { only_integer: true }
 
   before_validation :apply_iso_defaults, on: :create
-  after_commit :bust_cache
+  after_commit :refresh_i18n_available_locales
 
   scope :active, -> { where(active: true).order(:position, :id) }
   scope :inactive, -> { where(active: false).order(:position, :id) }
   scope :ordered, -> { order(:position, :id) }
 
+  # These reads are intentionally uncached at the Rails.cache layer. The default
+  # cache store is per-process, so a write in one Puma worker leaves stale
+  # values in every other worker until the TTL expires — that produced the
+  # "settings revert" / "deactivated language still routable" bugs. The table
+  # is tiny (typically 2 rows) and indexed; ActiveRecord's per-request query
+  # cache absorbs repeat calls within the same request.
   class << self
     # Codes of every language that currently exists on the site, active or not.
     # Used to validate stored translations so historical rows in a deactivated
     # language still pass model validations.
     def codes
-      cached(:codes) { ordered.pluck(:code) }
+      ordered.pluck(:code)
     end
 
     # Codes for languages that should be publicly reachable right now.
     def active_codes
-      cached(:active_codes) { active.pluck(:code) }
+      active.pluck(:code)
     end
 
     # Codes that cannot be deactivated or deleted. English is seeded as
     # non-deletable and becomes the required editorial language.
     def required_codes
-      cached(:required_codes) { where(deletable: false).pluck(:code) }
+      where(deletable: false).pluck(:code)
     end
 
     def required_code?(code)
@@ -87,9 +93,8 @@ class SiteLanguage < ApplicationRecord
     end
 
     # Keep I18n.available_locales aligned with the set of languages the site
-    # knows about. Called on every admin write (same-process update) and on
-    # each request via ApplicationController (covers other processes after
-    # their cache version refreshes).
+    # knows about. Called on every admin write and on each request via
+    # ApplicationController.
     def sync_i18n!
       list = codes.map(&:to_sym)
       I18n.available_locales = list if list.any?
@@ -102,22 +107,6 @@ class SiteLanguage < ApplicationRecord
     def addable_iso_options
       existing = pluck(:code).to_set
       ISO_OPTIONS.reject { |o| existing.include?(o[:code]) }
-    end
-
-    private
-
-    def cached(suffix)
-      Rails.cache.fetch("site_languages:#{suffix}:v#{cache_version}", expires_in: 1.hour) do
-        yield
-      end
-    end
-
-    def cache_version
-      Rails.cache.fetch("site_languages:cache_version") { 1 }
-    end
-
-    def bump_cache_version!
-      Rails.cache.write("site_languages:cache_version", cache_version + 1)
     end
   end
 
@@ -155,11 +144,6 @@ class SiteLanguage < ApplicationRecord
     self.name        = defaults[:name]        if name.blank?
     self.native_name = defaults[:native_name] if native_name.blank?
     self.flag_emoji  = defaults[:flag_emoji]  if flag_emoji.blank?
-  end
-
-  def bust_cache
-    self.class.send(:bump_cache_version!)
-    refresh_i18n_available_locales
   end
 
   def refresh_i18n_available_locales

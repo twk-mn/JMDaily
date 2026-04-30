@@ -21,6 +21,19 @@ RSpec.describe "Articles", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
+    it "redirects from a stale article-level slug to the canonical translation slug" do
+      # Reproduce the production scenario: article-level slug drifted from the
+      # English translation slug (e.g. editor renamed the translation). Old
+      # share links and sitemap entries shouldn't 404 — they should redirect.
+      article = create(:article, :published, slug: "old-article-slug")
+      article.translations.first.update!(slug: "new-translation-slug")
+
+      get "/en/articles/old-article-slug"
+
+      expect(response).to have_http_status(:moved_permanently)
+      expect(response.headers["Location"]).to end_with("/en/articles/new-translation-slug")
+    end
+
     it "shows related articles" do
       category = create(:category)
       article = create(:article, :published, category: category)
