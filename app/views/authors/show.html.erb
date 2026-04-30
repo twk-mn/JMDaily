@@ -1,4 +1,34 @@
 <% content_for :title, @author.name %>
+<%
+  meta_bits = []
+  meta_bits << @author.role_title if @author.role_title.present?
+  meta_bits << "Joetsu-Myoko Daily"
+  meta_bits << @author.bio.to_s.squish.truncate(160) if @author.bio.present?
+%>
+<% content_for :meta_description, meta_bits.join(" — ") %>
+<% content_for :og_type, "profile" %>
+<% if @author.photo.attached? %>
+  <% content_for :og_image, url_for(@author.photo) %>
+<% end %>
+
+<% content_for :head do %>
+  <script type="application/ld+json">
+    <%= raw({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": @author.name,
+      "url": author_url(@author, slug: @author.slug),
+      "jobTitle": @author.role_title.presence,
+      "description": @author.bio.presence,
+      "image": (@author.photo.attached? ? url_for(@author.photo) : nil),
+      "sameAs": Author::SOCIAL_LINK_FIELDS.filter_map { |attr, _| safe_external_url(@author.public_send(attr)) }.presence,
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Joetsu-Myoko Daily"
+      }
+    }.compact.to_json) %>
+  </script>
+<% end %>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
   <%= render "shared/breadcrumbs", items: [
