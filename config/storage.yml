@@ -31,3 +31,12 @@ cloudflare_r2:
   endpoint: https://<%= ENV["R2_ACCOUNT_ID"] %>.r2.cloudflarestorage.com
   force_path_style: true
   public: true
+  # aws-sdk-s3 >= 1.119 sends checksum headers by default; R2 rejects them
+  # with InvalidRequest. "when_required" skips them unless the server asks.
+  request_checksum_calculation: "when_required"
+  response_checksum_validation: "when_required"
+  # Active Storage uses content-addressed keys (the SHA-256 checksum is part
+  # of the object name) so the bytes at a given URL never change. That makes
+  # `immutable` safe and lets the CDN cache aggressively.
+  upload:
+    cache_control: "public, max-age=31536000, immutable"
