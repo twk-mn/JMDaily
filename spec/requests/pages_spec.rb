@@ -41,6 +41,31 @@ RSpec.describe "Pages", type: :request do
     end
   end
 
+  describe "static page Open Graph meta" do
+    it "uses meta_description when set on the page" do
+      create(:static_page, title: "About", slug: "about", meta_description: "About this site.")
+      get about_path
+      expect(response.body).to include('name="description" content="About this site."')
+      expect(response.body).to include('property="og:description" content="About this site."')
+    end
+
+    it "falls back to a truncated body excerpt when meta_description is blank" do
+      page = create(:static_page, title: "About", slug: "about", meta_description: nil)
+      page.update!(body: ("Joetsu-Myoko Daily covers local news in Niigata. " * 6))
+
+      get about_path
+      expect(response.body).to include("Joetsu-Myoko Daily covers local news in Niigata.")
+      # Layout's site-default fallback shouldn't kick in once body fallback fires
+      expect(response.body).not_to include("English-language local news for Joetsu, Myoko, and the surrounding region.")
+    end
+
+    it "sets og:type to article" do
+      create(:static_page, title: "About", slug: "about")
+      get about_path
+      expect(response.body).to include('property="og:type" content="article"')
+    end
+  end
+
   describe "POST /contact" do
     before { create(:static_page, title: "Contact", slug: "contact") }
 

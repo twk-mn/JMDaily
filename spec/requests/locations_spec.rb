@@ -34,5 +34,19 @@ RSpec.describe "Locations", type: :request do
       get location_path(slug: location.slug)
       expect(response.body).to include("No articles for this location yet")
     end
+
+    describe "Open Graph meta" do
+      it "uses the location description for meta_description when present" do
+        create(:location, name: "Joetsu", slug: "joetsu", description: "Coverage of Joetsu City.")
+        get location_path(slug: "joetsu")
+        expect(response.body).to include('content="Coverage of Joetsu City."')
+      end
+
+      it "falls back to a generated description when location.description is blank" do
+        create(:location, name: "Joetsu", slug: "joetsu", description: nil)
+        get location_path(slug: "joetsu")
+        expect(response.body).to include('content="News and coverage from Joetsu on Joetsu-Myoko Daily."')
+      end
+    end
   end
 end

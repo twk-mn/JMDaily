@@ -1,4 +1,8 @@
 <% content_for :title, @location.name %>
+<% content_for :meta_description, (@location.description.presence || "News and coverage from #{@location.name} on Joetsu-Myoko Daily.") %>
+<% lead = @articles.first; if lead&.featured_image&.attached? %>
+  <% content_for :og_image, url_for(lead.featured_image) %>
+<% end %>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
   <%= render "shared/index_header",
