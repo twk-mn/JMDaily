@@ -116,7 +116,6 @@ module Admin
           SiteLanguage.where(id: id).update_all(position: index)
         end
       end
-      SiteLanguage.new.send(:bust_cache) # bump version so other processes see it
 
       respond_to do |format|
         format.json { render json: { ok: true } }

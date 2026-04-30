@@ -4,7 +4,7 @@ class AuthorsController < ApplicationController
   def show
     @author = Author.find_by!(slug: params[:slug])
     @pagy, @articles = pagy(:offset,
-      Article.published.where(author: @author).recent,
+      Article.published.where(author: @author).recent.includes(:translations, :author, :category),
       limit: 12
     )
   end
