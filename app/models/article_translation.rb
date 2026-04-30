@@ -40,8 +40,26 @@ class ArticleTranslation < ApplicationRecord
 
   private
 
+  # Translation slugs are unique scoped to locale, so collisions only happen
+  # within the same language. Try bare parameterize, then date suffix, then
+  # numbered fallback — mirrors Article#generate_slug.
   def generate_slug
-    self.slug = title.parameterize
+    base = title.to_s.parameterize
+    return self.slug = base if base.blank?
+
+    scope = self.class.where(locale: locale).where.not(id: id)
+    return self.slug = base unless scope.exists?(slug: base)
+
+    date = (article&.published_at || Time.current).to_date.iso8601
+    dated = "#{base}-#{date}"
+    return self.slug = dated unless scope.exists?(slug: dated)
+
+    i = 2
+    loop do
+      candidate = "#{dated}-#{i}"
+      return self.slug = candidate unless scope.exists?(slug: candidate)
+      i += 1
+    end
   end
 
   # Keep denormalised search columns on articles in sync.

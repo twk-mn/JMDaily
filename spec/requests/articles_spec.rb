@@ -21,6 +21,46 @@ RSpec.describe "Articles", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
+    describe "GET /article/:id (short canonical alias)" do
+      it "301-redirects to the canonical English URL" do
+        article = create(:article, :published)
+        article.translations.first.update!(slug: "canonical-en-slug")
+
+        get "/article/#{article.id}"
+
+        expect(response).to have_http_status(:moved_permanently)
+        expect(response.headers["Location"]).to end_with("/en/articles/canonical-en-slug")
+      end
+
+      it "redirects to the visitor's preferred locale when a translation exists" do
+        article = create(:article, :published)
+        article.translations.first.update!(slug: "the-news-en")
+        create(:article_translation, article: article, locale: "ja",
+               title: "ニュース", slug: "the-news-ja")
+
+        get "/article/#{article.id}", headers: { "HTTP_ACCEPT_LANGUAGE" => "ja,en;q=0.5" }
+
+        expect(response).to have_http_status(:moved_permanently)
+        expect(response.headers["Location"]).to end_with("/ja/articles/the-news-ja")
+      end
+
+      it "404s for a non-numeric id (route constraint blocks it)" do
+        get "/article/not-a-number"
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "404s for an unpublished article" do
+        article = create(:article, status: "draft")
+        get "/article/#{article.id}"
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "404s for a missing id" do
+        get "/article/9999999"
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     it "redirects from a stale article-level slug to the canonical translation slug" do
       # Reproduce the production scenario: article-level slug drifted from the
       # English translation slug (e.g. editor renamed the translation). Old
