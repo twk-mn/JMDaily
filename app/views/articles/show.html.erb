@@ -67,6 +67,7 @@
           <%= image_tag @article.author.photo.variant(:small),
               class: "w-8 h-8 rounded-full object-cover",
               alt: @article.author.name,
+              loading: "lazy",
               width: 48, height: 48 %>
         <% end %>
         <span>By <%= link_to @article.author.name, author_path(@article.author, slug: @article.author.slug),

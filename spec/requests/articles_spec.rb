@@ -113,6 +113,35 @@ RSpec.describe "Articles", type: :request do
       end
     end
 
+    describe "image lazy loading" do
+      it "lazy-loads the byline author photo" do
+        author = create(:author)
+        author.photo.attach(
+          io: File.open(Rails.root.join("public/apple-touch-icon.png")),
+          filename: "byline.png", content_type: "image/png"
+        )
+        article = create(:article, :published, author: author)
+        get article_path(article)
+
+        # Byline thumbnail sits below the hero image, so it should be lazy.
+        expect(response.body).to match(/<img[^>]+rounded-full[^>]+loading="lazy"/)
+      end
+
+      it "lazy-loads the author bio card photo at the bottom of the article" do
+        author = create(:author, bio: "About the author bio body.")
+        author.photo.attach(
+          io: File.open(Rails.root.join("public/apple-touch-icon.png")),
+          filename: "bio.png", content_type: "image/png"
+        )
+        article = create(:article, :published, author: author)
+        get article_path(article)
+
+        # Author bio aside is below the article body — should always lazy-load.
+        bio_section = response.body[/<aside[^>]*>[\s\S]+?About the author bio body[\s\S]+?<\/aside>/]
+        expect(bio_section).to include('loading="lazy"')
+      end
+    end
+
     describe "author bio" do
       it "renders an author bio card when the author has a bio" do
         author = create(:author, name: "Jane Doe", bio: "Jane has covered Niigata for a decade.")
