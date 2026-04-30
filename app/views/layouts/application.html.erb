@@ -69,19 +69,20 @@
       Skip to content
     </a>
 
-    <%= render "shared/header" %>
-
-    <%= render "shared/breaking_banner" %>
+    <div data-print-hide>
+      <%= render "shared/header" %>
+      <%= render "shared/breaking_banner" %>
+    </div>
 
     <% if notice %>
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pt-4">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pt-4" data-print-hide>
         <div class="rounded-md bg-green-50 border border-green-200 p-4 dark:bg-green-950/40 dark:border-green-900" role="status">
           <p class="text-sm text-green-800 dark:text-green-200"><%= notice %></p>
         </div>
       </div>
     <% end %>
     <% if alert %>
-      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pt-4">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 pt-4" data-print-hide>
         <div class="rounded-md bg-red-50 border border-red-200 p-4 dark:bg-red-950/40 dark:border-red-900" role="alert">
           <p class="text-sm text-red-800 dark:text-red-200"><%= alert %></p>
         </div>
@@ -92,6 +93,8 @@
       <%= yield %>
     </main>
 
-    <%= render "shared/footer" %>
+    <div data-print-hide>
+      <%= render "shared/footer" %>
+    </div>
   </body>
 </html>

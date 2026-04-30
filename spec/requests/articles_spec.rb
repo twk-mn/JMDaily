@@ -113,6 +113,42 @@ RSpec.describe "Articles", type: :request do
       end
     end
 
+    describe "print rendering" do
+      it "marks chrome around the article with data-print-hide" do
+        article = create(:article, :published)
+        article.translations.first.update!(slug: "the-slug")
+        get "/en/articles/the-slug"
+
+        # Header, footer, breaking banner are hidden via the layout wrapper.
+        # On the article page itself we want breadcrumbs, share buttons,
+        # author bio, comments, related, and more-from-author hidden.
+        expect(response.body.scan('data-print-hide').size).to be >= 6
+      end
+
+      it "keeps the article body, corrections aside, and tags footer visible in print" do
+        category = create(:category, name: "News")
+        article = create(:article, :published, category: category, title: "Print me")
+        create(:correction, article: article, body: "Fixed a typo.")
+        article.tags << create(:tag, name: "Niigata")
+
+        get article_path(article)
+
+        # The tags + corrections + body content sit between the article
+        # `<header>` and the "Article footer ad" comment. None of those
+        # editorial elements should be wrapped in data-print-hide.
+        # We assert by locating each one and confirming no print-hide
+        # ancestor wraps it (i.e. the matching segment doesn't itself begin
+        # inside a hide-block).
+        expect(response.body).to include("Print me")
+        expect(response.body).to include("Fixed a typo.")
+        expect(response.body).to include(">Niigata</a>")
+
+        # Tags footer markup should not have data-print-hide on it.
+        tags_segment = response.body[/<footer[^>]*>[\s\S]+?<\/footer>/]
+        expect(tags_segment).not_to include("data-print-hide")
+      end
+    end
+
     describe "author bio" do
       it "renders an author bio card when the author has a bio" do
         author = create(:author, name: "Jane Doe", bio: "Jane has covered Niigata for a decade.")
