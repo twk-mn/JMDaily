@@ -19,9 +19,8 @@ class Article < ApplicationRecord
   accepts_nested_attributes_for :corrections, allow_destroy: true, reject_if: ->(attrs) { attrs[:body].blank? }
 
   has_one_attached :featured_image do |attachable|
-    attachable.variant :thumb,  resize_to_fill: [ 400, 250 ],   format: :webp
-    attachable.variant :medium, resize_to_fill: [ 800, 500 ],   format: :webp
-    attachable.variant :large,  resize_to_limit: [ 1200, 800 ], format: :webp
+    attachable.variant :thumb, resize_to_fill: [ 400, 250 ],   format: :webp
+    attachable.variant :large, resize_to_limit: [ 1200, 800 ], format: :webp
   end
 
   STATUSES = %w[draft scheduled published archived].freeze

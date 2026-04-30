@@ -42,5 +42,11 @@ module JmDaily
     # I18n
     config.i18n.available_locales = %i[en ja]
     config.i18n.default_locale = :en
+
+    # Pin the variant processor explicitly. Both libvips and ImageMagick are
+    # bundled, and Rails would otherwise pick whichever is installed first.
+    # libvips is faster and uses less memory; pinning it keeps dev and prod
+    # output identical.
+    config.active_storage.variant_processor = :vips
   end
 end
