@@ -73,6 +73,12 @@ Rails.application.routes.draw do
   # RSS / Sitemap (no locale needed)
   get "feed", to: "feed#index", defaults: { format: :rss }
 
+  # Short canonical alias: /article/123 → 301 → /<locale>/articles/<slug>.
+  # Lets us share stable, compact URLs that survive slug renames.
+  get "article/:id", to: "articles#short_redirect",
+                     constraints: { id: /\d+/ },
+                     as: :short_article
+
   # Root: detect preferred locale from cookie / Accept-Language and redirect.
   root to: redirect { |_, req|
     locale = req.cookies["locale"]

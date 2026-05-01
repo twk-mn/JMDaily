@@ -43,5 +43,32 @@ RSpec.describe "Categories", type: :request do
       expect(response.body).to include('aria-label="Pagination"')
       expect(response.body).to match(/Page\s+1\s+of\s+2/)
     end
+
+    describe "CollectionPage JSON-LD" do
+      it "emits a CollectionPage schema with the category name" do
+        create(:category, name: "News", slug: "news", description: "Local news.")
+        get news_path
+        expect(response.body).to include('"@type":"CollectionPage"')
+        expect(response.body).to include('"name":"News"')
+        expect(response.body).to include('"description":"Local news."')
+      end
+
+      it "lists each article as a positioned ItemList entry" do
+        category = create(:category, name: "News", slug: "news")
+        create(:article, :published, category: category, title: "First")
+        create(:article, :published, category: category, title: "Second")
+        get news_path
+        expect(response.body).to include('"@type":"ItemList"')
+        expect(response.body).to include('"position":1')
+        expect(response.body).to include('"position":2')
+      end
+
+      it "emits an ItemList with zero items when the category is empty" do
+        create(:category, name: "News", slug: "news")
+        get news_path
+        expect(response.body).to include('"@type":"ItemList"')
+        expect(response.body).to include('"numberOfItems":0')
+      end
+    end
   end
 end

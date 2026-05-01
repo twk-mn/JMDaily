@@ -74,6 +74,33 @@ RSpec.describe ArticleTranslation, type: :model do
                  title: "Some Title", slug: "custom-slug")
       expect(t.slug).to eq("custom-slug")
     end
+
+    it 'falls back to a date-suffixed slug when the parameterized title collides per locale' do
+      published_at = Time.zone.local(2026, 4, 30)
+      first_article  = create(:article, status: "published", published_at: published_at)
+      second_article = create(:article, status: "published", published_at: published_at)
+
+      first  = create(:article_translation, article: first_article,  locale: "ja",
+                      title: "Heavy snowfall hits Niigata", slug: nil)
+      second = create(:article_translation, article: second_article, locale: "ja",
+                      title: "Heavy snowfall hits Niigata", slug: nil)
+
+      expect(first.slug).to eq("heavy-snowfall-hits-niigata")
+      expect(second.slug).to eq("heavy-snowfall-hits-niigata-2026-04-30")
+    end
+
+    it 'does not date-suffix when colliding slug exists in a different locale' do
+      first_article = create(:article)
+      # Take an EN slug we'll clash with intentionally on the JA side.
+      first_article.translations.first.update!(slug: "clashing-slug")
+
+      second_article = create(:article)
+      ja = create(:article_translation, article: second_article, locale: "ja",
+                  title: "Clashing slug", slug: nil)
+
+      # Per-locale uniqueness, so the EN row doesn't constrain the JA generator.
+      expect(ja.slug).to eq("clashing-slug")
+    end
   end
 
   describe '#to_param' do

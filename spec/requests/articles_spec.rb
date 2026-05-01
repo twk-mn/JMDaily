@@ -21,6 +21,46 @@ RSpec.describe "Articles", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
+    describe "GET /article/:id (short canonical alias)" do
+      it "301-redirects to the canonical English URL" do
+        article = create(:article, :published)
+        article.translations.first.update!(slug: "canonical-en-slug")
+
+        get "/article/#{article.id}"
+
+        expect(response).to have_http_status(:moved_permanently)
+        expect(response.headers["Location"]).to end_with("/en/articles/canonical-en-slug")
+      end
+
+      it "redirects to the visitor's preferred locale when a translation exists" do
+        article = create(:article, :published)
+        article.translations.first.update!(slug: "the-news-en")
+        create(:article_translation, article: article, locale: "ja",
+               title: "ニュース", slug: "the-news-ja")
+
+        get "/article/#{article.id}", headers: { "HTTP_ACCEPT_LANGUAGE" => "ja,en;q=0.5" }
+
+        expect(response).to have_http_status(:moved_permanently)
+        expect(response.headers["Location"]).to end_with("/ja/articles/the-news-ja")
+      end
+
+      it "404s for a non-numeric id (route constraint blocks it)" do
+        get "/article/not-a-number"
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "404s for an unpublished article" do
+        article = create(:article, status: "draft")
+        get "/article/#{article.id}"
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "404s for a missing id" do
+        get "/article/9999999"
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     it "redirects from a stale article-level slug to the canonical translation slug" do
       # Reproduce the production scenario: article-level slug drifted from the
       # English translation slug (e.g. editor renamed the translation). Old
@@ -153,6 +193,35 @@ RSpec.describe "Articles", type: :request do
         tags_footer = doc.css("footer").find { |f| f.text.include?("Niigata") }
         expect(tags_footer).not_to be_nil
         expect(hidden_in_print.call(tags_footer)).to be(false)
+      end
+    end
+
+    describe "image lazy loading" do
+      it "lazy-loads the byline author photo" do
+        author = create(:author)
+        author.photo.attach(
+          io: File.open(Rails.root.join("public/apple-touch-icon.png")),
+          filename: "byline.png", content_type: "image/png"
+        )
+        article = create(:article, :published, author: author)
+        get article_path(article)
+
+        # Byline thumbnail sits below the hero image, so it should be lazy.
+        expect(response.body).to match(/<img[^>]+rounded-full[^>]+loading="lazy"/)
+      end
+
+      it "lazy-loads the author bio card photo at the bottom of the article" do
+        author = create(:author, bio: "About the author bio body.")
+        author.photo.attach(
+          io: File.open(Rails.root.join("public/apple-touch-icon.png")),
+          filename: "bio.png", content_type: "image/png"
+        )
+        article = create(:article, :published, author: author)
+        get article_path(article)
+
+        # Author bio aside is below the article body — should always lazy-load.
+        bio_section = response.body[/<aside[^>]*>[\s\S]+?About the author bio body[\s\S]+?<\/aside>/]
+        expect(bio_section).to include('loading="lazy"')
       end
     end
 

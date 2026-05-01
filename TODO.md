@@ -32,7 +32,7 @@ These were reported live on the running site. Fix order generally matches risk: 
 
 Tight-scope items continuing the silent-drop / SEO theme from #72–#78.
 
-- [ ] **Author show page OG meta + Person JSON-LD** — surfaces the new social URLs from #77 to crawlers via `Person.sameAs`. Author pages currently set only `<title>`.
+- [x] **Author show page OG meta + Person JSON-LD** — surfaces the new social URLs from #77 to crawlers via `Person.sameAs`.
 - [ ] **JSON-LD on category / tag / location index pages** — `CollectionPage`/`ItemList` schemas. Parallel to #75/#76 but for list pages.
 - [ ] **OG meta on tag / location / static pages** — currently no `og_image` or `meta_description`. Pull from the lead article (or page body for static).
 - [ ] **Image `loading="lazy"` audit** — author bio photo, article-show author photo, and a few other below-fold images miss the attribute.

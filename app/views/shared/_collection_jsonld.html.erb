@@ -1,0 +1,38 @@
+<%#
+  CollectionPage + ItemList JSON-LD for category / tag / location / author
+  index pages.
+
+  Locals:
+    name:        required — visible heading of the page (e.g. category name)
+    url:         required — canonical URL of this index page
+    articles:    required — Enumerable of Article records for the ItemList
+    description: optional — short description of the collection
+    item_type:   optional — Schema.org type for ItemList items (default
+                 "NewsArticle"); pass "Person" for an author archive
+%>
+<% list_items = articles.each_with_index.map { |article, i|
+     translation = article.translation_for(I18n.locale) || article.translations.first
+     next unless translation
+     {
+       "@type": "ListItem",
+       "position": i + 1,
+       "url": article_url(translation, locale: translation.locale),
+       "name": translation.title
+     }
+   }.compact %>
+<script type="application/ld+json">
+  <%= raw({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": name,
+    "description": local_assigns[:description].presence,
+    "url": url,
+    "inLanguage": I18n.locale.to_s,
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListOrder": "https://schema.org/ItemListOrderDescending",
+      "numberOfItems": list_items.size,
+      "itemListElement": list_items
+    }
+  }.compact.to_json) %>
+</script>

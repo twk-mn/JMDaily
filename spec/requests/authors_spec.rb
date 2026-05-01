@@ -52,5 +52,75 @@ RSpec.describe "Authors", type: :request do
         expect(response.body).to include(">#{label}</a>"), "expected author page to render #{label} link"
       end
     end
+
+    describe "Open Graph meta" do
+      it "sets og:type to profile" do
+        author = create(:author)
+        get author_path(author)
+        expect(response.body).to include('property="og:type" content="profile"')
+      end
+
+      it "uses the author bio in the meta description (truncated)" do
+        long_bio = "Jane has covered Niigata for a decade. " * 10
+        author = create(:author, name: "Jane Reporter", role_title: "Senior reporter", bio: long_bio)
+        get author_path(author)
+        expect(response.body).to include('name="description"')
+        expect(response.body).to include("Senior reporter")
+      end
+    end
+
+    describe "Person JSON-LD" do
+      it "emits a Person schema with name, URL, and worksFor" do
+        author = create(:author, name: "Jane Reporter", role_title: "Senior reporter", bio: "Jane covers Niigata.")
+        get author_path(author)
+        expect(response.body).to include('"@type":"Person"')
+        expect(response.body).to include('"name":"Jane Reporter"')
+        expect(response.body).to include('"jobTitle":"Senior reporter"')
+        expect(response.body).to include('"description":"Jane covers Niigata."')
+        expect(response.body).to include('"worksFor":{"@type":"Organization","name":"Joetsu-Myoko Daily"}')
+      end
+
+      it "includes social profile URLs in sameAs" do
+        author = create(:author,
+                        twitter_url: "https://twitter.com/jane",
+                        bluesky_url: "https://bsky.app/profile/jane",
+                        website_url: "https://jane.example")
+        get author_path(author)
+
+        expect(response.body).to include('"sameAs"')
+        expect(response.body).to include('"https://twitter.com/jane"')
+        expect(response.body).to include('"https://bsky.app/profile/jane"')
+        expect(response.body).to include('"https://jane.example"')
+      end
+
+      it "omits sameAs entirely when no social URLs are set" do
+        author = create(:author, twitter_url: nil, bluesky_url: nil, website_url: nil)
+        get author_path(author)
+        expect(response.body).not_to include('"sameAs"')
+      end
+
+      it "drops non-http(s) social URLs from sameAs" do
+        author = create(:author,
+                        twitter_url: "javascript:alert(1)",
+                        instagram_url: "ftp://example.com",
+                        website_url: "https://jane.example")
+        get author_path(author)
+
+        expect(response.body).not_to include("javascript:alert")
+        expect(response.body).not_to include("ftp://example.com")
+        expect(response.body).to include('"https://jane.example"')
+      end
+
+      it "omits jobTitle and description from the schema when not set" do
+        author = create(:author, role_title: nil, bio: nil)
+        get author_path(author)
+
+        # Pull out just the Person JSON-LD payload so the assertion isn't
+        # tripped up by the meta description tag elsewhere on the page.
+        person_payload = response.body[/"@type":"Person".*?\}\}/m]
+        expect(person_payload).not_to include('"jobTitle"')
+        expect(person_payload).not_to include('"description"')
+      end
+    end
   end
 end

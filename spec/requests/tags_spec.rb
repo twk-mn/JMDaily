@@ -34,5 +34,25 @@ RSpec.describe "Tags", type: :request do
       get tag_path(slug: tag.slug)
       expect(response.body).to include("No articles with this tag yet")
     end
+
+    describe "CollectionPage JSON-LD" do
+      it "emits a CollectionPage with a Tagged: prefix" do
+        tag = create(:tag, name: "Festivals")
+        get tag_path(slug: tag.slug)
+        expect(response.body).to include('"@type":"CollectionPage"')
+        expect(response.body).to include('"name":"Tagged: Festivals"')
+      end
+
+      it "lists matching articles in the ItemList" do
+        tag = create(:tag, name: "Festivals")
+        article = create(:article, :published, title: "Snow Festival")
+        create(:article_tag, article: article, tag: tag)
+
+        get tag_path(slug: tag.slug)
+        expect(response.body).to include('"@type":"ItemList"')
+        expect(response.body).to include('"name":"Snow Festival"')
+        expect(response.body).to include('"numberOfItems":1')
+      end
+    end
   end
 end
