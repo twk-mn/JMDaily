@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_28_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_01_011543) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -69,11 +69,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_28_000001) do
     t.datetime "starts_at"
     t.string "status", default: "active", null: false
     t.bigint "target_category_id"
+    t.string "target_locale"
     t.bigint "target_location_id"
     t.datetime "updated_at", null: false
     t.index ["placement_zone"], name: "index_ads_on_placement_zone"
     t.index ["status"], name: "index_ads_on_status"
     t.index ["target_category_id"], name: "index_ads_on_target_category_id"
+    t.index ["target_locale"], name: "index_ads_on_target_locale"
     t.index ["target_location_id"], name: "index_ads_on_target_location_id"
   end
 

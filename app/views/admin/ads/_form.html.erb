@@ -118,7 +118,7 @@
     <!-- Optional targeting -->
     <div class="border-t border-gray-100 pt-4 space-y-4">
       <h3 class="text-sm font-semibold text-gray-700">Targeting <span class="font-normal text-gray-400">(optional — leave blank to show everywhere)</span></h3>
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-3 gap-4">
         <div>
           <%= f.label :target_category_id, "Limit to category", class: "block text-sm font-medium text-gray-700" %>
           <%= f.select :target_category_id,
@@ -131,6 +131,14 @@
           <%= f.select :target_location_id,
               Location.order(:name).map { |l| [l.name, l.id] },
               { include_blank: "All locations" },
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+        </div>
+        <div>
+          <%= f.label :target_locale, "Limit to language", class: "block text-sm font-medium text-gray-700" %>
+          <p class="text-xs text-gray-400 mb-1">Only shown to visitors reading the site in this language.</p>
+          <%= f.select :target_locale,
+              SiteLanguage.ordered.map { |l| [ "#{l.flag_emoji} #{l.name}", l.code ] },
+              { include_blank: "All languages" },
               class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
         </div>
       </div>
