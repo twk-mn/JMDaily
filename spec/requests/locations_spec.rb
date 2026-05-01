@@ -47,6 +47,28 @@ RSpec.describe "Locations", type: :request do
         get location_path(slug: "joetsu")
         expect(response.body).to include('content="News and coverage from Joetsu on Joetsu-Myoko Daily."')
       end
+
+      it "uses the lead article's featured image as og:image when present" do
+        location = create(:location, name: "Joetsu", slug: "joetsu")
+        article = create(:article, :published, title: "Joetsu Snow")
+        File.open(Rails.root.join("public/apple-touch-icon.png")) do |file|
+          article.featured_image.attach(
+            io: file,
+            filename: "joetsu.png",
+            content_type: "image/png"
+          )
+        end
+        create(:article_location, article: article, location: location)
+
+        get location_path(slug: location.slug)
+        expect(response.body).to match(/property="og:image" content="[^"]+"/)
+      end
+
+      it "omits og:image when no articles have featured images" do
+        location = create(:location, name: "Joetsu", slug: "joetsu")
+        get location_path(slug: location.slug)
+        expect(response.body).not_to include('property="og:image"')
+      end
     end
   end
 end
