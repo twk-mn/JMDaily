@@ -133,20 +133,26 @@ RSpec.describe "Articles", type: :request do
 
         get article_path(article)
 
-        # The tags + corrections + body content sit between the article
-        # `<header>` and the "Article footer ad" comment. None of those
-        # editorial elements should be wrapped in data-print-hide.
-        # We assert by locating each one and confirming no print-hide
-        # ancestor wraps it (i.e. the matching segment doesn't itself begin
-        # inside a hide-block).
-        expect(response.body).to include("Print me")
-        expect(response.body).to include("Fixed a typo.")
-        expect(response.body).to include(">Niigata</a>")
+        doc = Nokogiri::HTML(response.body)
+        # Returns true when the node has a data-print-hide ancestor.
+        hidden_in_print = ->(node) { node.ancestors.any? { |a| a["data-print-hide"] } }
 
-        # Tags footer markup should not have data-print-hide on it.
-        tags_segment = response.body[/<footer[^>]*>[\s\S]+?<\/footer>/]
-        expect(tags_segment).not_to be_nil
-        expect(tags_segment).not_to include("data-print-hide")
+        # Corrections aside must not be nested inside a data-print-hide ancestor.
+        corrections_aside = doc.at_css('aside[aria-label="Corrections"]')
+        expect(corrections_aside).not_to be_nil
+        expect(hidden_in_print.call(corrections_aside)).to be(false)
+
+        # Article body prose div must not be nested inside a data-print-hide ancestor.
+        article_body = doc.at_css("div.prose.prose-lg")
+        expect(article_body).not_to be_nil
+        expect(hidden_in_print.call(article_body)).to be(false)
+
+        # Tags footer (the one containing tag links) must not be inside a
+        # data-print-hide ancestor.  The site footer is wrapped, so we identify
+        # the article-level footer by the tag text it contains.
+        tags_footer = doc.css("footer").find { |f| f.text.include?("Niigata") }
+        expect(tags_footer).not_to be_nil
+        expect(hidden_in_print.call(tags_footer)).to be(false)
       end
     end
 
