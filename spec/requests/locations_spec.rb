@@ -70,5 +70,25 @@ RSpec.describe "Locations", type: :request do
         expect(response.body).not_to include('property="og:image"')
       end
     end
+
+    describe "CollectionPage JSON-LD" do
+      it "emits a CollectionPage with the location name and description" do
+        location = create(:location, name: "Joetsu", slug: "joetsu", description: "Coverage of Joetsu City.")
+        get location_path(slug: location.slug)
+        expect(response.body).to include('"@type":"CollectionPage"')
+        expect(response.body).to include('"name":"Joetsu"')
+        expect(response.body).to include('"description":"Coverage of Joetsu City."')
+      end
+
+      it "lists location articles in the ItemList" do
+        location = create(:location, name: "Joetsu", slug: "joetsu")
+        article = create(:article, :published, title: "Joetsu Article")
+        create(:article_location, article: article, location: location)
+
+        get location_path(slug: location.slug)
+        expect(response.body).to include('"@type":"ItemList"')
+        expect(response.body).to include('"name":"Joetsu Article"')
+      end
+    end
   end
 end

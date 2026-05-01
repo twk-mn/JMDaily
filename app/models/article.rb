@@ -163,4 +163,27 @@ class Article < ApplicationRecord
     en = translations.find { |t| t.locale == "en" }
     self.title = en.title if en&.title.present?
   end
+
+  # Override the default Sluggable generator so two articles with the same
+  # headline don't collide on the unique index. Tries the bare parameterize
+  # first, then the base + publish-date, then the base + date + numeric
+  # suffix. Mirrors ArticleTranslation#generate_slug.
+  def generate_slug
+    base = title.to_s.parameterize
+    return self.slug = base if base.blank?
+
+    scope = self.class.where.not(id: id)
+    return self.slug = base unless scope.exists?(slug: base)
+
+    date = (published_at || Time.current).to_date.iso8601
+    dated = "#{base}-#{date}"
+    return self.slug = dated unless scope.exists?(slug: dated)
+
+    i = 2
+    loop do
+      candidate = "#{dated}-#{i}"
+      return self.slug = candidate unless scope.exists?(slug: candidate)
+      i += 1
+    end
+  end
 end
