@@ -42,6 +42,34 @@ RSpec.describe Article, type: :model do
       article = create(:article, title: "My Great Article", slug: nil)
       expect(article.slug).to eq("my-great-article")
     end
+
+    it 'falls back to a date-suffixed slug when the parameterized title collides' do
+      first  = create(:article, title: "Niigata snowfall record", slug: nil,
+                                published_at: Time.zone.local(2026, 4, 30), status: "published")
+      second = create(:article, title: "Niigata snowfall record", slug: nil,
+                                published_at: Time.zone.local(2026, 4, 30), status: "published")
+
+      expect(first.slug).to eq("niigata-snowfall-record")
+      expect(second.slug).to eq("niigata-snowfall-record-2026-04-30")
+    end
+
+    it 'falls back to a numbered suffix when the dated slug also collides' do
+      published_at = Time.zone.local(2026, 4, 30)
+      create(:article, title: "Niigata snowfall record", slug: nil, published_at: published_at, status: "published")
+      create(:article, title: "Niigata snowfall record", slug: nil, published_at: published_at, status: "published")
+      third = create(:article, title: "Niigata snowfall record", slug: nil,
+                               published_at: published_at, status: "published")
+
+      expect(third.slug).to eq("niigata-snowfall-record-2026-04-30-2")
+    end
+
+    it 'uses Time.current when no published_at is set yet' do
+      travel_to Time.zone.local(2026, 4, 30) do
+        create(:article, title: "Same title", slug: nil)
+        second = create(:article, title: "Same title", slug: nil)
+        expect(second.slug).to eq("same-title-2026-04-30")
+      end
+    end
   end
 
   describe 'slug format validation' do

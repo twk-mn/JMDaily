@@ -46,6 +46,19 @@ class ArticlesController < ApplicationController
     @json_ld = build_json_ld
   end
 
+  # Short canonical alias: redirect /article/:id to the per-locale article URL.
+  # Picks the translation matching the request's locale (set by ApplicationController
+  # from cookie / Accept-Language) and falls back to the first available translation
+  # so sharing the short URL never 404s for visitors whose preferred locale we
+  # haven't translated into yet.
+  def short_redirect
+    article = Article.published.includes(:translations).find_by(id: params[:id])
+    raise ActiveRecord::RecordNotFound unless article && article.translations.any?
+
+    target = article.translation_for(I18n.locale) || article.translations.first
+    redirect_to article_path(target, locale: target.locale), status: :moved_permanently
+  end
+
   # Per-translation hreflang URLs (slugs differ across locales for articles,
   # so the default path-substitution would produce wrong URLs). Returned as
   # locale → absolute URL.
