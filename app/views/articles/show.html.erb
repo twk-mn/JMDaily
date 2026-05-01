@@ -38,7 +38,9 @@
 <% end %>
 
 <article class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
-  <%= render "shared/breadcrumbs", items: breadcrumb_items %>
+  <div data-print-hide>
+    <%= render "shared/breadcrumbs", items: breadcrumb_items %>
+  </div>
 
   <!-- Article header -->
   <header class="mb-8">
@@ -83,14 +85,16 @@
 
       <%# Language switcher — link to other available translations %>
       <% if @other_translations.any? %>
-        <span class="text-gray-400 dark:text-gray-600" aria-hidden="true">·</span>
-        <% @other_translations.each do |t| %>
-          <% lang = SiteLanguage.iso_option(t.locale) %>
-          <%= link_to (lang ? lang[:native_name] : t.locale.upcase),
-              article_path(t, locale: t.locale),
-              lang: t.locale,
-              class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-xs font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded" %>
-        <% end %>
+        <span class="text-gray-400 dark:text-gray-600" aria-hidden="true" data-print-hide>·</span>
+        <span data-print-hide>
+          <% @other_translations.each do |t| %>
+            <% lang = SiteLanguage.iso_option(t.locale) %>
+            <%= link_to (lang ? lang[:native_name] : t.locale.upcase),
+                article_path(t, locale: t.locale),
+                lang: t.locale,
+                class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-xs font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded" %>
+          <% end %>
+        </span>
       <% end %>
     </div>
   </header>
@@ -128,7 +132,9 @@
   <% end %>
 
   <!-- Inline ad (before body) -->
-  <%= ad_for("article_inline") %>
+  <div data-print-hide>
+    <%= ad_for("article_inline") %>
+  </div>
 
   <!-- Article body -->
   <div class="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-img:rounded-lg prose-blockquote:border-l-4 prose-blockquote:border-indigo-600 dark:prose-blockquote:border-indigo-400 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-800 dark:prose-blockquote:text-gray-200">
@@ -146,13 +152,19 @@
   <% end %>
 
   <!-- Article footer ad -->
-  <%= ad_for("article_footer") %>
+  <div data-print-hide>
+    <%= ad_for("article_footer") %>
+  </div>
 
   <!-- Share buttons -->
-  <%= render "shared/share_buttons", article: @article %>
+  <div data-print-hide>
+    <%= render "shared/share_buttons", article: @article %>
+  </div>
 
   <!-- Author bio -->
-  <%= render "shared/author_bio", author: @article.author %>
+  <div data-print-hide>
+    <%= render "shared/author_bio", author: @article.author %>
+  </div>
 
   <!-- Tags, locations, and sources -->
   <footer class="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 space-y-3">
@@ -197,15 +209,17 @@
     <% end %>
   </footer>
 
-  <%= render "shared/comments",
-      article: @article,
-      approved_comments: @approved_comments,
-      pending_comment_preview: @pending_comment_preview %>
+  <div data-print-hide>
+    <%= render "shared/comments",
+        article: @article,
+        approved_comments: @approved_comments,
+        pending_comment_preview: @pending_comment_preview %>
+  </div>
 </article>
 
 <!-- More from this author -->
 <% if @more_from_author.any? %>
-  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-200 dark:border-gray-800">
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-200 dark:border-gray-800" data-print-hide>
     <%= render "shared/section_subhead", title: "More from #{@article.author.name}" %>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
       <% @more_from_author.each do |article| %>
@@ -217,7 +231,7 @@
 
 <!-- Related articles -->
 <% if @related_articles.any? %>
-  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-200 dark:border-gray-800">
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-200 dark:border-gray-800" data-print-hide>
     <%= render "shared/section_subhead", title: "Related Stories" %>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <% @related_articles.each do |article| %>

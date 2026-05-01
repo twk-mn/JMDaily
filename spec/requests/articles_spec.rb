@@ -153,6 +153,49 @@ RSpec.describe "Articles", type: :request do
       end
     end
 
+    describe "print rendering" do
+      it "marks chrome around the article with data-print-hide" do
+        article = create(:article, :published)
+        article.translations.first.update!(slug: "the-slug")
+        get "/en/articles/the-slug"
+
+        # Header, footer, breaking banner are hidden via the layout wrapper.
+        # On the article page itself we want breadcrumbs, share buttons,
+        # author bio, comments, related, and more-from-author hidden.
+        expect(response.body.scan('data-print-hide').size).to be >= 6
+      end
+
+      it "keeps the article body, corrections aside, and tags footer visible in print" do
+        category = create(:category, name: "News")
+        article = create(:article, :published, category: category, title: "Print me")
+        create(:correction, article: article, body: "Fixed a typo.")
+        article.tags << create(:tag, name: "Niigata")
+
+        get article_path(article)
+
+        doc = Nokogiri::HTML(response.body)
+        # Returns true when the node has a data-print-hide ancestor.
+        hidden_in_print = ->(node) { node.ancestors.any? { |a| a["data-print-hide"] } }
+
+        # Corrections aside must not be nested inside a data-print-hide ancestor.
+        corrections_aside = doc.at_css('aside[aria-label="Corrections"]')
+        expect(corrections_aside).not_to be_nil
+        expect(hidden_in_print.call(corrections_aside)).to be(false)
+
+        # Article body prose div must not be nested inside a data-print-hide ancestor.
+        article_body = doc.at_css("div.prose.prose-lg")
+        expect(article_body).not_to be_nil
+        expect(hidden_in_print.call(article_body)).to be(false)
+
+        # Tags footer (the one containing tag links) must not be inside a
+        # data-print-hide ancestor.  The site footer is wrapped, so we identify
+        # the article-level footer by the tag text it contains.
+        tags_footer = doc.css("footer").find { |f| f.text.include?("Niigata") }
+        expect(tags_footer).not_to be_nil
+        expect(hidden_in_print.call(tags_footer)).to be(false)
+      end
+    end
+
     describe "image lazy loading" do
       it "lazy-loads the byline author photo" do
         author = create(:author)

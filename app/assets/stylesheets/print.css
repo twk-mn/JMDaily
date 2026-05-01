@@ -1,18 +1,20 @@
-@media print {
-  /* Hide chrome */
-  header,
-  footer,
-  nav,
-  .ad,
-  [class*="ad_"],
-  [data-zone],
-  .share-buttons,
-  aside,
-  #related-articles,
-  [class*="related"],
-  .prose a[href]::after { content: none; }
+/*
+ * Print stylesheet for the article reading experience.
+ *
+ * Strategy: views opt elements out of the printed page by adding the
+ * `data-print-hide` attribute (header/footer chrome, ads, share buttons,
+ * comments, "More from author", "Related stories", language switchers,
+ * breadcrumbs, etc). Everything else stays visible — corrections boxes,
+ * context boxes, tags, locations, sources, and the article body — because
+ * those are part of the editorial record a reader is likely to want on
+ * paper.
+ */
 
-  /* Reset page */
+@media print {
+  /* Anything explicitly opted out by the view. */
+  [data-print-hide] { display: none !important; }
+
+  /* Reset page chrome so the print layout starts from a clean slate. */
   body {
     background: #fff !important;
     color: #000 !important;
@@ -20,38 +22,31 @@
     line-height: 1.5;
   }
 
-  /* Article content */
+  /* Article container should fill the page; drop the responsive padding/margin. */
   article {
     max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
   }
 
-  h1 {
-    font-size: 22pt;
-    line-height: 1.2;
-    margin-bottom: 0.5em;
-  }
-
+  /* Headings */
+  h1 { font-size: 22pt; line-height: 1.2; margin-bottom: 0.5em; }
   h2, h3 { font-size: 14pt; }
+  h1, h2, h3, h4 { page-break-after: avoid; }
 
-  /* Byline / metadata */
+  /* Byline / metadata reads as small ancillary text on paper. */
   time, .byline { font-size: 9pt; color: #444; }
 
-  /* Images */
+  /* Images shouldn't bleed off the page or split across breaks. */
   img {
     max-width: 100% !important;
     page-break-inside: avoid;
   }
-
   figure { page-break-inside: avoid; }
-
   figcaption { font-size: 9pt; color: #555; }
 
-  /* Prevent orphaned headings */
-  h1, h2, h3, h4 { page-break-after: avoid; }
-
-  /* Show full link URLs after anchor text */
+  /* Show the destination URL after every external link in the body so
+     printed copies are still useful for sources / further reading. */
   .prose a[href^="http"]::after {
     content: " (" attr(href) ")";
     font-size: 8pt;
@@ -59,7 +54,8 @@
     word-break: break-all;
   }
 
-  /* Publication name at top of print */
+  /* Masthead at the top of the printed page so detached pages still
+     identify the publication. */
   body::before {
     content: "Joetsu-Myoko Daily — jmdaily.com";
     display: block;
