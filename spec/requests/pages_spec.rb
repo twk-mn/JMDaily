@@ -41,6 +41,37 @@ RSpec.describe "Pages", type: :request do
     end
   end
 
+  describe "static page Open Graph meta" do
+    it "uses meta_description when set on the page" do
+      create(:static_page, title: "About", slug: "about", meta_description: "About this site.")
+      get about_path
+      expect(response.body).to include('name="description" content="About this site."')
+      expect(response.body).to include('property="og:description" content="About this site."')
+    end
+
+    it "falls back to a truncated body excerpt when meta_description is blank" do
+      page = create(:static_page, title: "About", slug: "about", meta_description: nil)
+      page.update!(body: ("Joetsu-Myoko Daily covers local news in Niigata. " * 6))
+
+      get about_path
+
+      doc = Nokogiri::HTML(response.body)
+      expected_excerpt = page.body.truncate(160)
+
+      expect(doc.at_css('meta[name="description"]')&.[]('content')).to eq(expected_excerpt)
+      expect(doc.at_css('meta[property="og:description"]')&.[]('content')).to eq(expected_excerpt)
+      # Layout's site-default fallback shouldn't kick in once body fallback fires
+      expect(doc.at_css('meta[name="description"]')&.[]('content')).not_to eq("English-language local news for Joetsu, Myoko, and the surrounding region.")
+      expect(doc.at_css('meta[property="og:description"]')&.[]('content')).not_to eq("English-language local news for Joetsu, Myoko, and the surrounding region.")
+    end
+
+    it "sets og:type to article" do
+      create(:static_page, title: "About", slug: "about")
+      get about_path
+      expect(response.body).to include('property="og:type" content="article"')
+    end
+  end
+
   describe "POST /contact" do
     before { create(:static_page, title: "Contact", slug: "contact") }
 

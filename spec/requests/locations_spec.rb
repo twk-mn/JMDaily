@@ -35,6 +35,42 @@ RSpec.describe "Locations", type: :request do
       expect(response.body).to include("No articles for this location yet")
     end
 
+    describe "Open Graph meta" do
+      it "uses the location description for meta_description when present" do
+        create(:location, name: "Joetsu", slug: "joetsu", description: "Coverage of Joetsu City.")
+        get location_path(slug: "joetsu")
+        expect(response.body).to include('content="Coverage of Joetsu City."')
+      end
+
+      it "falls back to a generated description when location.description is blank" do
+        create(:location, name: "Joetsu", slug: "joetsu", description: nil)
+        get location_path(slug: "joetsu")
+        expect(response.body).to include('content="News and coverage from Joetsu on Joetsu-Myoko Daily."')
+      end
+
+      it "uses the lead article's featured image as og:image when present" do
+        location = create(:location, name: "Joetsu", slug: "joetsu")
+        article = create(:article, :published, title: "Joetsu Snow")
+        File.open(Rails.root.join("public/apple-touch-icon.png")) do |file|
+          article.featured_image.attach(
+            io: file,
+            filename: "joetsu.png",
+            content_type: "image/png"
+          )
+        end
+        create(:article_location, article: article, location: location)
+
+        get location_path(slug: location.slug)
+        expect(response.body).to match(/property="og:image" content="[^"]+"/)
+      end
+
+      it "omits og:image when no articles have featured images" do
+        location = create(:location, name: "Joetsu", slug: "joetsu")
+        get location_path(slug: location.slug)
+        expect(response.body).not_to include('property="og:image"')
+      end
+    end
+
     describe "CollectionPage JSON-LD" do
       it "emits a CollectionPage with the location name and description" do
         location = create(:location, name: "Joetsu", slug: "joetsu", description: "Coverage of Joetsu City.")
