@@ -54,9 +54,15 @@ RSpec.describe "Pages", type: :request do
       page.update!(body: ("Joetsu-Myoko Daily covers local news in Niigata. " * 6))
 
       get about_path
-      expect(response.body).to include("Joetsu-Myoko Daily covers local news in Niigata.")
+
+      doc = Nokogiri::HTML(response.body)
+      expected_excerpt = page.body.truncate(160)
+
+      expect(doc.at_css('meta[name="description"]')&.[]('content')).to eq(expected_excerpt)
+      expect(doc.at_css('meta[property="og:description"]')&.[]('content')).to eq(expected_excerpt)
       # Layout's site-default fallback shouldn't kick in once body fallback fires
-      expect(response.body).not_to include("English-language local news for Joetsu, Myoko, and the surrounding region.")
+      expect(doc.at_css('meta[name="description"]')&.[]('content')).not_to eq("English-language local news for Joetsu, Myoko, and the surrounding region.")
+      expect(doc.at_css('meta[property="og:description"]')&.[]('content')).not_to eq("English-language local news for Joetsu, Myoko, and the surrounding region.")
     end
 
     it "sets og:type to article" do
