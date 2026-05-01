@@ -145,6 +145,7 @@ RSpec.describe "Articles", type: :request do
 
         # Tags footer markup should not have data-print-hide on it.
         tags_segment = response.body[/<footer[^>]*>[\s\S]+?<\/footer>/]
+        expect(tags_segment).not_to be_nil
         expect(tags_segment).not_to include("data-print-hide")
       end
     end
