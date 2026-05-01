@@ -45,11 +45,13 @@ RSpec.describe "Tags", type: :request do
       it "uses the lead article's featured image as og:image when present" do
         tag = create(:tag, name: "Festivals")
         article = create(:article, :published, title: "Snow Festival")
-        article.featured_image.attach(
-          io: File.open(Rails.root.join("public/apple-touch-icon.png")),
-          filename: "snow.png",
-          content_type: "image/png"
-        )
+        File.open(Rails.root.join("public/apple-touch-icon.png")) do |file|
+          article.featured_image.attach(
+            io: file,
+            filename: "snow.png",
+            content_type: "image/png"
+          )
+        end
         create(:article_tag, article: article, tag: tag)
 
         get tag_path(slug: tag.slug)
