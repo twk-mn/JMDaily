@@ -30,7 +30,7 @@ module ApplicationHelper
   # Impression is recorded asynchronously and deduplicated per-session per ad
   # so repeated page loads by the same visitor don't inflate counts.
   def ad_for(zone)
-    ad = Ad.pick_for_zone(zone)
+    ad = Ad.pick_for_zone(zone, locale: I18n.locale)
     return unless ad
 
     seen_key = "ad_seen_#{ad.id}"

@@ -42,4 +42,41 @@ RSpec.describe "Ad rendering", type: :request do
       expect(response.body).not_to include('class="ad-unit')
     end
   end
+
+  describe "locale-targeted ads" do
+    it "shows a JA-targeted ad to a JA visitor" do
+      create(:ad, :script,
+             placement_zone: "homepage_mid",
+             sponsor_label:  "JA only",
+             target_locale:  "ja",
+             script_code:    "<div>JA</div>")
+
+      get "/ja"
+      expect(response.body).to include("JA only")
+    end
+
+    it "hides a JA-targeted ad from an EN visitor" do
+      create(:ad, :script,
+             placement_zone: "homepage_mid",
+             sponsor_label:  "JA only",
+             target_locale:  "ja",
+             script_code:    "<div>JA</div>")
+
+      get "/en"
+      expect(response.body).not_to include("JA only")
+    end
+
+    it "still shows untargeted ads to every locale" do
+      create(:ad, :script,
+             placement_zone: "homepage_mid",
+             sponsor_label:  "Everywhere",
+             target_locale:  nil,
+             script_code:    "<div>Any</div>")
+
+      get "/en"
+      expect(response.body).to include("Everywhere")
+      get "/ja"
+      expect(response.body).to include("Everywhere")
+    end
+  end
 end

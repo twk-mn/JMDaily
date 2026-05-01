@@ -48,7 +48,7 @@ module Admin
         :link_url, :link_target, :sponsor_label,
         :script_code,
         :starts_at, :ends_at,
-        :target_category_id, :target_location_id,
+        :target_category_id, :target_location_id, :target_locale,
         :priority, :image
       )
     end

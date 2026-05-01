@@ -30,18 +30,30 @@ class Ad < ApplicationRecord
   validates :link_url, format: { with: /\Ahttps?:\/\/.+\z/i, message: "must start with http:// or https://" },
                        allow_blank: true
   validates :script_code, presence: true, if: -> { ad_type.in?(%w[adsense custom_html]) }
+  # target_locale is optional; "" / nil means "show in every language". Any value
+  # has to be a code we actually serve, otherwise an admin typo silently filters
+  # the ad out of every page.
+  validates :target_locale, inclusion: { in: ->(_) { SiteLanguage.codes } }, allow_blank: true
   validate :ends_at_after_starts_at
 
   scope :active_status, -> { where(status: "active") }
   scope :for_zone, ->(zone) { where(placement_zone: zone) }
+  scope :for_locale, ->(locale) {
+    where("target_locale IS NULL OR target_locale = '' OR target_locale = ?", locale.to_s)
+  }
   scope :currently_running, -> {
     active_status
       .where("starts_at IS NULL OR starts_at <= ?", Time.current)
       .where("ends_at IS NULL OR ends_at >= ?", Time.current)
   }
 
-  def self.pick_for_zone(zone)
-    for_zone(zone).currently_running.order(priority: :desc).first
+  # Highest-priority running ad for the given zone, optionally restricted to
+  # ads that target the supplied locale (or have no locale targeting set).
+  # Pass `nil` for the locale to skip the language filter entirely.
+  def self.pick_for_zone(zone, locale: nil)
+    scope = for_zone(zone).currently_running
+    scope = scope.for_locale(locale) if locale.present?
+    scope.order(priority: :desc).first
   end
 
   def zone_label

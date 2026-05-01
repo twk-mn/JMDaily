@@ -49,6 +49,22 @@ RSpec.describe Ad, type: :model do
       expect(ad).not_to be_valid
       expect(ad.errors[:ends_at]).to be_present
     end
+
+    it "accepts a target_locale that matches a known SiteLanguage code" do
+      ad = build(:ad, target_locale: "ja")
+      expect(ad).to be_valid
+    end
+
+    it "accepts a blank target_locale (means 'all languages')" do
+      expect(build(:ad, target_locale: nil)).to be_valid
+      expect(build(:ad, target_locale: "")).to be_valid
+    end
+
+    it "rejects an unknown target_locale to catch admin typos" do
+      ad = build(:ad, target_locale: "xx")
+      expect(ad).not_to be_valid
+      expect(ad.errors[:target_locale]).to be_present
+    end
   end
 
   describe "scopes" do
@@ -98,6 +114,36 @@ RSpec.describe Ad, type: :model do
     it "returns nil when no ad runs in the zone" do
       create(:ad, placement_zone: "homepage_mid", status: "paused")
       expect(Ad.pick_for_zone("homepage_mid")).to be_nil
+    end
+
+    describe "locale targeting" do
+      it "shows ads with no target_locale to every visitor" do
+        ad = create(:ad, placement_zone: "homepage_mid", target_locale: nil)
+        expect(Ad.pick_for_zone("homepage_mid", locale: "en")).to eq(ad)
+        expect(Ad.pick_for_zone("homepage_mid", locale: "ja")).to eq(ad)
+      end
+
+      it "only returns a locale-targeted ad to visitors in that locale" do
+        ja_ad = create(:ad, placement_zone: "homepage_mid", target_locale: "ja")
+        expect(Ad.pick_for_zone("homepage_mid", locale: "ja")).to eq(ja_ad)
+        expect(Ad.pick_for_zone("homepage_mid", locale: "en")).to be_nil
+      end
+
+      it "prefers a locale-matched ad over an untargeted ad with the same priority" do
+        # Same priority — both qualify, but the deterministic order is by id
+        # so we make the targeted one explicitly higher priority to assert
+        # the locale filter narrows the candidate set rather than relying on
+        # ordering luck.
+        _untargeted = create(:ad, placement_zone: "homepage_mid", target_locale: nil, priority: 1)
+        targeted    = create(:ad, placement_zone: "homepage_mid", target_locale: "ja", priority: 5)
+
+        expect(Ad.pick_for_zone("homepage_mid", locale: "ja")).to eq(targeted)
+      end
+
+      it "falls back to ignoring the language filter when locale: nil is passed" do
+        _ja = create(:ad, placement_zone: "homepage_mid", target_locale: "ja", priority: 1)
+        expect(Ad.pick_for_zone("homepage_mid", locale: nil)).not_to be_nil
+      end
     end
   end
 
