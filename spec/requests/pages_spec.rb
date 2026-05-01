@@ -56,7 +56,10 @@ RSpec.describe "Pages", type: :request do
       get about_path
 
       doc = Nokogiri::HTML(response.body)
-      expected_excerpt = page.body.truncate(160)
+      # The view squishes whitespace and truncates the plain-text version of
+      # the rich-text body, so reproduce that transform here rather than
+      # calling .truncate on the ActionText::RichText directly.
+      expected_excerpt = page.body.to_plain_text.squish.truncate(160)
 
       expect(doc.at_css('meta[name="description"]')&.[]('content')).to eq(expected_excerpt)
       expect(doc.at_css('meta[property="og:description"]')&.[]('content')).to eq(expected_excerpt)
