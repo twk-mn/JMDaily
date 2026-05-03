@@ -108,7 +108,7 @@ class ArticlesController < ApplicationController
       },
       "publisher": {
         "@type": "Organization",
-        "name": "Joetsu-Myoko Daily"
+        "name": Setting.site_name
       },
       "mainEntityOfPage": {
         "@type": "WebPage",

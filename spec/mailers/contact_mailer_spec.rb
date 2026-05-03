@@ -5,8 +5,13 @@ RSpec.describe ContactMailer do
     let(:submission) { create(:contact_submission, name: "Jane Doe", email: "jane@example.com", subject: "Hello there", message: "Great site!") }
     let(:mail) { described_class.new_submission(submission) }
 
-    it "is sent to the editor address" do
-      expect(mail.to).to eq([ ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com") ])
+    it "is sent to the configured admin email" do
+      expect(mail.to).to eq([ Setting.admin_email ])
+    end
+
+    it "honors a custom admin_email setting" do
+      Setting.set("admin_email", "editor@example.com")
+      expect(described_class.new_submission(submission).to).to eq([ "editor@example.com" ])
     end
 
     it "sets reply-to to the submitter" do

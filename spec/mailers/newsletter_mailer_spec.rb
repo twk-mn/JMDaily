@@ -9,8 +9,14 @@ RSpec.describe NewsletterMailer do
       expect(mail.to).to eq([ subscriber.email ])
     end
 
-    it "has the correct subject" do
-      expect(mail.subject).to eq("Confirm your subscription to Joetsu-Myoko Daily")
+    it "uses the configured site name in the subject" do
+      expect(mail.subject).to eq("Confirm your subscription to #{Setting.site_name}")
+    end
+
+    it "honors a custom site_name setting in the subject" do
+      Setting.set("site_name", "My News Site")
+      expect(described_class.confirmation(subscriber).subject)
+        .to eq("Confirm your subscription to My News Site")
     end
 
     it "includes the confirmation URL in the HTML body" do

@@ -18,13 +18,13 @@
 <body>
   <div class="wrapper">
     <div class="header">
-      <a href="<%= @home_url %>">Joetsu-Myoko Daily</a>
+      <a href="<%= @home_url %>"><%= Setting.site_name %></a>
     </div>
     <div class="content">
       <%= simple_format(@issue.body) %>
     </div>
     <div class="footer">
-      <p>You're receiving this because you subscribed to the Joetsu-Myoko Daily newsletter.</p>
+      <p>You're receiving this because you subscribed to the <%= Setting.site_name %> newsletter.</p>
       <p><a href="<%= @unsubscribe_url %>">Unsubscribe</a></p>
     </div>
   </div>

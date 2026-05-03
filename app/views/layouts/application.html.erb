@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>">
   <head>
-    <title><%= content_for?(:title) ? "#{yield(:title)} — Joetsu-Myoko Daily" : "Joetsu-Myoko Daily — Local News in English" %></title>
+    <%
+      site_name    = Setting.site_name
+      site_tagline = Setting.site_tagline.presence
+      default_meta = "English-language local news for Joetsu, Myoko, and the surrounding region in Niigata, Japan."
+      browser_title = if content_for?(:title)
+        "#{yield(:title)} — #{site_name}"
+      elsif site_tagline
+        "#{site_name} — #{site_tagline}"
+      else
+        site_name
+      end
+      head_meta_description = content_for?(:meta_description) ? yield(:meta_description) : (site_tagline || default_meta)
+      head_og_title         = content_for?(:title) ? yield(:title) : site_name
+    %>
+    <title><%= browser_title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#030712" media="(prefers-color-scheme: dark)">
-    <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "English-language local news for Joetsu, Myoko, and the surrounding region in Niigata, Japan." %>">
+    <meta name="description" content="<%= head_meta_description %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -41,9 +55,9 @@
     <%= render "shared/site_jsonld" %>
 
     <!-- Open Graph -->
-    <meta property="og:site_name" content="Joetsu-Myoko Daily">
-    <meta property="og:title" content="<%= content_for?(:title) ? yield(:title) : "Joetsu-Myoko Daily" %>">
-    <meta property="og:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "English-language local news for Joetsu, Myoko, and the surrounding region." %>">
+    <meta property="og:site_name" content="<%= site_name %>">
+    <meta property="og:title" content="<%= head_og_title %>">
+    <meta property="og:description" content="<%= head_meta_description %>">
     <meta property="og:type" content="<%= content_for?(:og_type) ? yield(:og_type) : "website" %>">
     <% if content_for?(:og_image) %>
       <meta property="og:image" content="<%= yield(:og_image) %>">
@@ -51,15 +65,15 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : "Joetsu-Myoko Daily" %>">
-    <meta name="twitter:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "English-language local news for Joetsu, Myoko, and the surrounding region." %>">
+    <meta name="twitter:title" content="<%= head_og_title %>">
+    <meta name="twitter:description" content="<%= head_meta_description %>">
     <% if content_for?(:og_image) %>
       <meta name="twitter:image" content="<%= yield(:og_image) %>">
     <% end %>
 
     <%= yield(:head) if content_for?(:head) %>
 
-    <link rel="alternate" type="application/rss+xml" title="Joetsu-Myoko Daily (English)" href="<%= feed_url(format: :rss, locale: 'en') %>">
+    <link rel="alternate" type="application/rss+xml" title="<%= site_name %> (English)" href="<%= feed_url(format: :rss, locale: 'en') %>">
     <link rel="alternate" type="application/rss+xml" title="上越妙高デイリー (日本語)" href="<%= feed_url(format: :rss, locale: 'ja') %>">
     <%= Sentry.get_trace_propagation_meta.html_safe %>
   </head>

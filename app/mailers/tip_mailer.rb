@@ -2,8 +2,8 @@ class TipMailer < ApplicationMailer
   def new_tip(tip)
     @tip = tip
     mail(
-      to:      ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com"),
-      subject: "[JMDaily] New tip received"
+      to:      Setting.admin_email,
+      subject: "[#{Setting.site_name}] New tip received"
     )
   end
 end

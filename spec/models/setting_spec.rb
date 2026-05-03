@@ -77,6 +77,53 @@ RSpec.describe Setting, type: :model do
     end
   end
 
+  describe 'convenience accessors' do
+    describe '.site_name' do
+      it 'returns the registered default when no row exists' do
+        expect(Setting.site_name).to eq("Joetsu-Myoko Daily")
+      end
+
+      it 'returns the saved value when present' do
+        Setting.set("site_name", "Niigata News")
+        expect(Setting.site_name).to eq("Niigata News")
+      end
+
+      it 'falls back to the default when the saved value is blank' do
+        Setting.set("site_name", "")
+        expect(Setting.site_name).to eq("Joetsu-Myoko Daily")
+      end
+    end
+
+    describe '.site_tagline' do
+      it 'returns an empty string when unset' do
+        expect(Setting.site_tagline).to eq("")
+      end
+
+      it 'returns the saved tagline' do
+        Setting.set("tagline", "Local news in English")
+        expect(Setting.site_tagline).to eq("Local news in English")
+      end
+    end
+
+    describe '.admin_email' do
+      it 'falls back to ENV[EDITOR_EMAIL] when no setting saved' do
+        expected = ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com")
+        expect(Setting.admin_email).to eq(expected)
+      end
+
+      it 'returns the saved admin_email when present' do
+        Setting.set("admin_email", "editor@example.com")
+        expect(Setting.admin_email).to eq("editor@example.com")
+      end
+
+      it 'falls back to ENV when the saved value is blank' do
+        Setting.set("admin_email", "")
+        expected = ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com")
+        expect(Setting.admin_email).to eq(expected)
+      end
+    end
+  end
+
   describe '.definitions_for_tab' do
     it 'returns only definitions for the matching tab' do
       result = Setting.definitions_for_tab("general")
