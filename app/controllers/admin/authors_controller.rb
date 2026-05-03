@@ -41,7 +41,7 @@ module Admin
     private
 
     def set_author
-      @author = Author.find(params[:id])
+      @author = find_resource(Author)
     end
 
     def author_params

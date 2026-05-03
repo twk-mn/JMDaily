@@ -42,7 +42,7 @@ module Admin
     private
 
     def set_category
-      @category = Category.find(params[:id])
+      @category = find_resource(Category)
     end
 
     def category_params

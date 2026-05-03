@@ -33,10 +33,21 @@ RSpec.describe "Admin::Tags", type: :request do
   end
 
   describe "GET /admin/tags/:id/edit" do
-    it "returns success" do
+    it "returns success when accessed by integer id" do
       tag = create(:tag)
       get "/admin/tags/#{tag.id}/edit"
       expect(response).to have_http_status(:success)
+    end
+
+    it "returns success when accessed by slug (since Tag#to_param returns slug)" do
+      create(:tag, name: "Festivals", slug: "festivals")
+      get "/admin/tags/festivals/edit"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns 404 for an unknown slug" do
+      get "/admin/tags/does-not-exist/edit"
+      expect(response).to have_http_status(:not_found)
     end
   end
 

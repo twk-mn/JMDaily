@@ -33,10 +33,23 @@ RSpec.describe "Admin::Categories", type: :request do
   end
 
   describe "GET /admin/categories/:id/edit" do
-    it "returns success" do
+    it "returns success when accessed by integer id" do
       category = create(:category)
       get "/admin/categories/#{category.id}/edit"
       expect(response).to have_http_status(:success)
+    end
+
+    # Category#to_param returns the slug, so URL helpers in the admin index
+    # render `/admin/categories/<slug>/edit`. Both forms must resolve.
+    it "returns success when accessed by slug" do
+      create(:category, name: "News", slug: "news")
+      get "/admin/categories/news/edit"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns 404 for an unknown slug" do
+      get "/admin/categories/does-not-exist/edit"
+      expect(response).to have_http_status(:not_found)
     end
   end
 

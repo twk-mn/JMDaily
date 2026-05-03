@@ -39,7 +39,7 @@ module Admin
     private
 
     def set_page
-      @page = StaticPage.find(params[:id])
+      @page = find_resource(StaticPage)
     end
 
     def page_params

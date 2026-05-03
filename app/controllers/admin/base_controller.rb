@@ -70,5 +70,21 @@ module Admin
     def refresh_last_active_at
       session[:last_active_at] = Time.current.to_s if current_user
     end
+
+    # Resolve a record from `params[:id]`, accepting either a numeric primary
+    # key or a slug. Models in this app override `to_param` to return their
+    # slug, so URL helpers like `edit_admin_<resource>_path(record)` produce
+    # `/admin/.../<slug>/edit` rather than `/admin/.../<id>/edit`. The default
+    # `find(params[:id])` then 404s on every admin edit/show/update/destroy
+    # route. Pass the model class (or any chained scope, e.g. with eager loads
+    # already applied) and the param defaults to `params[:id]`. Raises
+    # ActiveRecord::RecordNotFound when neither an id nor a slug matches.
+    def find_resource(scope, param: params[:id])
+      if param.to_s.match?(/\A\d+\z/)
+        scope.find(param)
+      else
+        scope.find_by!(slug: param)
+      end
+    end
   end
 end

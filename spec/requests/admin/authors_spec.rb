@@ -35,10 +35,21 @@ RSpec.describe "Admin::Authors", type: :request do
   end
 
   describe "GET /admin/authors/:id/edit" do
-    it "returns success" do
+    it "returns success when accessed by integer id" do
       author = create(:author)
       get "/admin/authors/#{author.id}/edit"
       expect(response).to have_http_status(:success)
+    end
+
+    it "returns success when accessed by slug (since Author#to_param returns slug)" do
+      create(:author, name: "Aya Tanaka", slug: "aya-tanaka")
+      get "/admin/authors/aya-tanaka/edit"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns 404 for an unknown slug" do
+      get "/admin/authors/does-not-exist/edit"
+      expect(response).to have_http_status(:not_found)
     end
   end
 

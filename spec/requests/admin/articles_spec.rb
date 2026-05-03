@@ -115,10 +115,32 @@ RSpec.describe "Admin::Articles", type: :request do
   end
 
   describe "GET /admin/articles/:id/edit" do
-    it "returns success" do
+    it "returns success when accessed by integer id" do
       article = create(:article, author: author, category: category)
       get "/admin/articles/#{article.id}/edit"
       expect(response).to have_http_status(:success)
+    end
+
+    # Article#to_param returns the locale-current translation slug when
+    # translations are eager-loaded (admin index does this), so the edit
+    # link rendered by the admin index points at /admin/articles/<slug>/edit
+    # rather than /admin/articles/<id>/edit. Make sure both still resolve.
+    it "returns success when accessed by article-level slug" do
+      article = create(:article, slug: "my-article-slug", author: author, category: category)
+      get "/admin/articles/my-article-slug/edit"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns success when accessed by translation slug" do
+      article = create(:article, author: author, category: category)
+      article.translations.first.update!(slug: "translation-only-slug")
+      get "/admin/articles/translation-only-slug/edit"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns 404 for an unknown slug" do
+      get "/admin/articles/does-not-exist/edit"
+      expect(response).to have_http_status(:not_found)
     end
   end
 
