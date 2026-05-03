@@ -16,8 +16,15 @@ module Admin
     end
 
     def preview
-      @article = Article.includes(:author, :category, :tags, :locations, :sources, :corrections, :translations,
-                                  featured_image_attachment: :blob).find(params[:id])
+      scope = Article.includes(:author, :category, :tags, :locations, :sources, :corrections, :translations,
+                               featured_image_attachment: :blob)
+      @article = if params[:id].to_s.match?(/\A\d+\z/)
+        scope.find(params[:id])
+      else
+        scope.find_by(slug: params[:id]) ||
+          ArticleTranslation.find_by(slug: params[:id])&.then { |t| scope.find(t.article_id) } ||
+          (raise ActiveRecord::RecordNotFound)
+      end
       @translation = @article.translation_for(I18n.locale) || @article.translations.first
 
       card_includes = [ :translations, { featured_image_attachment: :blob } ]
@@ -112,7 +119,18 @@ module Admin
     private
 
     def set_article
-      @article = Article.includes(:translations, :sources, :corrections).find(params[:id])
+      scope = Article.includes(:translations, :sources, :corrections)
+      @article = if params[:id].to_s.match?(/\A\d+\z/)
+        scope.find(params[:id])
+      else
+        # `Article#to_param` returns the locale-current translation slug when
+        # translations are eager-loaded (admin index does this for the cards),
+        # so the URL coming back may carry a translation slug rather than the
+        # article-level one. Resolve through translations as a fallback.
+        scope.find_by(slug: params[:id]) ||
+          ArticleTranslation.find_by(slug: params[:id])&.then { |t| scope.find(t.article_id) } ||
+          (raise ActiveRecord::RecordNotFound, "No Article with slug or translation slug #{params[:id].inspect}")
+      end
     end
 
     def article_params

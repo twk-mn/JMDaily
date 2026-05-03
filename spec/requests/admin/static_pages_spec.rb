@@ -35,10 +35,21 @@ RSpec.describe "Admin::StaticPages", type: :request do
   end
 
   describe "GET /admin/static_pages/:id/edit" do
-    it "returns success" do
+    it "returns success when accessed by integer id" do
       page = create(:static_page)
       get "/admin/static_pages/#{page.id}/edit"
       expect(response).to have_http_status(:success)
+    end
+
+    it "returns success when accessed by slug (since StaticPage#to_param returns slug)" do
+      create(:static_page, title: "About", slug: "about")
+      get "/admin/static_pages/about/edit"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns 404 for an unknown slug" do
+      get "/admin/static_pages/does-not-exist/edit"
+      expect(response).to have_http_status(:not_found)
     end
   end
 

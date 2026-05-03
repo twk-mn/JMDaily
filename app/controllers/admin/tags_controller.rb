@@ -38,7 +38,7 @@ module Admin
     private
 
     def set_tag
-      @tag = Tag.find(params[:id])
+      @tag = find_resource(Tag)
     end
 
     def tag_params

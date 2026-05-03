@@ -33,10 +33,21 @@ RSpec.describe "Admin::Locations", type: :request do
   end
 
   describe "GET /admin/locations/:id/edit" do
-    it "returns success" do
+    it "returns success when accessed by integer id" do
       location = create(:location)
       get "/admin/locations/#{location.id}/edit"
       expect(response).to have_http_status(:success)
+    end
+
+    it "returns success when accessed by slug (since Location#to_param returns slug)" do
+      create(:location, name: "Joetsu", slug: "joetsu")
+      get "/admin/locations/joetsu/edit"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns 404 for an unknown slug" do
+      get "/admin/locations/does-not-exist/edit"
+      expect(response).to have_http_status(:not_found)
     end
   end
 

@@ -39,7 +39,7 @@ module Admin
     private
 
     def set_location
-      @location = Location.find(params[:id])
+      @location = find_resource(Location)
     end
 
     def location_params
