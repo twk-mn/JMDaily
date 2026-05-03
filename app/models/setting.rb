@@ -117,6 +117,33 @@ class Setting < ApplicationRecord
       DEFINITIONS.select { |_, d| d[:tab] == tab.to_s }
     end
 
+    # ---- Convenience accessors used across views, controllers, and mailers ----
+    # Each falls back to a sensible default when the row is missing or blank,
+    # so deleting a settings row never produces a literally empty masthead /
+    # title / mail recipient. Callers can rely on these returning a usable
+    # string regardless of admin state.
+
+    # Public site name. Falls back to the registered default
+    # ("Joetsu-Myoko Daily") so headings, OG metadata, and mail subjects
+    # never go blank if the setting is cleared.
+    def site_name
+      get("site_name").to_s.presence || default_for("site_name") || "Joetsu-Myoko Daily"
+    end
+
+    # Optional tagline shown under the masthead. Empty string when unset so
+    # callers can use `.presence` to decide whether to render the line.
+    def site_tagline
+      get("tagline").to_s
+    end
+
+    # Recipient for contact-form and tip submissions. Falls back to the
+    # legacy EDITOR_EMAIL env var so existing deploys keep working until
+    # admins set the value via /admin/settings.
+    def admin_email
+      get("admin_email").to_s.presence ||
+        ENV.fetch("EDITOR_EMAIL", "editor@jmdaily.com")
+    end
+
     private
 
     def coerce(raw, type)

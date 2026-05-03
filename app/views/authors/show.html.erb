@@ -2,7 +2,7 @@
 <%
   meta_bits = []
   meta_bits << @author.role_title if @author.role_title.present?
-  meta_bits << "Joetsu-Myoko Daily"
+  meta_bits << Setting.site_name
   meta_bits << @author.bio.to_s.squish.truncate(160) if @author.bio.present?
 %>
 <% content_for :meta_description, meta_bits.join(" — ") %>
@@ -24,7 +24,7 @@
       "sameAs": Author::SOCIAL_LINK_FIELDS.filter_map { |attr, _| safe_external_url(@author.public_send(attr)) }.presence,
       "worksFor": {
         "@type": "Organization",
-        "name": "Joetsu-Myoko Daily"
+        "name": Setting.site_name
       }
     }.compact.to_json) %>
   </script>

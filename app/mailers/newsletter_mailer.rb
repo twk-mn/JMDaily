@@ -4,7 +4,7 @@ class NewsletterMailer < ApplicationMailer
     @confirm_url = confirm_newsletter_url(token: subscriber.confirmation_token, locale: :en)
     mail(
       to:      subscriber.email,
-      subject: "Confirm your subscription to Joetsu-Myoko Daily"
+      subject: "Confirm your subscription to #{Setting.site_name}"
     )
   end
 

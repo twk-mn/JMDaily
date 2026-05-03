@@ -164,7 +164,7 @@ module Admin
         },
         "publisher": {
           "@type": "Organization",
-          "name": "Joetsu-Myoko Daily"
+          "name": Setting.site_name
         }
       }
       schema[:image] = url_for(@article.featured_image) if @article.featured_image.attached?

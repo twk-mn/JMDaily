@@ -1,5 +1,5 @@
 <% content_for :title, "Tagged: #{@tag.name}" %>
-<% content_for :meta_description, "Articles tagged with #{@tag.name} on Joetsu-Myoko Daily." %>
+<% content_for :meta_description, "Articles tagged with #{@tag.name} on #{Setting.site_name}." %>
 <% lead = @articles.first; if lead&.featured_image&.attached? %>
   <% content_for :og_image, url_for(lead.featured_image) %>
 <% end %>

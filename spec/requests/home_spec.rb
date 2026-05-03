@@ -107,5 +107,35 @@ RSpec.describe "Home", type: :request do
         expect(en_link).to include('aria-current="true"')
       end
     end
+
+    describe "site_name / tagline settings wiring" do
+      it "uses the saved site_name in the masthead, footer, and og:site_name" do
+        Setting.set("site_name", "Niigata News")
+        get locale_root_path
+
+        # Masthead h1
+        expect(response.body).to match(/<h1[^>]*>\s*Niigata News\s*<\/h1>/)
+        # Footer copyright + about-block heading
+        expect(response.body).to include("Niigata News. All rights reserved.")
+        # og:site_name + RSS title
+        expect(response.body).to include('property="og:site_name" content="Niigata News"')
+      end
+
+      it "uses the saved tagline under the masthead" do
+        Setting.set("tagline", "Hyperlocal coverage of Niigata")
+        get locale_root_path
+
+        # Tagline appears in the masthead p tag and the footer about blurb.
+        expect(response.body).to include("Hyperlocal coverage of Niigata")
+      end
+
+      it "falls back to the registered defaults when no settings saved" do
+        get locale_root_path
+
+        expect(response.body).to include("Joetsu-Myoko Daily")
+        # The hardcoded masthead tagline only appears when the setting is blank.
+        expect(response.body).to include("Local news in English — Joetsu · Myoko · Niigata")
+      end
+    end
   end
 end

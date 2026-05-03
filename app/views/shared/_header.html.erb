@@ -3,9 +3,10 @@
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 text-center">
     <%= link_to locale_root_path, class: "inline-block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-600 rounded" do %>
       <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 font-serif">
-        Joetsu-Myoko Daily
+        <%= Setting.site_name %>
       </h1>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Local news in English — Joetsu · Myoko · Niigata</p>
+      <% masthead_tagline = Setting.site_tagline.presence || "Local news in English — Joetsu · Myoko · Niigata" %>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><%= masthead_tagline %></p>
     <% end %>
   </div>
 
