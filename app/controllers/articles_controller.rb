@@ -115,7 +115,7 @@ class ArticlesController < ApplicationController
         "@id": article_url(@article)
       }
     }
-    tag_names = @article.tags.map(&:name)
+    tag_names = @article.tags.map { |t| t.localized_name(@translation.locale) }
     schema[:keywords] = tag_names if tag_names.any?
     schema[:image] = url_for(@article.featured_image) if @article.featured_image.attached?
     schema

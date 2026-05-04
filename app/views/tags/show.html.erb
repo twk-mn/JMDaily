@@ -1,23 +1,24 @@
-<% content_for :title, "Tagged: #{@tag.name}" %>
-<% content_for :meta_description, "Articles tagged with #{@tag.name} on #{Setting.site_name}." %>
+<% tag_name = @tag.localized_name %>
+<% content_for :title, "Tagged: #{tag_name}" %>
+<% content_for :meta_description, "Articles tagged with #{tag_name} on #{Setting.site_name}." %>
 <% lead = @articles.first; if lead&.featured_image&.attached? %>
   <% content_for :og_image, url_for(lead.featured_image) %>
 <% end %>
 
 <% content_for :head do %>
   <%= render "shared/collection_jsonld",
-      name: "Tagged: #{@tag.name}",
+      name: "Tagged: #{tag_name}",
       url: canonical_url_for_current_request,
       articles: @articles %>
 <% end %>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
   <%= render "shared/index_header",
-      title: "Tagged: #{@tag.name}",
+      title: "Tagged: #{tag_name}",
       count: @pagy.count,
       breadcrumbs: [
         { name: t("nav.home", default: "Home"), url: locale_root_path },
-        { name: @tag.name, url: request.path }
+        { name: tag_name, url: request.path }
       ] %>
 
   <%= render "shared/paginated_article_list",

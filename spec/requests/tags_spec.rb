@@ -65,6 +65,22 @@ RSpec.describe "Tags", type: :request do
       end
     end
 
+    describe "translated tag name" do
+      it "renders the JA name in the heading and breadcrumb" do
+        tag = create(:tag, name: "Festivals", slug: "festivals")
+        tag.translations.create!(locale: "ja", name: "祭り")
+
+        get "/ja/tags/festivals"
+        expect(response.body).to include("祭り")
+      end
+
+      it "falls back to English when no JA translation exists" do
+        create(:tag, name: "Festivals", slug: "festivals")
+        get "/ja/tags/festivals"
+        expect(response.body).to include("Festivals")
+      end
+    end
+
     describe "CollectionPage JSON-LD" do
       it "emits a CollectionPage with a Tagged: prefix" do
         tag = create(:tag, name: "Festivals")

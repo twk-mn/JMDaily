@@ -8,6 +8,7 @@ module Admin
 
     def new
       @tag = Tag.new
+      build_translation_inputs
     end
 
     def create
@@ -15,17 +16,20 @@ module Admin
       if @tag.save
         redirect_to admin_tags_path, notice: "Tag created."
       else
+        build_translation_inputs
         render :new, status: :unprocessable_content
       end
     end
 
     def edit
+      build_translation_inputs
     end
 
     def update
       if @tag.update(tag_params)
         redirect_to admin_tags_path, notice: "Tag updated."
       else
+        build_translation_inputs
         render :edit, status: :unprocessable_content
       end
     end
@@ -42,7 +46,16 @@ module Admin
     end
 
     def tag_params
-      params.require(:tag).permit(:name, :slug)
+      params.require(:tag).permit(
+        :name, :slug,
+        translations_attributes: [ :id, :locale, :name, :_destroy ]
+      )
+    end
+
+    def build_translation_inputs
+      (SiteLanguage.active_codes - [ "en" ]).each do |locale|
+        @tag.translations.find_or_initialize_by(locale: locale)
+      end
     end
   end
 end
