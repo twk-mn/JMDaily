@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_054228) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_04_054829) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -440,6 +440,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_054228) do
     t.index ["slug"], name: "index_static_pages_on_slug", unique: true
   end
 
+  create_table "tag_translations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "locale", null: false
+    t.string "name"
+    t.bigint "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tag_id", "locale"], name: "index_tag_translations_on_tag_id_and_locale", unique: true
+    t.index ["tag_id"], name: "index_tag_translations_on_tag_id"
+  end
+
   create_table "tags", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -493,4 +503,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_054228) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "tag_translations", "tags"
 end

@@ -59,6 +59,33 @@ RSpec.describe "Admin::Tags", type: :request do
       expect(response).to redirect_to(admin_tags_path)
       expect(tag.reload.name).to eq("Updated")
     end
+
+    it "creates a translation through nested attributes" do
+      patch "/admin/tags/#{tag.id}", params: {
+        tag: {
+          translations_attributes: [ { locale: "ja", name: "祭り" } ]
+        }
+      }
+      expect(response).to redirect_to(admin_tags_path)
+      expect(tag.reload.translation_for(:ja)&.name).to eq("祭り")
+    end
+
+    it "drops a translation row when name is blank" do
+      expect {
+        patch "/admin/tags/#{tag.id}", params: {
+          tag: { translations_attributes: [ { locale: "ja", name: "" } ] }
+        }
+      }.not_to change(TagTranslation, :count)
+    end
+  end
+
+  describe "GET /admin/tags/:id/edit form" do
+    it "pre-builds a translation section per active non-English language" do
+      tag = create(:tag, name: "Festivals", slug: "festivals")
+      get edit_admin_tag_path(tag)
+      expect(response.body).to include('name="tag[translations_attributes][0][locale]"')
+      expect(response.body).to include('value="ja"')
+    end
   end
 
   describe "DELETE /admin/tags/:id" do

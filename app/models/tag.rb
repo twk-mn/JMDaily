@@ -1,6 +1,10 @@
 class Tag < ApplicationRecord
+  include Translatable
+
   has_many :article_tags, dependent: :destroy
   has_many :articles, through: :article_tags
+
+  translates :name
 
   validates :name, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true,
