@@ -24,7 +24,7 @@
   <% end %>
   <div class="flex-1 min-w-0">
     <div class="flex items-center gap-2 mb-1">
-      <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide"><%= article.category.name %></span>
+      <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide"><%= article.category.localized_name %></span>
       <% if article.type_label %>
         <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">· <%= article.type_label %></span>
       <% end %>

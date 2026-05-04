@@ -10,7 +10,7 @@
 
 <% breadcrumb_items = [
   { name: t("nav.home", default: "Home"), url: locale_root_path },
-  { name: @article.category.name, url: "/#{I18n.locale}/#{@article.category.slug}" },
+  { name: @article.category.localized_name, url: "/#{I18n.locale}/#{@article.category.slug}" },
   { name: @translation.title, url: article_url(@article) }
 ] %>
 
@@ -45,7 +45,7 @@
   <!-- Article header -->
   <header class="mb-8">
     <div class="flex items-center gap-2 mb-3">
-      <%= link_to @article.category.name, "/#{I18n.locale}/#{@article.category.slug}",
+      <%= link_to @article.category.localized_name, "/#{I18n.locale}/#{@article.category.slug}",
           class: "text-sm font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide hover:text-indigo-800 dark:hover:text-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded" %>
       <% if @article.type_label %>
         <span class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide" aria-label="Article type">· <%= @article.type_label %></span>

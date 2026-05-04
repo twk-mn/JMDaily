@@ -1,5 +1,9 @@
 class Category < ApplicationRecord
+  include Translatable
+
   has_many :articles, dependent: :restrict_with_error
+
+  translates :name, :description
 
   validates :name, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true,

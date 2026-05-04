@@ -100,7 +100,7 @@ class ArticlesController < ApplicationController
       "datePublished": @article.published_at&.iso8601,
       "dateModified": @article.updated_at.iso8601,
       "inLanguage": @translation.locale,
-      "articleSection": @article.category.name,
+      "articleSection": @article.category.localized_name(@translation.locale),
       "author": {
         "@type": "Person",
         "name": @article.author.name,
