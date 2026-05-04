@@ -1,6 +1,13 @@
 class Location < ApplicationRecord
+  include Translatable
+
   has_many :article_locations, dependent: :destroy
   has_many :articles, through: :article_locations
+
+  # `name` and `description` carry the canonical English values; per-locale
+  # overrides live in `location_translations`. `localized_name(locale)` and
+  # `localized_description(locale)` wrap the fallback logic.
+  translates :name, :description
 
   validates :name, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true,

@@ -35,6 +35,25 @@ RSpec.describe "Locations", type: :request do
       expect(response.body).to include("No articles for this location yet")
     end
 
+    describe "translated name and description" do
+      it "renders the JA name in the heading and breadcrumb when a JA translation exists" do
+        location = create(:location, name: "Joetsu", slug: "joetsu", description: "Coverage of Joetsu.")
+        location.translations.create!(locale: "ja", name: "上越", description: "上越市の取材")
+
+        get "/ja/locations/joetsu"
+        expect(response.body).to include("上越")
+        expect(response.body).to include("上越市の取材")
+      end
+
+      it "falls back to English when no translation exists for the active locale" do
+        create(:location, name: "Joetsu", slug: "joetsu", description: "Coverage of Joetsu.")
+
+        get "/ja/locations/joetsu"
+        expect(response.body).to include("Joetsu")
+        expect(response.body).to include("Coverage of Joetsu.")
+      end
+    end
+
     describe "Open Graph meta" do
       it "uses the location description for meta_description when present" do
         create(:location, name: "Joetsu", slug: "joetsu", description: "Coverage of Joetsu City.")
