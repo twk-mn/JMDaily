@@ -84,4 +84,57 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect { helper.article_time_tag(time, format: :weird) }.to raise_error(KeyError)
     end
   end
+
+  describe "#t_ui" do
+    it "returns the DB row for the current locale when present" do
+      UiString.create!(key: "footer.about_heading", locale: "ja", value: "について")
+      I18n.with_locale(:ja) do
+        expect(helper.t_ui("footer.about_heading")).to eq("について")
+      end
+    end
+
+    it "falls back to the registered English default when no DB row or YAML exists" do
+      I18n.with_locale(:ja) do
+        # No JA UiString, no YAML key — falls through to DEFINITIONS default.
+        expect(helper.t_ui("footer.about_heading")).to eq("About")
+      end
+    end
+
+    it "falls through to the English DB row when the active locale has no row but EN does" do
+      UiString.create!(key: "footer.about_heading", locale: "en", value: "About (custom)")
+      I18n.with_locale(:ja) do
+        expect(helper.t_ui("footer.about_heading")).to eq("About (custom)")
+      end
+    end
+
+    it "prefers a YAML translation over the registered default" do
+      I18n.backend.store_translations(:ja, { "footer" => { "about_heading" => "YAML JA" } })
+      I18n.with_locale(:ja) do
+        expect(helper.t_ui("footer.about_heading")).to eq("YAML JA")
+      end
+    ensure
+      I18n.reload!
+    end
+
+    it "humanises the last segment of the key when nothing matches" do
+      expect(helper.t_ui("nope.completely.unknown")).to eq("Unknown")
+    end
+
+    it "memoizes the per-locale lookup so multiple calls share one query" do
+      UiString.create!(key: "footer.about_heading", locale: "en", value: "A")
+      UiString.create!(key: "footer.legal_heading", locale: "en", value: "L")
+
+      expect(UiString).to receive(:map_for).with("en").once.and_call_original
+      helper.t_ui("footer.about_heading")
+      helper.t_ui("footer.legal_heading")
+    end
+
+    it "accepts an explicit :locale option without affecting I18n.locale" do
+      UiString.create!(key: "footer.about_heading", locale: "ja", value: "について")
+      I18n.with_locale(:en) do
+        expect(helper.t_ui("footer.about_heading", locale: :ja)).to eq("について")
+        expect(I18n.locale).to eq(:en)
+      end
+    end
+  end
 end

@@ -45,7 +45,7 @@
 
           <%= form_with url: search_path, method: :get, class: "flex items-center" do %>
             <label for="site-search" class="sr-only">Search</label>
-            <input type="search" id="site-search" name="q" placeholder="Search..." value="<%= params[:q] %>"
+            <input type="search" id="site-search" name="q" placeholder="<%= t_ui("nav.search_placeholder") %>" value="<%= params[:q] %>"
                    class="block w-40 rounded-md border-0 py-1 px-3 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600">
           <% end %>
         </div>
@@ -55,13 +55,13 @@
           <button type="button" data-action="click->mobile-menu#toggle"
                   aria-expanded="false" aria-controls="mobile-menu"
                   class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-2 py-1 text-sm font-medium">
-            ☰ Menu
+            <%= t_ui("nav.menu_button") %>
           </button>
           <div class="flex items-center gap-2">
             <%= render "shared/theme_toggle" %>
             <%= form_with url: search_path, method: :get, class: "flex items-center" do %>
               <label for="site-search-mobile" class="sr-only">Search</label>
-              <input type="search" id="site-search-mobile" name="q" placeholder="Search..." value="<%= params[:q] %>"
+              <input type="search" id="site-search-mobile" name="q" placeholder="<%= t_ui("nav.search_placeholder") %>" value="<%= params[:q] %>"
                      class="block w-32 rounded-md border-0 py-1 px-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600">
             <% end %>
           </div>

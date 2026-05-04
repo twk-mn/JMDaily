@@ -22,8 +22,8 @@
 
       <!-- Newsletter signup -->
       <div class="md:col-span-1">
-        <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Stay informed</h4>
-        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">Get the latest news delivered to your inbox.</p>
+        <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider"><%= t_ui("footer.stay_informed_heading") %></h4>
+        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300"><%= t_ui("footer.stay_informed_blurb") %></p>
         <div class="mt-3">
           <% footer_frame_id = "newsletter-signup-footer" %>
           <%= turbo_frame_tag footer_frame_id do %>
@@ -36,29 +36,29 @@
 
       <!-- Pages -->
       <div>
-        <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">About</h4>
+        <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider"><%= t_ui("footer.about_heading") %></h4>
         <ul class="mt-3 space-y-2">
-          <li><%= link_to "About Us", about_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
-          <li><%= link_to "Contact", contact_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
-          <li><%= link_to "Submit a Tip", submit_a_tip_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
-          <li><%= link_to "Corrections Policy", corrections_policy_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
+          <li><%= link_to t_ui("footer.about_us"), about_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
+          <li><%= link_to t_ui("footer.contact"), contact_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
+          <li><%= link_to t_ui("footer.submit_a_tip"), submit_a_tip_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
+          <li><%= link_to t_ui("footer.corrections_policy"), corrections_policy_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
         </ul>
       </div>
 
       <!-- Legal -->
       <div>
-        <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Legal</h4>
+        <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider"><%= t_ui("footer.legal_heading") %></h4>
         <ul class="mt-3 space-y-2">
-          <li><%= link_to "Privacy Policy", privacy_policy_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
-          <li><%= link_to "Terms", terms_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
-          <li><%= link_to "RSS Feed", feed_path(format: :rss), class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
+          <li><%= link_to t_ui("footer.privacy_policy"), privacy_policy_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
+          <li><%= link_to t_ui("footer.terms"), terms_path, class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
+          <li><%= link_to t_ui("footer.rss_feed"), feed_path(format: :rss), class: "text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" %></li>
         </ul>
       </div>
     </div>
 
     <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
       <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
-        &copy; <%= Date.current.year %> <%= Setting.site_name %>. All rights reserved.
+        &copy; <%= Date.current.year %> <%= Setting.site_name %>. <%= t_ui("footer.copyright_suffix") %>
       </p>
     </div>
   </div>

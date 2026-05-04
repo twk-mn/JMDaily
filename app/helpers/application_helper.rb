@@ -48,6 +48,38 @@ module ApplicationHelper
     @current_breaking_articles ||= Article.published.breaking.recent.includes(:translations).limit(3).to_a
   end
 
+  # DB-backed translation for UI chrome strings — menu labels, footer copy,
+  # button text, etc. Resolves keys against `UiString` first so admins can
+  # edit translations from the admin without a deploy, then falls through to
+  # YAML i18n, then the English `UiString` row, then the registered default
+  # in `UiString::DEFINITIONS`, then a humanised version of the key.
+  #
+  # Memoizes the per-locale lookup table once per request so a page render
+  # touching dozens of t_ui keys batches into a single SQL query (or zero
+  # if no rows exist for the locale yet).
+  def t_ui(key, **opts)
+    key_str = key.to_s
+    locale  = (opts.delete(:locale) || I18n.locale).to_s
+
+    db_value = ui_strings_for(locale)[key_str]
+    return db_value if db_value.present?
+
+    yaml = I18n.t(key_str, default: nil, **opts)
+    return yaml if yaml.present?
+
+    en_value = ui_strings_for("en")[key_str]
+    return en_value if en_value.present?
+
+    UiString.default_for(key_str) || key_str.split(".").last.to_s.humanize
+  end
+
+  # Per-request locale → {key => value} cache for `t_ui`. Touch a locale once
+  # and every subsequent t_ui call for the same locale becomes a hash lookup.
+  def ui_strings_for(locale)
+    @_ui_strings ||= {}
+    @_ui_strings[locale.to_s] ||= UiString.map_for(locale)
+  end
+
   # Locale-aware label for a location slug shown in the header navigation.
   # Falls back to the slug-titleized hardcoded label when the row or its
   # localization is missing, so deleting a Location row doesn't break the
