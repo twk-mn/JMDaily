@@ -63,6 +63,39 @@ RSpec.describe "Admin::StaticPages", type: :request do
       expect(response).to redirect_to(admin_static_pages_path)
       expect(page.reload.title).to eq("Updated Title")
     end
+
+    it "creates a translation through nested attributes" do
+      patch "/admin/static_pages/#{page.id}", params: {
+        static_page: {
+          translations_attributes: [
+            { locale: "ja", title: "概要", body: "<p>地域のニュース</p>" }
+          ]
+        }
+      }
+      expect(response).to redirect_to(admin_static_pages_path)
+      expect(page.reload.translation_for(:ja)&.title).to eq("概要")
+    end
+
+    it "drops a translation row when every translatable field is blank" do
+      expect {
+        patch "/admin/static_pages/#{page.id}", params: {
+          static_page: {
+            translations_attributes: [
+              { locale: "ja", title: "", seo_title: "", meta_description: "", body: "" }
+            ]
+          }
+        }
+      }.not_to change(StaticPageTranslation, :count)
+    end
+  end
+
+  describe "GET /admin/static_pages/:id/edit form" do
+    it "pre-builds a translation section per active non-English language" do
+      page = create(:static_page, title: "About", slug: "about")
+      get edit_admin_static_page_path(page)
+      expect(response.body).to include('name="static_page[translations_attributes][0][locale]"')
+      expect(response.body).to include('value="ja"')
+    end
   end
 
   describe "DELETE /admin/static_pages/:id" do

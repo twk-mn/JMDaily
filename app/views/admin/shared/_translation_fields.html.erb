@@ -6,9 +6,11 @@
   Required locals:
     f      — the parent record's form builder
     record — the parent record (Location, Category, Tag, Author, StaticPage)
-    attrs  — Array of [attr, kind] pairs.
-             kind is :string (text_field) or :text (text_area).
-             e.g. [[:name, :string], [:description, :text]]
+    attrs  — Array of [attr, kind] pairs. Supported kinds:
+             :string     → text_field
+             :text       → text_area (rows: 3)
+             :rich_text  → rich_text_area (Trix editor; for ActionText fields)
+             e.g. [[:title, :string], [:body, :rich_text]]
 
   An editor leaving every input blank in a section drops that
   translation row at save time (Translatable#translation_attrs_blank?),
@@ -32,7 +34,10 @@
           <% attrs.each do |attr, kind| %>
             <div>
               <%= tf.label attr, class: "block text-sm font-medium text-gray-700" %>
-              <% if kind == :text %>
+              <% case kind %>
+              <% when :rich_text %>
+                <%= tf.rich_text_area attr, class: "mt-1 min-h-[200px]" %>
+              <% when :text %>
                 <%= tf.text_area attr, rows: 3,
                     class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border",
                     placeholder: record.public_send(attr) %>
