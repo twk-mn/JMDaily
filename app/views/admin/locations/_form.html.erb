@@ -14,18 +14,59 @@
       </div>
     <% end %>
 
-    <div>
-      <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
-      <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+    <div class="space-y-4">
+      <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">English (default)</h2>
+      <div>
+        <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+      </div>
+      <div>
+        <%= f.label :slug, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :slug, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border font-mono", placeholder: "auto-generated" %>
+        <p class="mt-1 text-xs text-gray-500">URL slug — stays English across all languages.</p>
+      </div>
+      <div>
+        <%= f.label :description, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :description, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
+      </div>
     </div>
-    <div>
-      <%= f.label :slug, class: "block text-sm font-medium text-gray-700" %>
-      <%= f.text_field :slug, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border font-mono", placeholder: "auto-generated" %>
-    </div>
-    <div>
-      <%= f.label :description, class: "block text-sm font-medium text-gray-700" %>
-      <%= f.text_area :description, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border" %>
-    </div>
+
+    <%# Per-locale translation sections. Sorted by SiteLanguage.position so
+        the order in the form matches the language switcher. Leaving every
+        field blank in a section drops the row on save (see
+        Translatable#translation_attrs_blank?), so admins can ignore
+        languages they aren't translating yet without polluting the DB. %>
+    <% other_translations = location.translations.reject { |t| t.locale == "en" }
+                                    .sort_by { |t| SiteLanguage.iso_option(t.locale)&.dig(:code) || t.locale } %>
+    <% if other_translations.any? %>
+      <div class="space-y-6 pt-4 border-t border-gray-200">
+        <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Translations</h2>
+        <p class="text-xs text-gray-500 -mt-2">Leave a section blank to use the English values for that language.</p>
+
+        <% other_translations.each do |translation| %>
+          <% lang = SiteLanguage.iso_option(translation.locale) %>
+          <%= f.fields_for :translations, translation do |tf| %>
+            <%= tf.hidden_field :locale %>
+            <div class="rounded-md border border-gray-200 p-4 space-y-3">
+              <h3 class="text-sm font-semibold text-gray-700">
+                <%= "#{lang[:flag_emoji]} #{lang[:native_name]}" if lang %>
+                <%= "(#{translation.locale.upcase})" %>
+              </h3>
+              <div>
+                <%= tf.label :name, class: "block text-sm font-medium text-gray-700" %>
+                <%= tf.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border",
+                    placeholder: location.name %>
+              </div>
+              <div>
+                <%= tf.label :description, class: "block text-sm font-medium text-gray-700" %>
+                <%= tf.text_area :description, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm px-3 py-2 border",
+                    placeholder: location.description %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
 
     <div class="flex items-center gap-4 pt-4">
       <%= f.submit class: "rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>

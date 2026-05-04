@@ -1,25 +1,27 @@
-<% content_for :title, @location.name %>
-<% content_for :meta_description, (@location.description.presence || "News and coverage from #{@location.name} on #{Setting.site_name}.") %>
+<% loc_name = @location.localized_name %>
+<% loc_desc = @location.localized_description %>
+<% content_for :title, loc_name %>
+<% content_for :meta_description, (loc_desc.presence || "News and coverage from #{loc_name} on #{Setting.site_name}.") %>
 <% lead = @articles.first; if lead&.featured_image&.attached? %>
   <% content_for :og_image, url_for(lead.featured_image) %>
 <% end %>
 
 <% content_for :head do %>
   <%= render "shared/collection_jsonld",
-      name: @location.name,
-      description: @location.description,
+      name: loc_name,
+      description: loc_desc,
       url: canonical_url_for_current_request,
       articles: @articles %>
 <% end %>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
   <%= render "shared/index_header",
-      title: @location.name,
-      description: @location.description,
+      title: loc_name,
+      description: loc_desc,
       count: @pagy.count,
       breadcrumbs: [
         { name: t("nav.home", default: "Home"), url: locale_root_path },
-        { name: @location.name, url: request.path }
+        { name: loc_name, url: request.path }
       ] %>
 
   <%= render "shared/paginated_article_list",

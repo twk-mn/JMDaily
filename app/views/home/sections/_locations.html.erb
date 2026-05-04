@@ -6,7 +6,7 @@
       <% if has_joetsu %>
         <div>
           <%= render "shared/section_subhead",
-              title: "Joetsu",
+              title: @joetsu.localized_name,
               link: location_path("joetsu"),
               wrapper_class: "mb-4" %>
           <div class="space-y-4">
@@ -20,7 +20,7 @@
       <% if has_myoko %>
         <div>
           <%= render "shared/section_subhead",
-              title: "Myoko",
+              title: @myoko.localized_name,
               link: location_path("myoko"),
               wrapper_class: "mb-4" %>
           <div class="space-y-4">

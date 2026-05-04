@@ -172,7 +172,7 @@
       <div class="flex flex-wrap items-center gap-2">
         <span class="text-sm text-gray-600 dark:text-gray-400">Location:</span>
         <% @article.locations.each do |location| %>
-          <%= link_to location.name, location_path(location),
+          <%= link_to location.localized_name, location_path(location),
               class: "inline-block bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm px-3 py-0.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" %>
         <% end %>
       </div>

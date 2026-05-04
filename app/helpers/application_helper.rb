@@ -48,6 +48,17 @@ module ApplicationHelper
     @current_breaking_articles ||= Article.published.breaking.recent.includes(:translations).limit(3).to_a
   end
 
+  # Locale-aware label for a location slug shown in the header navigation.
+  # Falls back to the slug-titleized hardcoded label when the row or its
+  # localization is missing, so deleting a Location row doesn't break the
+  # masthead. Memoized per request so all three header location links plus
+  # the mobile-menu repeats share a single query.
+  def header_location_label(slug, fallback)
+    @_header_location_lookup ||= Location.where(slug: %w[joetsu myoko itoigawa])
+                                         .includes(:translations).index_by(&:slug)
+    @_header_location_lookup[slug.to_s]&.localized_name || fallback
+  end
+
   # A stable fingerprint of the current breaking lineup. The dismiss button
   # writes this to sessionStorage; if a *new* breaking article appears later,
   # the fingerprint changes and the banner returns even for visitors who
