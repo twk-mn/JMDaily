@@ -1,6 +1,8 @@
 <%# Small author-bio card rendered below the article body.
     `author` is required. %>
-<% if author.bio.present? || author.photo.attached? || author.role_title.present? %>
+<% role = author.localized_role_title %>
+<% bio  = author.localized_bio %>
+<% if bio.present? || author.photo.attached? || role.present? %>
   <aside class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row gap-4 items-start">
     <% if author.photo.attached? %>
       <%= link_to author_path(author, slug: author.slug), class: "shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded-full" do %>
@@ -17,11 +19,11 @@
         <%= link_to author.name, author_path(author, slug: author.slug),
             class: "hover:text-indigo-600 dark:hover:text-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded" %>
       </h2>
-      <% if author.role_title.present? %>
-        <p class="text-sm text-indigo-600 dark:text-indigo-400 font-medium"><%= author.role_title %></p>
+      <% if role.present? %>
+        <p class="text-sm text-indigo-600 dark:text-indigo-400 font-medium"><%= role %></p>
       <% end %>
-      <% if author.bio.present? %>
-        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300 leading-relaxed"><%= author.bio %></p>
+      <% if bio.present? %>
+        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300 leading-relaxed"><%= bio %></p>
       <% end %>
       <% social_links = Author::SOCIAL_LINK_FIELDS.filter_map { |attr, label|
            href = safe_external_url(author.public_send(attr))
