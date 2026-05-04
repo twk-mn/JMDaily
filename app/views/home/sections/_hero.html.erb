@@ -14,7 +14,7 @@
             </div>
           <% end %>
           <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
-            <%= lead.category.name %><% if lead.type_label %> <span class="text-gray-500 dark:text-gray-400">· <%= lead.type_label %></span><% end %>
+            <%= lead.category.localized_name %><% if lead.type_label %> <span class="text-gray-500 dark:text-gray-400">· <%= lead.type_label %></span><% end %>
           </span>
           <h2 class="mt-2 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-tight font-serif">
             <%= lead_t.title %>
@@ -49,7 +49,7 @@
                 <% end %>
                 <div class="flex-1 min-w-0">
                   <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
-                    <%= article.category.name %><% if article.type_label %> <span class="text-gray-500 dark:text-gray-400">· <%= article.type_label %></span><% end %>
+                    <%= article.category.localized_name %><% if article.type_label %> <span class="text-gray-500 dark:text-gray-400">· <%= article.type_label %></span><% end %>
                   </span>
                   <h3 class="mt-1 text-base font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug font-serif">
                     <%= t.title %>

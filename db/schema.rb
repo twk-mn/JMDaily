@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_053631) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_04_054228) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -195,6 +195,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_053631) do
     t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
+  create_table "category_translations", force: :cascade do |t|
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "locale", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["category_id", "locale"], name: "index_category_translations_on_category_id_and_locale", unique: true
+    t.index ["category_id"], name: "index_category_translations_on_category_id"
   end
 
   create_table "comments", force: :cascade do |t|
@@ -472,6 +483,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_053631) do
   add_foreign_key "articles", "authors"
   add_foreign_key "articles", "categories"
   add_foreign_key "authors", "users"
+  add_foreign_key "category_translations", "categories"
   add_foreign_key "comments", "articles"
   add_foreign_key "corrections", "articles"
   add_foreign_key "location_translations", "locations"
