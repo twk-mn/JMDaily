@@ -53,6 +53,28 @@ RSpec.describe "Authors", type: :request do
       end
     end
 
+    describe "translated bio + role_title" do
+      it "renders the JA bio and role on the author page when a translation exists" do
+        author = create(:author, name: "Aya Tanaka", slug: "aya-tanaka",
+                                 role_title: "Senior reporter",
+                                 bio: "Covers Niigata politics.")
+        author.translations.create!(locale: "ja", role_title: "上級記者", bio: "新潟の政治を担当")
+
+        get "/ja/authors/aya-tanaka"
+        expect(response.body).to include("上級記者")
+        expect(response.body).to include("新潟の政治を担当")
+      end
+
+      it "falls back to English when no translation exists for the active locale" do
+        create(:author, name: "Aya Tanaka", slug: "aya-tanaka",
+                       role_title: "Senior reporter",
+                       bio: "Covers Niigata politics.")
+        get "/ja/authors/aya-tanaka"
+        expect(response.body).to include("Senior reporter")
+        expect(response.body).to include("Covers Niigata politics.")
+      end
+    end
+
     describe "Open Graph meta" do
       it "sets og:type to profile" do
         author = create(:author)

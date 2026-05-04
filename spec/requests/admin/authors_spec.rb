@@ -61,6 +61,39 @@ RSpec.describe "Admin::Authors", type: :request do
       expect(response).to redirect_to(admin_authors_path)
       expect(author.reload.name).to eq("Updated Name")
     end
+
+    it "creates a translation through nested attributes" do
+      patch "/admin/authors/#{author.id}", params: {
+        author: {
+          translations_attributes: [
+            { locale: "ja", role_title: "上級記者", bio: "新潟の政治を担当" }
+          ]
+        }
+      }
+      expect(response).to redirect_to(admin_authors_path)
+      expect(author.reload.translation_for(:ja)&.bio).to eq("新潟の政治を担当")
+    end
+
+    it "drops a translation row when every translatable field is left blank" do
+      expect {
+        patch "/admin/authors/#{author.id}", params: {
+          author: {
+            translations_attributes: [
+              { locale: "ja", role_title: "", bio: "" }
+            ]
+          }
+        }
+      }.not_to change(AuthorTranslation, :count)
+    end
+  end
+
+  describe "GET /admin/authors/:id/edit form" do
+    it "pre-builds a translation section per active non-English language" do
+      author = create(:author, name: "Aya", slug: "aya")
+      get edit_admin_author_path(author)
+      expect(response.body).to include('name="author[translations_attributes][0][locale]"')
+      expect(response.body).to include('value="ja"')
+    end
   end
 
   describe "DELETE /admin/authors/:id" do

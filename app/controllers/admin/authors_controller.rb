@@ -8,6 +8,7 @@ module Admin
 
     def new
       @author = Author.new
+      build_translation_inputs
     end
 
     def create
@@ -15,17 +16,20 @@ module Admin
       if @author.save
         redirect_to admin_authors_path, notice: "Author created."
       else
+        build_translation_inputs
         render :new, status: :unprocessable_content
       end
     end
 
     def edit
+      build_translation_inputs
     end
 
     def update
       if @author.update(author_params)
         redirect_to admin_authors_path, notice: "Author updated."
       else
+        build_translation_inputs
         render :edit, status: :unprocessable_content
       end
     end
@@ -47,8 +51,15 @@ module Admin
     def author_params
       params.require(:author).permit(
         :name, :slug, :bio, :role_title, :photo, :user_id,
-        *Author::SOCIAL_LINK_FIELDS.map(&:first)
+        *Author::SOCIAL_LINK_FIELDS.map(&:first),
+        translations_attributes: [ :id, :locale, :role_title, :bio, :_destroy ]
       )
+    end
+
+    def build_translation_inputs
+      (SiteLanguage.active_codes - [ "en" ]).each do |locale|
+        @author.translations.find_or_initialize_by(locale: locale)
+      end
     end
   end
 end

@@ -1,9 +1,11 @@
+<% author_role = @author.localized_role_title %>
+<% author_bio  = @author.localized_bio %>
 <% content_for :title, @author.name %>
 <%
   meta_bits = []
-  meta_bits << @author.role_title if @author.role_title.present?
+  meta_bits << author_role if author_role.present?
   meta_bits << Setting.site_name
-  meta_bits << @author.bio.to_s.squish.truncate(160) if @author.bio.present?
+  meta_bits << author_bio.to_s.squish.truncate(160) if author_bio.present?
 %>
 <% content_for :meta_description, meta_bits.join(" — ") %>
 <% content_for :og_type, "profile" %>
@@ -18,8 +20,8 @@
       "@type": "Person",
       "name": @author.name,
       "url": author_url(@author, slug: @author.slug),
-      "jobTitle": @author.role_title.presence,
-      "description": @author.bio.presence,
+      "jobTitle": author_role.presence,
+      "description": author_bio.presence,
       "image": (@author.photo.attached? ? url_for(@author.photo) : nil),
       "sameAs": Author::SOCIAL_LINK_FIELDS.filter_map { |attr, _| safe_external_url(@author.public_send(attr)) }.presence,
       "worksFor": {
@@ -45,11 +47,11 @@
     <% end %>
     <div>
       <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 font-serif"><%= @author.name %></h1>
-      <% if @author.role_title.present? %>
-        <p class="text-lg text-indigo-600 dark:text-indigo-400 font-medium"><%= @author.role_title %></p>
+      <% if author_role.present? %>
+        <p class="text-lg text-indigo-600 dark:text-indigo-400 font-medium"><%= author_role %></p>
       <% end %>
-      <% if @author.bio.present? %>
-        <p class="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed"><%= @author.bio %></p>
+      <% if author_bio.present? %>
+        <p class="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed"><%= author_bio %></p>
       <% end %>
       <% social_links = Author::SOCIAL_LINK_FIELDS.filter_map { |attr, label|
            href = safe_external_url(@author.public_send(attr))

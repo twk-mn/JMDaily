@@ -47,6 +47,11 @@
       </div>
     <% end %>
 
+    <%= render "admin/shared/translation_fields",
+        f: f,
+        record: author,
+        attrs: [ [ :role_title, :string ], [ :bio, :text ] ] %>
+
     <div class="flex items-center gap-4 pt-4">
       <%= f.submit class: "rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
       <%= link_to "Cancel", admin_authors_path, class: "text-sm text-gray-500 hover:text-gray-700" %>

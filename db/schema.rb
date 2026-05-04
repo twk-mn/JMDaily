@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_054829) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_04_055204) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -165,6 +165,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_054829) do
     t.index ["created_at"], name: "index_audit_logs_on_created_at"
     t.index ["resource_type", "resource_id"], name: "index_audit_logs_on_resource_type_and_resource_id"
     t.index ["user_id"], name: "index_audit_logs_on_user_id"
+  end
+
+  create_table "author_translations", force: :cascade do |t|
+    t.bigint "author_id", null: false
+    t.text "bio"
+    t.datetime "created_at", null: false
+    t.string "locale", null: false
+    t.string "role_title"
+    t.datetime "updated_at", null: false
+    t.index ["author_id", "locale"], name: "index_author_translations_on_author_id_and_locale", unique: true
+    t.index ["author_id"], name: "index_author_translations_on_author_id"
   end
 
   create_table "authors", force: :cascade do |t|
@@ -492,6 +503,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_054829) do
   add_foreign_key "article_translations", "articles"
   add_foreign_key "articles", "authors"
   add_foreign_key "articles", "categories"
+  add_foreign_key "author_translations", "authors"
   add_foreign_key "authors", "users"
   add_foreign_key "category_translations", "categories"
   add_foreign_key "comments", "articles"
