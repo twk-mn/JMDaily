@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_111442) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_04_225513) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -489,6 +489,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_111442) do
     t.text "tip_body", null: false
     t.datetime "updated_at", null: false
     t.index ["read"], name: "index_tip_submissions_on_read"
+  end
+
+  create_table "ui_strings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.string "locale", null: false
+    t.datetime "updated_at", null: false
+    t.text "value"
+    t.index ["key", "locale"], name: "index_ui_strings_on_key_and_locale", unique: true
+    t.index ["locale"], name: "index_ui_strings_on_locale"
   end
 
   create_table "users", force: :cascade do |t|

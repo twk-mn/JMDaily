@@ -137,5 +137,33 @@ RSpec.describe "Home", type: :request do
         expect(response.body).to include("Local news in English — Joetsu · Myoko · Niigata")
       end
     end
+
+    describe "UI chrome strings (t_ui)" do
+      it "renders the registered English defaults when no UiString rows exist" do
+        get locale_root_path
+
+        # Footer column headings come from UiString::DEFINITIONS via t_ui.
+        expect(response.body).to include("About")
+        expect(response.body).to include("Legal")
+        expect(response.body).to include("Stay informed")
+      end
+
+      it "renders a saved UiString translation in the active locale" do
+        UiString.create!(key: "footer.about_heading", locale: "ja", value: "について")
+        UiString.create!(key: "footer.legal_heading", locale: "ja", value: "法的事項")
+
+        get locale_root_path(locale: :ja)
+        expect(response.body).to include("について")
+        expect(response.body).to include("法的事項")
+      end
+
+      it "falls back to English when the active locale has no row" do
+        UiString.create!(key: "footer.about_heading", locale: "en", value: "About Us Footer")
+
+        get locale_root_path(locale: :ja)
+        # Footer header takes the EN row when no JA row exists.
+        expect(response.body).to include("About Us Footer")
+      end
+    end
   end
 end
