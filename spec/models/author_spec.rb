@@ -54,4 +54,40 @@ RSpec.describe Author, type: :model do
       expect(author.to_param).to eq("test-author")
     end
   end
+
+  describe 'translations (Translatable concern)' do
+    let(:author) do
+      create(:author, name: "Aya Tanaka", slug: "aya-tanaka",
+             role_title: "Senior reporter",
+             bio: "Aya covers Niigata politics.")
+    end
+
+    it 'has many translations and destroys them with the parent' do
+      author.translations.create!(locale: "ja", role_title: "上級記者", bio: "新潟の政治を担当")
+      expect { author.destroy }.to change(AuthorTranslation, :count).by(-1)
+    end
+
+    it 'localized_bio returns the JA translation when present' do
+      author.translations.create!(locale: "ja", bio: "新潟の政治を担当")
+      expect(author.localized_bio(:ja)).to eq("新潟の政治を担当")
+    end
+
+    it 'localized_role_title falls back to the parent when no translation' do
+      expect(author.localized_role_title(:ja)).to eq("Senior reporter")
+    end
+
+    it 'rejects nested translation rows where every translatable field is blank' do
+      author.update!(translations_attributes: [
+        { locale: "ja", role_title: "", bio: "" }
+      ])
+      expect(author.translations.where(locale: "ja")).to be_empty
+    end
+
+    it 'accepts new translations via nested attributes' do
+      author.update!(translations_attributes: [
+        { locale: "ja", role_title: "上級記者", bio: "新潟の政治を担当" }
+      ])
+      expect(author.translation_for(:ja).bio).to eq("新潟の政治を担当")
+    end
+  end
 end

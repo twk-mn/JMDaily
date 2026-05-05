@@ -91,6 +91,15 @@ module ApplicationHelper
     @_header_location_lookup[slug.to_s]&.localized_name || fallback
   end
 
+  # Locale-aware label for a category slug shown in the header navigation.
+  # Same memoization pattern as the location variant — six category links
+  # plus their mobile-menu repeats batch into a single query per request.
+  def header_category_label(slug, fallback)
+    @_header_category_lookup ||= Category.where(slug: %w[news politics business community weather-travel events opinion])
+                                         .includes(:translations).index_by(&:slug)
+    @_header_category_lookup[slug.to_s]&.localized_name || fallback
+  end
+
   # A stable fingerprint of the current breaking lineup. The dismiss button
   # writes this to sessionStorage; if a *new* breaking article appears later,
   # the fingerprint changes and the banner returns even for visitors who

@@ -61,6 +61,39 @@ RSpec.describe "Admin::Categories", type: :request do
       expect(response).to redirect_to(admin_categories_path)
       expect(category.reload.name).to eq("Updated")
     end
+
+    it "creates a translation through nested attributes" do
+      patch "/admin/categories/#{category.id}", params: {
+        category: {
+          translations_attributes: [
+            { locale: "ja", name: "ニュース", description: "地域のニュース" }
+          ]
+        }
+      }
+      expect(response).to redirect_to(admin_categories_path)
+      expect(category.reload.translation_for(:ja)&.name).to eq("ニュース")
+    end
+
+    it "drops a translation row when every translatable field is left blank" do
+      expect {
+        patch "/admin/categories/#{category.id}", params: {
+          category: {
+            translations_attributes: [
+              { locale: "ja", name: "", description: "" }
+            ]
+          }
+        }
+      }.not_to change(CategoryTranslation, :count)
+    end
+  end
+
+  describe "GET /admin/categories/:id/edit form" do
+    it "pre-builds a translation section per active non-English language" do
+      category = create(:category, name: "News", slug: "news")
+      get edit_admin_category_path(category)
+      expect(response.body).to include('name="category[translations_attributes][0][locale]"')
+      expect(response.body).to include('value="ja"')
+    end
   end
 
   describe "DELETE /admin/categories/:id" do

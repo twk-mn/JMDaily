@@ -25,12 +25,12 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-12">
         <div class="hidden md:flex items-center space-x-1">
-          <%= link_to "News", news_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-          <%= link_to "Politics", politics_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-          <%= link_to "Business", business_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-          <%= link_to "Community", community_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-          <%= link_to "Weather & Travel", weather_travel_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-          <%= link_to "Events", events_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+          <%= link_to header_category_label("news", "News"), news_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+          <%= link_to header_category_label("politics", "Politics"), politics_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+          <%= link_to header_category_label("business", "Business"), business_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+          <%= link_to header_category_label("community", "Community"), community_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+          <%= link_to header_category_label("weather-travel", "Weather & Travel"), weather_travel_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+          <%= link_to header_category_label("events", "Events"), events_path, class: "px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
           <span class="text-gray-300 dark:text-gray-700 px-1" aria-hidden="true">|</span>
           <%= link_to header_location_label("joetsu", "Joetsu"), location_path("joetsu"), class: "px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
           <%= link_to header_location_label("myoko", "Myoko"), location_path("myoko"), class: "px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
@@ -70,12 +70,12 @@
 
       <!-- Mobile menu -->
       <div id="mobile-menu" class="md:hidden hidden pb-4 space-y-1" data-mobile-menu-target="menu">
-        <%= link_to "News", news_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-        <%= link_to "Politics", politics_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-        <%= link_to "Business", business_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-        <%= link_to "Community", community_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-        <%= link_to "Weather & Travel", weather_travel_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
-        <%= link_to "Events", events_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+        <%= link_to header_category_label("news", "News"), news_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+        <%= link_to header_category_label("politics", "Politics"), politics_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+        <%= link_to header_category_label("business", "Business"), business_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+        <%= link_to header_category_label("community", "Community"), community_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+        <%= link_to header_category_label("weather-travel", "Weather & Travel"), weather_travel_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
+        <%= link_to header_category_label("events", "Events"), events_path, class: "block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
         <div class="border-t border-gray-100 dark:border-gray-800 pt-2 mt-2">
           <%= link_to header_location_label("joetsu", "Joetsu"), location_path("joetsu"), class: "block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
           <%= link_to header_location_label("myoko", "Myoko"), location_path("myoko"), class: "block px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md" %>
