@@ -33,4 +33,27 @@ RSpec.describe Tag, type: :model do
       expect(tag.to_param).to eq("test-tag")
     end
   end
+
+  describe 'translations (Translatable concern)' do
+    let(:tag) { create(:tag, name: "Festivals", slug: "festivals") }
+
+    it 'has many translations and destroys them with the parent' do
+      tag.translations.create!(locale: "ja", name: "祭り")
+      expect { tag.destroy }.to change(TagTranslation, :count).by(-1)
+    end
+
+    it 'localized_name returns the JA translation when present' do
+      tag.translations.create!(locale: "ja", name: "祭り")
+      expect(tag.localized_name(:ja)).to eq("祭り")
+    end
+
+    it 'localized_name falls back to the parent name when missing' do
+      expect(tag.localized_name(:ja)).to eq("Festivals")
+    end
+
+    it 'rejects nested translation rows where name is blank' do
+      tag.update!(translations_attributes: [ { locale: "ja", name: "" } ])
+      expect(tag.translations.where(locale: "ja")).to be_empty
+    end
+  end
 end

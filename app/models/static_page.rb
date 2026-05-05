@@ -1,5 +1,9 @@
 class StaticPage < ApplicationRecord
+  include Translatable
+
   has_rich_text :body
+
+  translates :title, :seo_title, :meta_description, :body
 
   validates :title, presence: true
   validates :slug, presence: true, uniqueness: true,

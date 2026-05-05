@@ -41,6 +41,27 @@ RSpec.describe "Pages", type: :request do
     end
   end
 
+  describe "translated title and body" do
+    it "renders the JA translation on /ja when one exists" do
+      page = create(:static_page, title: "About", slug: "about")
+      page.update!(body: "<p>Independent local news.</p>")
+      ja = page.translations.create!(locale: "ja", title: "概要")
+      ja.update!(body: "<p>独立した地域ニュース</p>")
+
+      get "/ja/about"
+      expect(response.body).to include("概要")
+      expect(response.body).to include("独立した地域ニュース")
+    end
+
+    it "falls back to English when no translation exists for the active locale" do
+      page = create(:static_page, title: "About", slug: "about")
+      page.update!(body: "<p>Independent local news.</p>")
+      get "/ja/about"
+      expect(response.body).to include("About")
+      expect(response.body).to include("Independent local news.")
+    end
+  end
+
   describe "static page Open Graph meta" do
     it "uses meta_description when set on the page" do
       create(:static_page, title: "About", slug: "about", meta_description: "About this site.")

@@ -100,7 +100,7 @@ class ArticlesController < ApplicationController
       "datePublished": @article.published_at&.iso8601,
       "dateModified": @article.updated_at.iso8601,
       "inLanguage": @translation.locale,
-      "articleSection": @article.category.name,
+      "articleSection": @article.category.localized_name(@translation.locale),
       "author": {
         "@type": "Person",
         "name": @article.author.name,
@@ -115,7 +115,7 @@ class ArticlesController < ApplicationController
         "@id": article_url(@article)
       }
     }
-    tag_names = @article.tags.map(&:name)
+    tag_names = @article.tags.map { |t| t.localized_name(@translation.locale) }
     schema[:keywords] = tag_names if tag_names.any?
     schema[:image] = url_for(@article.featured_image) if @article.featured_image.attached?
     schema

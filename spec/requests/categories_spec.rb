@@ -44,6 +44,24 @@ RSpec.describe "Categories", type: :request do
       expect(response.body).to match(/Page\s+1\s+of\s+2/)
     end
 
+    describe "translated category metadata" do
+      it "renders the JA name and description in the heading and breadcrumb" do
+        category = create(:category, name: "News", slug: "news", description: "Local news.")
+        category.translations.create!(locale: "ja", name: "ニュース", description: "地域のニュース")
+
+        get "/ja/news"
+        expect(response.body).to include("ニュース")
+        expect(response.body).to include("地域のニュース")
+      end
+
+      it "falls back to English when no translation exists for the active locale" do
+        create(:category, name: "News", slug: "news", description: "Local news.")
+        get "/ja/news"
+        expect(response.body).to include("News")
+        expect(response.body).to include("Local news.")
+      end
+    end
+
     describe "CollectionPage JSON-LD" do
       it "emits a CollectionPage schema with the category name" do
         create(:category, name: "News", slug: "news", description: "Local news.")
